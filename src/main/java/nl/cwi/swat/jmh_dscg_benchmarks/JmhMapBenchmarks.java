@@ -104,7 +104,7 @@ public class JmhMapBenchmarks {
 			writer2.put(current, current);
 
 			if (i == existingValueIndex) {
-				VALUE_EXISTING = current;
+				VALUE_EXISTING = valueFactory.integer(j);
 			}
 		}
 

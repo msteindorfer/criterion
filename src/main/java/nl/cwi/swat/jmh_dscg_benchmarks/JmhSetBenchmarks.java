@@ -104,7 +104,7 @@ public class JmhSetBenchmarks {
 			writer2.insert(current);
 
 			if (i == existingValueIndex) {
-				VALUE_EXISTING = current;
+				VALUE_EXISTING = valueFactory.integer(j);
 			}
 		}
 
