@@ -54,8 +54,11 @@ public class JmhMapBenchmarks {
 	@Param
 	public ValueFactoryFactory valueFactoryFactory;
 
-	@Param({ "10", "100", "1000", "10000", "100000", "1000000" })
-	// "10", "100", "1000",
+	/*
+	 * (for (i <- 0 to 23) yield s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
+	 */
+	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608" })
+//	@Param({ "10", "100", "1000", "10000", "100000", "1000000" })
 	protected int size;
 
 	public IMap testMap;
@@ -149,7 +152,7 @@ public class JmhMapBenchmarks {
 			bh.consume(iterator.next());
 		}
 	}
-
+	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeInsert(Blackhole bh) {
