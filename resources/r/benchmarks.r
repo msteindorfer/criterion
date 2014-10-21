@@ -201,7 +201,7 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   dss.tmp <- melt(sel.tmp, id.vars=c('elementCount', 'arch'), measure.vars = c('memorySavingComparedToTheOther'))
 
   res <- dcast(dss.tmp, elementCount ~ arch + variable)
-  print(res)
+  # print(res)
   res
 }
 
@@ -326,31 +326,35 @@ benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchma
 # benchmarksByNameOutput$Param_size <- latexMath(benchmarksByName$Param_size)
 # benchmarksByNameOutput$value <- latexMath(benchmarksByName$value)
 
-# TODO: ensure that Param_dataType is always the same for each invocation
-benchmarksCast_Map <- dcast(benchmarksByNameOutput[benchmarksByNameOutput$Param_dataType == "MAP",], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
-benchmarksCast_Set <- dcast(benchmarksByNameOutput[benchmarksByNameOutput$Param_dataType == "SET",], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
-
-benchmarksCast_Map$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast_Map$Param_size), "}", sep = ""))
-benchmarksCast_Map$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast_Map$VF_CLOJURE_Score, "\\pm", benchmarksCast_Map$VF_CLOJURE_ScoreError))
-benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Interval <- latexMath(paste(benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score, "\\pm", benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_ScoreError))
-benchmarksCast_Map$VF_SCALA_Interval <- latexMath(paste(benchmarksCast_Map$VF_SCALA_Score, "\\pm", benchmarksCast_Map$VF_SCALA_ScoreError))
 ###
-benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score)
-benchmarksCast_Map$VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Map$VF_SCALA_Score / benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score)
-benchmarksCast_Map$VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Map$VF_CLOJURE_Score / benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score)
-benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score <- (benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Map$VF_SCALA_Score)
-benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score <- (benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Map$VF_CLOJURE_Score)
+# OLD CODE
+##
 
-benchmarksCast_Set$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast_Set$Param_size), "}", sep = ""))
-benchmarksCast_Set$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast_Set$VF_CLOJURE_Score, "\\pm", benchmarksCast_Set$VF_CLOJURE_ScoreError))
-benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Interval <- latexMath(paste(benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score, "\\pm", benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_ScoreError))
-benchmarksCast_Set$VF_SCALA_Interval <- latexMath(paste(benchmarksCast_Set$VF_SCALA_Score, "\\pm", benchmarksCast_Set$VF_SCALA_ScoreError))
-###
-benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score)
-benchmarksCast_Set$VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Set$VF_SCALA_Score / benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score)
-benchmarksCast_Set$VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Set$VF_CLOJURE_Score / benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score)
-benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score <- (benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Set$VF_SCALA_Score)
-benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score <- (benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Set$VF_CLOJURE_Score)
+# # TODO: ensure that Param_dataType is always the same for each invocation
+# benchmarksCast_Map <- dcast(benchmarksByNameOutput[benchmarksByNameOutput$Param_dataType == "MAP",], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
+# benchmarksCast_Set <- dcast(benchmarksByNameOutput[benchmarksByNameOutput$Param_dataType == "SET",], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
+# 
+# benchmarksCast_Map$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast_Map$Param_size), "}", sep = ""))
+# benchmarksCast_Map$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast_Map$VF_CLOJURE_Score, "\\pm", benchmarksCast_Map$VF_CLOJURE_ScoreError))
+# benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Interval <- latexMath(paste(benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score, "\\pm", benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_ScoreError))
+# benchmarksCast_Map$VF_SCALA_Interval <- latexMath(paste(benchmarksCast_Map$VF_SCALA_Score, "\\pm", benchmarksCast_Map$VF_SCALA_ScoreError))
+# ###
+# benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score)
+# benchmarksCast_Map$VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Map$VF_SCALA_Score / benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score)
+# benchmarksCast_Map$VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Map$VF_CLOJURE_Score / benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score)
+# benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score <- (benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Map$VF_SCALA_Score)
+# benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score <- (benchmarksCast_Map$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Map$VF_CLOJURE_Score)
+# 
+# benchmarksCast_Set$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast_Set$Param_size), "}", sep = ""))
+# benchmarksCast_Set$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast_Set$VF_CLOJURE_Score, "\\pm", benchmarksCast_Set$VF_CLOJURE_ScoreError))
+# benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Interval <- latexMath(paste(benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score, "\\pm", benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_ScoreError))
+# benchmarksCast_Set$VF_SCALA_Interval <- latexMath(paste(benchmarksCast_Set$VF_SCALA_Score, "\\pm", benchmarksCast_Set$VF_SCALA_ScoreError))
+# ###
+# benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score)
+# benchmarksCast_Set$VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Set$VF_SCALA_Score / benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score)
+# benchmarksCast_Set$VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast_Set$VF_CLOJURE_Score / benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score)
+# benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score <- (benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Set$VF_SCALA_Score)
+# benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score <- (benchmarksCast_Set$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast_Set$VF_CLOJURE_Score)
 
 #benchmarksCast <- data.frame(benchmarksCast_Map, benchmarksCast_Set)
 
@@ -416,41 +420,46 @@ calculateMemoryFootprintSummary <- function(inputData) {
 #   res
 # }
 
-tableMapAll_summary <- selectComparisionColumnsSummary(benchmarksCast_Map, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
-tableSetAll_summary <- selectComparisionColumnsSummary(benchmarksCast_Set, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
 
-tableMapAll <- selectComparisionColumns(benchmarksCast_Map, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
-tableSetAll <- selectComparisionColumns(benchmarksCast_Set, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
+###
+# OLD CODE
+##
 
-memFootprintMap <- calculateMemoryFootprintOverhead("MAP") 
-memFootprintMap_fmt <- data.frame(sapply(1:NCOL(memFootprintMap), function(col_idx) { memFootprintMap[,c(col_idx)] <- latexMathFactor(formatNsmall2(memFootprintMap[,c(col_idx)], rounding=T))}))
-colnames(memFootprintMap_fmt) <- colnames(memFootprintMap)
-#
-memFootprintSet <- calculateMemoryFootprintOverhead("SET") 
-memFootprintSet_fmt <- data.frame(sapply(1:NCOL(memFootprintSet), function(col_idx) { memFootprintSet[,c(col_idx)] <- latexMathFactor(formatNsmall2(memFootprintSet[,c(col_idx)], rounding=T))}))
-colnames(memFootprintSet_fmt) <- colnames(memFootprintSet)
-
-tableMapAll <- data.frame(tableMapAll, memFootprintMap_fmt[,c(2,3,4,5)])
-tableSetAll <- data.frame(tableSetAll, memFootprintSet_fmt[,c(2,3,4,5)])
-
-
-
-tableMapAll_summary <- data.frame(tableMapAll_summary, calculateMemoryFootprintSummary(memFootprintMap))
-tableSetAll_summary <- data.frame(tableSetAll_summary, calculateMemoryFootprintSummary(memFootprintSet))
-
-tableMapAll_summary_fmt <- data.frame(sapply(1:NCOL(tableMapAll_summary), function(col_idx) { tableMapAll_summary[,c(col_idx)] <- latexMathFactor(tableMapAll_summary[,c(col_idx)]) }))
-rownames(tableMapAll_summary_fmt) <- rownames(tableMapAll_summary)
-tableSetAll_summary_fmt <- data.frame(sapply(1:NCOL(tableSetAll_summary), function(col_idx) { tableSetAll_summary[,c(col_idx)] <- latexMathFactor(tableSetAll_summary[,c(col_idx)]) }))
-rownames(tableSetAll_summary_fmt) <- rownames(tableSetAll_summary)
-
-write.table(tableMapAll_summary_fmt, file = "all-benchmarks-map-summary.tex", sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
-write.table(tableSetAll_summary_fmt, file = "all-benchmarks-set-summary.tex", sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
-
-# tableMapAll <- data.frame(sapply(1:NCOL(tableMapAll), function(col_idx) { tableMapAll[,c(col_idx)] <- paste("\\tableMapAll_c", col_idx, "{", tableMapAll[,c(col_idx)], "}", sep = "") })) # colnames(tableMapAll)[col_idx]
-# tableSetAll <- data.frame(sapply(1:NCOL(tableSetAll), function(col_idx) { tableSetAll[,c(col_idx)] <- paste("\\tableSetAll_c", col_idx, "{", tableSetAll[,c(col_idx)], "}", sep = "") })) # colnames(tableSetAll)[col_idx]
-
-write.table(tableMapAll, file = "all-benchmarks-map.tex", sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
-write.table(tableSetAll, file = "all-benchmarks-set.tex", sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+# tableMapAll_summary <- selectComparisionColumnsSummary(benchmarksCast_Map, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
+# tableSetAll_summary <- selectComparisionColumnsSummary(benchmarksCast_Set, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
+# 
+# tableMapAll <- selectComparisionColumns(benchmarksCast_Map, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
+# tableSetAll <- selectComparisionColumns(benchmarksCast_Set, c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score', 'VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score'))
+# 
+# memFootprintMap <- calculateMemoryFootprintOverhead("MAP") 
+# memFootprintMap_fmt <- data.frame(sapply(1:NCOL(memFootprintMap), function(col_idx) { memFootprintMap[,c(col_idx)] <- latexMathFactor(formatNsmall2(memFootprintMap[,c(col_idx)], rounding=T))}))
+# colnames(memFootprintMap_fmt) <- colnames(memFootprintMap)
+# #
+# memFootprintSet <- calculateMemoryFootprintOverhead("SET") 
+# memFootprintSet_fmt <- data.frame(sapply(1:NCOL(memFootprintSet), function(col_idx) { memFootprintSet[,c(col_idx)] <- latexMathFactor(formatNsmall2(memFootprintSet[,c(col_idx)], rounding=T))}))
+# colnames(memFootprintSet_fmt) <- colnames(memFootprintSet)
+# 
+# tableMapAll <- data.frame(tableMapAll, memFootprintMap_fmt[,c(2,3,4,5)])
+# tableSetAll <- data.frame(tableSetAll, memFootprintSet_fmt[,c(2,3,4,5)])
+# 
+# 
+# 
+# tableMapAll_summary <- data.frame(tableMapAll_summary, calculateMemoryFootprintSummary(memFootprintMap))
+# tableSetAll_summary <- data.frame(tableSetAll_summary, calculateMemoryFootprintSummary(memFootprintSet))
+# 
+# tableMapAll_summary_fmt <- data.frame(sapply(1:NCOL(tableMapAll_summary), function(col_idx) { tableMapAll_summary[,c(col_idx)] <- latexMathFactor(tableMapAll_summary[,c(col_idx)]) }))
+# rownames(tableMapAll_summary_fmt) <- rownames(tableMapAll_summary)
+# tableSetAll_summary_fmt <- data.frame(sapply(1:NCOL(tableSetAll_summary), function(col_idx) { tableSetAll_summary[,c(col_idx)] <- latexMathFactor(tableSetAll_summary[,c(col_idx)]) }))
+# rownames(tableSetAll_summary_fmt) <- rownames(tableSetAll_summary)
+# 
+# write.table(tableMapAll_summary_fmt, file = "all-benchmarks-map-summary.tex", sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+# write.table(tableSetAll_summary_fmt, file = "all-benchmarks-set-summary.tex", sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+# 
+# # tableMapAll <- data.frame(sapply(1:NCOL(tableMapAll), function(col_idx) { tableMapAll[,c(col_idx)] <- paste("\\tableMapAll_c", col_idx, "{", tableMapAll[,c(col_idx)], "}", sep = "") })) # colnames(tableMapAll)[col_idx]
+# # tableSetAll <- data.frame(sapply(1:NCOL(tableSetAll), function(col_idx) { tableSetAll[,c(col_idx)] <- paste("\\tableSetAll_c", col_idx, "{", tableSetAll[,c(col_idx)], "}", sep = "") })) # colnames(tableSetAll)[col_idx]
+# 
+# write.table(tableMapAll, file = "all-benchmarks-map.tex", sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+# write.table(tableSetAll, file = "all-benchmarks-set.tex", sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 
 
 createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
@@ -488,7 +497,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   colnames(memFootprint_fmt) <- colnames(memFootprint)
     
   tableAll <- selectComparisionColumns(benchmarksCast, measureVars)
-  tableAll <- data.frame(tableAll, memFootprint[,c(2,3)])    
+  tableAll <- data.frame(tableAll, memFootprint[,c(2,3)])      
   
   tableAll_fmt <- data.frame(
     latexMath(paste("2^{", log2(tableAll$Param_size), "}", sep = "")),
@@ -498,15 +507,11 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
   tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- latexMathPercent(formatNsmall2(tableAll_summary[,c(col_idx)]))}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
-  
+
   fileNameSummary <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "summary", sep="-"), "tex", sep=".")
-  fileNameSummary
-  
-  fileName <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), sep="-"), "tex", sep=".")
-  fileName
-  
   write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
+  fileName <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), sep="-"), "tex", sep=".")
   write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 }
 

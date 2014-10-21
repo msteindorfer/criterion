@@ -46,8 +46,16 @@ public class JmhSetBenchmarks {
 		SET
 	}
 
+	public static enum SampleDataSelection {
+		MATCH,
+		RANDOM
+	}	
+
 	@Param
 	public DataType dataType = DataType.SET;
+
+	@Param
+	public SampleDataSelection sampleDataSelection = SampleDataSelection.MATCH;
 
 	public IValueFactory valueFactory;
 
@@ -70,17 +78,71 @@ public class JmhSetBenchmarks {
 
 	public static final int CACHED_NUMBERS_SIZE = 8;
 	public IValue[] cachedNumbers = new IValue[CACHED_NUMBERS_SIZE];
+	public IValue[] cachedNumbersNotContained = new IValue[CACHED_NUMBERS_SIZE];
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
 		setUpTestSetWithRandomContent(size);
 
-		// random data generator with fixed seed
-		Random randForOperations = new Random(2147483647L); // seed == Mersenne
-															// Prime #8
+		switch (sampleDataSelection) {
 
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			cachedNumbers[i] = valueFactory.integer(randForOperations.nextInt());
+		/*
+		 * random integers might or might not be in the dataset
+		 */
+		case RANDOM: {
+			// random data generator with fixed seed
+			/* seed == Mersenne Prime #8 */
+			Random randForOperations = new Random(2147483647L);
+
+			for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+				cachedNumbers[i] = valueFactory.integer(randForOperations.nextInt());
+			}
+		}
+		
+		/*
+		 * random integers are in the dataset
+		 */
+		case MATCH: {
+			// random data generator with fixed seed
+			/* seed == Mersenne Prime #9 */
+			Random rand = new Random(2305843009213693951L);
+
+			if (CACHED_NUMBERS_SIZE < size) {
+				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+					if (i >= size) {
+						cachedNumbers[i] = cachedNumbers[i % size];
+					} else {
+						cachedNumbers[i] = valueFactory.integer(rand.nextInt());
+					}
+				}
+			} else {
+				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+					cachedNumbers[i] = valueFactory.integer(rand.nextInt());
+				}
+			}
+
+			// random data generator with fixed seed
+			/* seed == Mersenne Prime #8 */
+			Random anotherRand = new Random(2147483647L);
+
+			for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+				/*
+				 * generate random values until a value not part of the data
+				 * strucure is found
+				 */
+				boolean found = false;
+				while (!found) {
+					final IValue candidate = valueFactory.integer(anotherRand.nextInt());
+
+					if (testSet.contains(candidate)) {
+						continue;
+					} else {
+						cachedNumbersNotContained[i] = candidate;
+						found = true;
+					}
+				}
+			}
+		}
 		}
 	}
 
@@ -156,10 +218,18 @@ public class JmhSetBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeInsert(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testSet.insert(cachedNumbers[i % CACHED_NUMBERS_SIZE]));
+			bh.consume(testSet.insert(cachedNumbersNotContained[i % CACHED_NUMBERS_SIZE]));
 
 		}
 	}
+	
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeRemoveKey(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testSet.delete(cachedNumbers[i % CACHED_NUMBERS_SIZE]));
+		}
+	}	
 
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {	
