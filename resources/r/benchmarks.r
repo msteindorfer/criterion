@@ -32,11 +32,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
-  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-20141017_1137.csv"
+  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-20141022_1324.csv"
   dss32_stats <- read.csv(dss32_fileName, sep=",", header=TRUE)
   dss32_stats <- within(dss32_stats, arch <- factor(32))
   #
-  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-20141017_1137.csv"
+  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-20141022_1324.csv"
   dss64_stats <- read.csv(dss64_fileName, sep=",", header=TRUE)
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
@@ -223,8 +223,8 @@ formatPercent__ <- function(arg,rounding=T) {
     }      
   }
   
-  paste(x, "\\%", sep = "")
-  # x
+  # paste(x, "\\%", sep = "")
+  x
 }
 
 formatPercent <- Vectorize(formatPercent__)
@@ -273,10 +273,14 @@ latexMathFactor <- Vectorize(latexMathFactor__)
 latexMathPercent__ <- function(arg) {
   arg_fmt <- formatPercent(arg)
   
-  if (as.numeric(arg) < 0) {
-    paste("${\\color{red}", arg_fmt, "}$", sep = "")
+  if (is.na(arg) | is.nan(arg)) { #  | !is.numeric(arg)
+    paste("$", "--", "$", sep = "")
   } else {
-    paste("$", arg_fmt, "$", sep = "")
+    if (as.numeric(arg) < 0) {
+      paste("${\\color{red}", arg_fmt, "}$", sep = "")
+    } else {
+      paste("$", arg_fmt, "$", sep = "")
+    }
   }
 }
 
@@ -290,13 +294,13 @@ getBenchmarkMethodName__ <- function(arg) {
 getBenchmarkMethodName <- Vectorize(getBenchmarkMethodName__)
 
 
-benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141017_1137.log"
+benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141022_1324.log"
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
-colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_size", "Param_valueFactoryFactory")
+colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
-benchmarksCleaned <- benchmarks[,c(-2,-3,-4,-7)]
+benchmarksCleaned <- benchmarks[benchmarks$Param_sampleDataSelection == "MATCH",c(-2,-3,-4,-7,-9)]
 benchmarksCleaned[benchmarksCleaned$Param_valueFactoryFactory == "VF_PDB_PERSISTENT_BLEEDING_EDGE", ]$Param_valueFactoryFactory <- "VF_PDB_PERSISTENT_CURRENT"
 
 #benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory')) # 'Param_valueFactoryFactory'
@@ -366,7 +370,7 @@ benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchma
 # write.table(benchmarksCast_Map[,c(1,9,13,14,15)], file = "results_latex_map.tex", sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 # write.table(benchmarksCast_Set[,c(1,9,13,14,15)], file = "results_latex_set.tex", sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 
-orderedBenchmarkNames <- c("ContainsKey", "Insert", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
+orderedBenchmarkNames <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
 orderedBenchmarkIDs <- seq(1:length(orderedBenchmarkNames))
 
 orderingByName <- data.frame(orderedBenchmarkIDs, orderedBenchmarkNames)
@@ -379,7 +383,7 @@ colnames(orderingByName) <- c("BenchmarkSortingID", "Benchmark")
 selectComparisionColumns <- function(inputData, measureVars) {
   tmp.m <- melt(data=join(inputData, orderingByName), id.vars=c('BenchmarkSortingID', 'Benchmark', 'Param_size'), measure.vars=measureVars)
 
-  tmp.m$value <- formatNsmall2(tmp.m$value, rounding=T)
+  #tmp.m$value <- formatNsmall2(tmp.m$value, rounding=T)
 
   tmp.c <- dcast(tmp.m, Param_size ~ BenchmarkSortingID + Benchmark + variable)
   # tmp.c$Param_size <- latexMath(paste("2^{", log2(tmp.c$Param_size), "}", sep = ""))
@@ -391,9 +395,9 @@ selectComparisionColumnsSummary <- function(inputData, measureVars) {
   
   tmp.c <- dcast(tmp.m, Param_size ~ BenchmarkSortingID + Benchmark + variable)
   
-  mins.c <- as.numeric(formatNsmall2(apply(tmp.c, c(2), min), rounding=T))
-  maxs.c <- as.numeric(formatNsmall2(apply(tmp.c, c(2), max), rounding=T))
-  medians.c <- as.numeric(formatNsmall2(apply(tmp.c, c(2), median), rounding=T))
+  mins.c <- apply(tmp.c, c(2), min) # as.numeric(formatNsmall2(apply(tmp.c, c(2), min), rounding=T))
+  maxs.c <- apply(tmp.c, c(2), max) # as.numeric(formatNsmall2(apply(tmp.c, c(2), max), rounding=T))
+  medians.c <- apply(tmp.c, c(2), median) # as.numeric(formatNsmall2(apply(tmp.c, c(2), median), rounding=T))
 
   res <- data.frame(rbind(mins.c, maxs.c, medians.c))[-1]
   rownames(res) <- c('minimum', 'maximum', 'median')
@@ -401,9 +405,9 @@ selectComparisionColumnsSummary <- function(inputData, measureVars) {
 }
 
 calculateMemoryFootprintSummary <- function(inputData) {
-  mins.c <- as.numeric(formatNsmall2(apply(inputData, c(2), min), rounding=T))
-  maxs.c <- as.numeric(formatNsmall2(apply(inputData, c(2), max), rounding=T))
-  medians.c <- as.numeric(formatNsmall2(apply(inputData, c(2), median), rounding=T))
+  mins.c <- apply(inputData, c(2), min) # as.numeric(formatNsmall2(apply(inputData, c(2), min), rounding=T))
+  maxs.c <- apply(inputData, c(2), max) # as.numeric(formatNsmall2(apply(inputData, c(2), max), rounding=T))
+  medians.c <- apply(inputData, c(2), median) # as.numeric(formatNsmall2(apply(inputData, c(2), median), rounding=T))
   
   res <- data.frame(rbind(mins.c, maxs.c, medians.c))[-1]
   rownames(res) <- c('minimum', 'maximum', 'median')
@@ -493,7 +497,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, measureVars)
   
   memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureOrigin) 
-  memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- latexMathPercent(formatNsmall2(memFootprint[,c(col_idx)]))}))
+  memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- latexMathPercent(memFootprint[,c(col_idx)])}))
   colnames(memFootprint_fmt) <- colnames(memFootprint)
     
   tableAll <- selectComparisionColumns(benchmarksCast, measureVars)
@@ -501,18 +505,20 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   
   tableAll_fmt <- data.frame(
     latexMath(paste("2^{", log2(tableAll$Param_size), "}", sep = "")),
-    sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- latexMathPercent(formatNsmall2(tableAll[,c(col_idx)]))}))
+    sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- latexMathPercent(tableAll[,c(col_idx)])}))
   colnames(tableAll_fmt) <- colnames(tableAll)
   
   tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
-  tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- latexMathPercent(formatNsmall2(tableAll_summary[,c(col_idx)]))}))
+  tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- latexMathPercent(tableAll_summary[,c(col_idx)])}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
 
   fileNameSummary <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "summary", sep="-"), "tex", sep=".")
   write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  #write.table(t(tableAll_summary_fmt), file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
   fileName <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), sep="-"), "tex", sep=".")
   write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 }
 
 # measureVars_Scala <- c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score')

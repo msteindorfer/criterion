@@ -38,7 +38,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 @BenchmarkMode(Mode.SampleTime)
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class JmhMapBenchmarks {
 
@@ -196,7 +196,7 @@ public class JmhMapBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeContainsKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.containsKey(cachedNumbers[i % CACHED_NUMBERS_SIZE]));
+			bh.consume(testMap.containsKey(cachedNumbers[i]));
 		}
 	}
 
@@ -219,7 +219,7 @@ public class JmhMapBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeInsert(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.put(cachedNumbersNotContained[i % CACHED_NUMBERS_SIZE], VALUE_NOT_EXISTING));
+			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
 
 		}
 	}
@@ -228,7 +228,7 @@ public class JmhMapBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeRemoveKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.removeKey(cachedNumbers[i % CACHED_NUMBERS_SIZE]));
+			bh.consume(testMap.removeKey(cachedNumbers[i]));
 		}
 	}	
 

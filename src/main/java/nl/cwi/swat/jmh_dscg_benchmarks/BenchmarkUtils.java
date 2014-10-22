@@ -20,12 +20,12 @@ public class BenchmarkUtils {
 //				return org.eclipse.imp.pdb.facts.impl.reference.ValueFactory.getInstance();
 //			}
 //		},
-//		VF_PDB_FAST {
-//			@Override
-//			IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
-//			}
-//		},
+		VF_PDB_FAST {
+			@Override
+			IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
+			}
+		},
 //		VF_PDB_PERSISTENT {
 //			@Override
 //			IValueFactory getInstance() {
@@ -90,11 +90,11 @@ public class BenchmarkUtils {
 				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessValueFactory.getInstance();
 			}
 		},
-//		VF_CLJ_DS {
-//			@Override IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
-//			}
-//		},		
+		VF_CLJ_DS {
+			@Override IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
+			}
+		},		
 		VF_SCALA {
 			@Override IValueFactory getInstance() {
 				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.TypelessValueFactory();

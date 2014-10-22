@@ -38,7 +38,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 @BenchmarkMode(Mode.SampleTime)
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class JmhSetBenchmarks {
 
@@ -195,7 +195,7 @@ public class JmhSetBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeContainsKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testSet.contains(cachedNumbers[i % CACHED_NUMBERS_SIZE]));
+			bh.consume(testSet.contains(cachedNumbers[i]));
 		}
 	}
 
@@ -218,7 +218,7 @@ public class JmhSetBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeInsert(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testSet.insert(cachedNumbersNotContained[i % CACHED_NUMBERS_SIZE]));
+			bh.consume(testSet.insert(cachedNumbersNotContained[i]));
 
 		}
 	}
@@ -227,7 +227,7 @@ public class JmhSetBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeRemoveKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testSet.delete(cachedNumbers[i % CACHED_NUMBERS_SIZE]));
+			bh.consume(testSet.delete(cachedNumbers[i]));
 		}
 	}	
 
