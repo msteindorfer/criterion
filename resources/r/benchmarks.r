@@ -32,11 +32,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
-  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-20141022_1324.csv"
+  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-path-compression-without-mutator.csv"
   dss32_stats <- read.csv(dss32_fileName, sep=",", header=TRUE)
   dss32_stats <- within(dss32_stats, arch <- factor(32))
   #
-  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-20141022_1324.csv"
+  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-path-compression-without-mutator.csv"
   dss64_stats <- read.csv(dss64_fileName, sep=",", header=TRUE)
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
@@ -46,6 +46,8 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   classNameTheOther <- switch(dataStructureOrigin, 
                               Scala = paste("scala.collection.immutable.Hash", capwords(tolower(requestedDataType)), sep = ""),
                               Clojure = paste("clojure.lang.PersistentHash", capwords(tolower(requestedDataType)), sep = ""))  
+
+  classNameOurs <-  paste("org.eclipse.imp.pdb.facts.util.Trie", capwords(tolower(requestedDataType)), "_5Bits", sep = "")
   
   ###
   # If there are more measurements for one size, calculate the median.
@@ -54,11 +56,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   dss_stats_meltByElementCount <- melt(dss_stats, id.vars=c('elementCount', 'className', 'dataType', 'arch'), measure.vars=c('footprintInBytes')) # measure.vars=c('footprintInBytes')
   dss_stats_castByMedian <- dcast(dss_stats_meltByElementCount, elementCount + className + dataType + arch ~ "footprintInBytes_median", median, fill=0)
   
-#   mapClassName <- "org.eclipse.imp.pdb.facts.util.TrieMap_5Bits"
-#   setClassName <- "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits"
-   
-  mapClassName <- "org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge"
-  setClassName <- "org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge"
+  mapClassName <- "org.eclipse.imp.pdb.facts.util.TrieMap_5Bits"
+  setClassName <- "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits"
+
+#   mapClassName <- "org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge"
+#   setClassName <- "org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge"
   
   ###
   # Calculate different baselines for comparison.
@@ -192,7 +194,7 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
 #   res
 
   theOther <- dss_stats_castByMedian[dss_stats_castByMedian$className == classNameTheOther & dss_stats_castByMedian$dataType == requestedDataType,]
-  ours <- dss_stats_castByMedian[dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge" & dss_stats_castByMedian$dataType == "MAP",]
+  ours <- dss_stats_castByMedian[dss_stats_castByMedian$className == classNameOurs & dss_stats_castByMedian$dataType == requestedDataType,]
 
   memorySavingComparedToTheOther <- 1 - (ours$footprintInBytes_median / theOther$footprintInBytes_median)
 
@@ -209,7 +211,7 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
 
 
 
-formatPercent__ <- function(arg,rounding=T) {
+formatPercent__ <- function(arg,rounding=F) {
   if (is.nan(arg)) {
     x <- "0"
   } else {
@@ -273,13 +275,15 @@ latexMathFactor <- Vectorize(latexMathFactor__)
 latexMathPercent__ <- function(arg) {
   arg_fmt <- formatPercent(arg)
   
+  postfix <- "\\%"
+  
   if (is.na(arg) | is.nan(arg)) { #  | !is.numeric(arg)
     paste("$", "--", "$", sep = "")
   } else {
     if (as.numeric(arg) < 0) {
-      paste("${\\color{red}", arg_fmt, "}$", sep = "")
+      paste("${\\color{red}", arg_fmt, postfix, "}$", sep = "")
     } else {
-      paste("$", arg_fmt, "$", sep = "")
+      paste("$", arg_fmt, postfix, "$", sep = "")
     }
   }
 }
@@ -294,14 +298,14 @@ getBenchmarkMethodName__ <- function(arg) {
 getBenchmarkMethodName <- Vectorize(getBenchmarkMethodName__)
 
 
-benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141022_1324.log"
+benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141107_2248.log"
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
 benchmarksCleaned <- benchmarks[benchmarks$Param_sampleDataSelection == "MATCH",c(-2,-3,-4,-7,-9)]
-benchmarksCleaned[benchmarksCleaned$Param_valueFactoryFactory == "VF_PDB_PERSISTENT_BLEEDING_EDGE", ]$Param_valueFactoryFactory <- "VF_PDB_PERSISTENT_CURRENT"
+# benchmarksCleaned[benchmarksCleaned$Param_valueFactoryFactory == "VF_PDB_PERSISTENT_BLEEDING_EDGE", ]$Param_valueFactoryFactory <- "VF_PDB_PERSISTENT_CURRENT"
 
 #benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory')) # 'Param_valueFactoryFactory'
 
@@ -370,17 +374,17 @@ benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchma
 # write.table(benchmarksCast_Map[,c(1,9,13,14,15)], file = "results_latex_map.tex", sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 # write.table(benchmarksCast_Set[,c(1,9,13,14,15)], file = "results_latex_set.tex", sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 
-orderedBenchmarkNames <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
-orderedBenchmarkIDs <- seq(1:length(orderedBenchmarkNames))
-
-orderingByName <- data.frame(orderedBenchmarkIDs, orderedBenchmarkNames)
-colnames(orderingByName) <- c("BenchmarkSortingID", "Benchmark")
+# orderedBenchmarkNames <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
+# orderedBenchmarkIDs <- seq(1:length(orderedBenchmarkNames))
+# 
+# orderingByName <- data.frame(orderedBenchmarkIDs, orderedBenchmarkNames)
+# colnames(orderingByName) <- c("BenchmarkSortingID", "Benchmark")
 
 # selectComparisionColumns <- Vectorize(function(castedData, benchmarkName) {
 #   data.frame(castedData[castedData$Benchmark == benchmarkName,])[,c(13,14,15)]
 # })
 
-selectComparisionColumns <- function(inputData, measureVars) {
+selectComparisionColumns <- function(inputData, measureVars, orderingByName) {
   tmp.m <- melt(data=join(inputData, orderingByName), id.vars=c('BenchmarkSortingID', 'Benchmark', 'Param_size'), measure.vars=measureVars)
 
   #tmp.m$value <- formatNsmall2(tmp.m$value, rounding=T)
@@ -390,13 +394,14 @@ selectComparisionColumns <- function(inputData, measureVars) {
   tmp.c
 }
 
-selectComparisionColumnsSummary <- function(inputData, measureVars) {
+selectComparisionColumnsSummary <- function(inputData, measureVars, orderingByName) {
   tmp.m <- melt(data=join(inputData, orderingByName), id.vars=c('BenchmarkSortingID', 'Benchmark', 'Param_size'), measure.vars=measureVars)
   
   tmp.c <- dcast(tmp.m, Param_size ~ BenchmarkSortingID + Benchmark + variable)
   
   mins.c <- apply(tmp.c, c(2), min) # as.numeric(formatNsmall2(apply(tmp.c, c(2), min), rounding=T))
   maxs.c <- apply(tmp.c, c(2), max) # as.numeric(formatNsmall2(apply(tmp.c, c(2), max), rounding=T))
+  #mean.c <- apply(tmp.c, c(2), mean)
   medians.c <- apply(tmp.c, c(2), median) # as.numeric(formatNsmall2(apply(tmp.c, c(2), median), rounding=T))
 
   res <- data.frame(rbind(mins.c, maxs.c, medians.c))[-1]
@@ -407,6 +412,7 @@ selectComparisionColumnsSummary <- function(inputData, measureVars) {
 calculateMemoryFootprintSummary <- function(inputData) {
   mins.c <- apply(inputData, c(2), min) # as.numeric(formatNsmall2(apply(inputData, c(2), min), rounding=T))
   maxs.c <- apply(inputData, c(2), max) # as.numeric(formatNsmall2(apply(inputData, c(2), max), rounding=T))
+  #mean.c <- apply(inputData, c(2), mean)
   medians.c <- apply(inputData, c(2), median) # as.numeric(formatNsmall2(apply(inputData, c(2), median), rounding=T))
   
   res <- data.frame(rbind(mins.c, maxs.c, medians.c))[-1]
@@ -467,7 +473,9 @@ calculateMemoryFootprintSummary <- function(inputData) {
 
 
 createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
-  benchmarksCast <- dcast(input[input$Param_dataType == dataType,], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
+  lowerBoundExclusive <- 1
+  
+  benchmarksCast <- dcast(input[input$Param_dataType == dataType & input$Param_size > lowerBoundExclusive,], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
     
   benchmarksCast$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast$Param_size), "}", sep = ""))
   benchmarksCast$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast$VF_CLOJURE_Score, "\\pm", benchmarksCast$VF_CLOJURE_ScoreError))
@@ -484,7 +492,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score)
   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score)
   
-  orderedBenchmarkNames <- c("ContainsKey", "Insert", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
+  orderedBenchmarkNames <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
   orderedBenchmarkIDs <- seq(1:length(orderedBenchmarkNames))
   
   orderingByName <- data.frame(orderedBenchmarkIDs, orderedBenchmarkNames)
@@ -493,14 +501,16 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   # selectComparisionColumns <- Vectorize(function(castedData, benchmarkName) {
   #   data.frame(castedData[castedData$Benchmark == benchmarkName,])[,c(13,14,15)]
   # })
-  
-  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, measureVars)
+    
+  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, measureVars, orderingByName)
   
   memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureOrigin) 
+  memFootprint <- memFootprint[memFootprint$elementCount > lowerBoundExclusive,]
   memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- latexMathPercent(memFootprint[,c(col_idx)])}))
   colnames(memFootprint_fmt) <- colnames(memFootprint)
     
-  tableAll <- selectComparisionColumns(benchmarksCast, measureVars)
+  tableAll <- selectComparisionColumns(benchmarksCast, measureVars, orderingByName)
+  tableAll <- tableAll[tableAll$Param_size > lowerBoundExclusive,]
   tableAll <- data.frame(tableAll, memFootprint[,c(2,3)])      
   
   tableAll_fmt <- data.frame(

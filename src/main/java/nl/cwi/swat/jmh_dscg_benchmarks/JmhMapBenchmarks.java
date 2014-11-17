@@ -190,15 +190,21 @@ public class JmhMapBenchmarks {
 
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
 						VALUE_EXISTING);
+	}	
+	
+	@Benchmark
+	public void timeContainsKeySingle(Blackhole bh) {
+		bh.consume(testMap.containsKey(VALUE_EXISTING));
 	}
-
+	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeContainsKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.containsKey(cachedNumbers[i]));
 		}
-	}
+//		bh.consume(testMap.containsKey(VALUE_EXISTING));
+	}	
 
 	@Benchmark
 	public void timeIteration(Blackhole bh) {
@@ -244,8 +250,13 @@ public class JmhMapBenchmarks {
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
-						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".*").forks(1)
-						.warmupIterations(5).measurementIterations(5).build();
+						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeContainsKey|timeInsert|timeIteration)").forks(0)
+						.warmupIterations(5).measurementIterations(5)
+						.param("dataType", "MAP")
+						.param("sampleDataSelection", "MATCH")
+						.param("size", "24000")
+						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_UNTYPED")
+						.build();
 
 		new Runner(opt).run();
 	}

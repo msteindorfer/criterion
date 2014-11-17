@@ -73,6 +73,12 @@ public class BenchmarkUtils {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryBleedingEdge.getInstance();
 			}
 		},
+		VF_PDB_PERSISTENT_SPECIALIZED {
+			@Override
+			IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactorySpecialization.getInstance();
+			}
+		},		
 		VF_PDB_PERSISTENT_UNTYPED {
 			@Override
 			IValueFactory getInstance() {
