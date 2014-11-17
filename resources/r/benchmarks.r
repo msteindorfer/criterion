@@ -32,11 +32,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
-  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-path-compression-without-mutator.csv"
+  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-path-compression.csv"
   dss32_stats <- read.csv(dss32_fileName, sep=",", header=TRUE)
   dss32_stats <- within(dss32_stats, arch <- factor(32))
   #
-  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-path-compression-without-mutator.csv"
+  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-path-compression.csv"
   dss64_stats <- read.csv(dss64_fileName, sep=",", header=TRUE)
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
@@ -298,13 +298,13 @@ getBenchmarkMethodName__ <- function(arg) {
 getBenchmarkMethodName <- Vectorize(getBenchmarkMethodName__)
 
 
-benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141107_2248.log"
+benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141115_1826.log"
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
-benchmarksCleaned <- benchmarks[benchmarks$Param_sampleDataSelection == "MATCH",c(-2,-3,-4,-7,-9)]
+benchmarksCleaned <- benchmarks[benchmarks$Param_sampleDataSelection == "MATCH" & !grepl("@", benchmarks$Benchmark),c(-2,-3,-4,-7,-9)]
 # benchmarksCleaned[benchmarksCleaned$Param_valueFactoryFactory == "VF_PDB_PERSISTENT_BLEEDING_EDGE", ]$Param_valueFactoryFactory <- "VF_PDB_PERSISTENT_CURRENT"
 
 #benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory')) # 'Param_valueFactoryFactory'

@@ -220,6 +220,11 @@ public class JmhMapBenchmarks {
 			bh.consume(iterator.next());
 		}
 	}
+
+	@Benchmark
+	public void timeInsertSingle(Blackhole bh) {
+		bh.consume(testMap.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING));
+	}	
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
