@@ -16,7 +16,7 @@ mkdir -p target/result-logs
 export VALUE_FACTORY_FACTORY="VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE" # "VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE,VF_PDB_PERSISTENT_SPECIALIZED" # VF_PDB_PERSISTENT_CURRENT,VF_PDB_FAST,VF_PDB_PERSISTENT_BLEEDING_EDGE,VF_CLJ_DS,VF_PDB_PERSISTENT_SPECIALIZED
 
 export COMMON_JVM_SETTINGS="-Djmh.stack.period=1 -Djmh.perfasm.events=cycles,cache-misses"
-export COMMON_SETTINGS="-wi 10 -i 10 -f 1 -t 1 -r 1 -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -p sampleDataSelection=MATCH -gc false -rf csv -jvmArgs "-Xmx4g" -v EXTRA -foe true -bm avgt" # -prof perfasm
+export COMMON_SETTINGS="-wi 25 -i 25 -f 1 -t 1 -r 1 -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -p sampleDataSelection=MATCH -gc false -rf csv -jvmArgs "-Xmx4g" -v EXTRA -foe true -bm avgt" # -prof perfasm
 
 command java $COMMON_JVM_SETTINGS -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size8388608.log -p size=8388608 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 
 command java $COMMON_JVM_SETTINGS -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size4194304.log -p size=4194304 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size4194304.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size4194304.log 
@@ -371,8 +371,28 @@ do
 	tail -n +2 $f >> $RESULTS_FILE
 done
 
+STD_CONSOLE_LOG_FILES=target/result-logs/results.std-console.*.log
+RESULTS_FILE_CACHE_MISSES=target/results/results.all-$TIMESTAMP-cache-misses.log
+RESULTS_FILE_CYCLES=target/results/results.all-$TIMESTAMP-cycles.log
+
+echo "cache-misses" > $RESULTS_FILE_CACHE_MISSES
+for f in $STD_CONSOLE_LOG_FILES
+do
+	cat $f | grep "Column 2:" | awk -F'[() ]' '{ print $6 }' >  $f.cycles	
+	cat $f | grep "Column 2:" | awk -F'[() ]' '{ print $6 }' >> $RESULTS_FILE_CACHE_MISSES
+done
+
+echo "cycles" > $RESULTS_FILE_CYCLES
+for f in $STD_CONSOLE_LOG_FILES
+do
+	cat $f | grep "Column 1:" | awk -F'[() ]' '{ print $6 }' >  $f.cycles
+	cat $f | grep "Column 1:" | awk -F'[() ]' '{ print $6 }' >> $RESULTS_FILE_CYCLES
+done
+
 ARCHIVE_PATH=~/Dropbox/Research/hamt-improved-results
 ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-$TIMESTAMP.tgz
 
-cp $RESULTS_FILE $ARCHIVE_PATH
-cd target && tar -cvf $ARCHIVE_NAME results result-logs
+RESULTS_FILES=target/results/results.all-$TIMESTAMP*
+
+cp $RESULTS_FILES $ARCHIVE_PATH
+# cd target && tar -cvf $ARCHIVE_NAME results result-logs
