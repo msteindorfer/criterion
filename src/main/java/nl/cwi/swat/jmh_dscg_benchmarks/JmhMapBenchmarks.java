@@ -45,28 +45,30 @@ public class JmhMapBenchmarks {
 	public static enum DataType {
 		MAP
 	}
-	
+
 	public static enum SampleDataSelection {
-		MATCH,
-		RANDOM
-	}	
+		MATCH, RANDOM
+	}
 
 	@Param
 	public DataType dataType = DataType.MAP;
 
 	@Param
 	public SampleDataSelection sampleDataSelection = SampleDataSelection.MATCH;
-	
+
 	public IValueFactory valueFactory;
 
 	@Param
 	public ValueFactoryFactory valueFactoryFactory;
 
 	/*
-	 * (for (i <- 0 to 23) yield s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
+	 * (for (i <- 0 to 23) yield
+	 * s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
 	 */
-	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608" })
-//	@Param({ "10", "100", "1000", "10000", "100000", "1000000" })
+	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096",
+					"8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576",
+					"2097152", "4194304", "8388608" })
+	// @Param({ "10", "100", "1000", "10000", "100000", "1000000" })
 	protected int size;
 
 	public IMap testMap;
@@ -78,7 +80,7 @@ public class JmhMapBenchmarks {
 
 	public static final int CACHED_NUMBERS_SIZE = 8;
 	public IValue[] cachedNumbers = new IValue[CACHED_NUMBERS_SIZE];
-	public IValue[] cachedNumbersNotContained = new IValue[CACHED_NUMBERS_SIZE];	
+	public IValue[] cachedNumbersNotContained = new IValue[CACHED_NUMBERS_SIZE];
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
@@ -98,7 +100,7 @@ public class JmhMapBenchmarks {
 				cachedNumbers[i] = valueFactory.integer(randForOperations.nextInt());
 			}
 		}
-		
+
 		/*
 		 * random integers are in the dataset
 		 */
@@ -190,21 +192,21 @@ public class JmhMapBenchmarks {
 
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
 						VALUE_EXISTING);
-	}	
-	
+	}
+
 	@Benchmark
 	public void timeContainsKeySingle(Blackhole bh) {
 		bh.consume(testMap.containsKey(VALUE_EXISTING));
 	}
-	
+
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeContainsKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.containsKey(cachedNumbers[i]));
 		}
-//		bh.consume(testMap.containsKey(VALUE_EXISTING));
-	}	
+		// bh.consume(testMap.containsKey(VALUE_EXISTING));
+	}
 
 	@Benchmark
 	public void timeIteration(Blackhole bh) {
@@ -224,8 +226,8 @@ public class JmhMapBenchmarks {
 	@Benchmark
 	public void timeInsertSingle(Blackhole bh) {
 		bh.consume(testMap.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING));
-	}	
-	
+	}
+
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeInsert(Blackhole bh) {
@@ -234,14 +236,14 @@ public class JmhMapBenchmarks {
 
 		}
 	}
-	
+
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeRemoveKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.removeKey(cachedNumbers[i]));
 		}
-	}	
+	}
 
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {
@@ -254,14 +256,13 @@ public class JmhMapBenchmarks {
 	}
 
 	public static void main(String[] args) throws RunnerException {
+		System.out.println(JmhMapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeContainsKey|timeInsert|timeIteration)").forks(0)
-						.warmupIterations(5).measurementIterations(5)
-						.param("dataType", "MAP")
-						.param("sampleDataSelection", "MATCH")
-						.param("size", "24000")
-						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_UNTYPED")
-						.build();
+						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeIteration)")
+						.forks(1).warmupIterations(5).measurementIterations(5)
+						.mode(Mode.AverageTime).param("dataType", "MAP")
+						.param("sampleDataSelection", "MATCH").param("size", "8388608")
+						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT").build();
 
 		new Runner(opt).run();
 	}
