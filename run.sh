@@ -389,10 +389,10 @@ do
 	cat $f | grep "Column 1:" | awk -F'[() ]' '{ print $6 }' >> $RESULTS_FILE_CYCLES
 done
 
-ARCHIVE_PATH=~/Dropbox/Research/hamt-improved-results
+ARCHIVE_PATH=`pwd` # ~/Dropbox/Research/hamt-improved-results
 ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-$TIMESTAMP.tgz
 
 RESULTS_FILES=target/results/results.all-$TIMESTAMP*
 
 cp $RESULTS_FILES $ARCHIVE_PATH
-# cd target && tar -cvf $ARCHIVE_NAME results result-logs
+cd target && tar -cvf $ARCHIVE_NAME results result-logs
