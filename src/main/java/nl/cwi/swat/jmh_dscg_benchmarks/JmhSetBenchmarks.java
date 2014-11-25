@@ -152,9 +152,10 @@ public class JmhSetBenchmarks {
 		ISetWriter writer1 = valueFactory.setWriter();
 		ISetWriter writer2 = valueFactory.setWriter();
 
-		// random data generator with fixed seed
-		Random rand = new Random(2305843009213693951L); // seed == Mersenne
-														// Prime #9
+		Random rand = new Random();
+		// // random data generator with fixed seed
+		// Random rand = new Random(2305843009213693951L); // seed == Mersenne
+		//										// Prime #9
 
 		/*
 		 * randomly choose one element amongst the elements

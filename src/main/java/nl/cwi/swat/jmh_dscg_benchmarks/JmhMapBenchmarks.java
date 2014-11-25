@@ -154,9 +154,10 @@ public class JmhMapBenchmarks {
 		IMapWriter writer1 = valueFactory.mapWriter();
 		IMapWriter writer2 = valueFactory.mapWriter();
 
-		// random data generator with fixed seed
-		Random rand = new Random(2305843009213693951L); // seed == Mersenne
-														// Prime #9
+		Random rand = new Random();
+		// // random data generator with fixed seed
+		// Random rand = new Random(2305843009213693951L); // seed == Mersenne
+		// // Prime #9
 
 		/*
 		 * randomly choose one element amongst the elements
