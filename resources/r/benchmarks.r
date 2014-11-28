@@ -298,7 +298,7 @@ getBenchmarkMethodName__ <- function(arg) {
 getBenchmarkMethodName <- Vectorize(getBenchmarkMethodName__)
 
 
-benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141124_1632.log"
+benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141126_0957.log"
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
