@@ -1,6 +1,7 @@
 target/
 
 *.log
+*.tgz
 
 results.tmp.log
 results.tmp.txt
