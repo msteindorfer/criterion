@@ -11,10 +11,13 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
+import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory;
 
 import org.eclipse.imp.pdb.facts.ISet;
@@ -42,33 +45,29 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @State(Scope.Thread)
 public class JmhSetBenchmarks {
 
-	public static enum DataType {
-		SET
-	}
-
-	public static enum SampleDataSelection {
-		MATCH,
-		RANDOM
-	}	
-
 	@Param
 	public DataType dataType = DataType.SET;
 
 	@Param
 	public SampleDataSelection sampleDataSelection = SampleDataSelection.MATCH;
 
-	public IValueFactory valueFactory;
-
 	@Param
 	public ValueFactoryFactory valueFactoryFactory;
 
 	/*
-	 * (for (i <- 0 to 23) yield s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
+	 * (for (i <- 0 to 23) yield
+	 * s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
 	 */
-	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152", "4194304", "8388608" })
-//	@Param({ "10", "100", "1000", "10000", "100000", "1000000" })
+	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096",
+					"8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576",
+					"2097152", "4194304", "8388608" })
 	protected int size;
 
+	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+	protected int run;
+	
+	public IValueFactory valueFactory;
+	
 	public ISet testSet;
 	private ISet testSetRealDuplicate;
 	private ISet testSetDeltaDuplicate;

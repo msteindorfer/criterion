@@ -11,6 +11,11 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
+import java.util.Arrays;
+import java.util.Random;
+
+import org.eclipse.imp.pdb.facts.IMapWriter;
+import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 
 public class BenchmarkUtils {
@@ -109,4 +114,49 @@ public class BenchmarkUtils {
 
 		abstract IValueFactory getInstance();
 	}
+	
+	public static enum DataType {
+		MAP,
+		SET
+	}	
+	
+	public static enum SampleDataSelection {
+		MATCH,
+		RANDOM
+	}	
+	
+	public static int seedFromSizeAndRun(int size, int run) {
+		return mix(size) ^ mix(run);
+	}
+	
+	private static int mix(int n) {
+		int h = n;
+
+		h *= 0x5bd1e995;
+		h ^= h >>> 13;
+		h *= 0x5bd1e995;
+		h ^= h >>> 15;
+
+		return h;
+	}
+	
+	public static int[] generateSortedArrayWithRandomData(int size, int run) {
+
+		int[] randomNumbers = new int[size];
+
+		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		Random rand = new Random(seedForThisTrial);
+
+		// System.out.println(String.format("Seed for this trial: %d.",
+		// seedForThisTrial));
+
+		for (int i = size - 1; i >= 0; i--) {
+			randomNumbers[i] = rand.nextInt();
+		}
+
+		Arrays.sort(randomNumbers);
+
+		return randomNumbers;
+	}
+
 }

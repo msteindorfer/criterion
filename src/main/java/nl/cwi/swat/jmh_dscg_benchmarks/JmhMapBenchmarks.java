@@ -11,10 +11,13 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
+import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory;
 
 import org.eclipse.imp.pdb.facts.IMap;
@@ -42,21 +45,11 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @State(Scope.Thread)
 public class JmhMapBenchmarks {
 
-	public static enum DataType {
-		MAP
-	}
+	@Param({ "MAP" })
+	public DataType dataType;
 
-	public static enum SampleDataSelection {
-		MATCH, RANDOM
-	}
-
-	@Param
-	public DataType dataType = DataType.MAP;
-
-	@Param
-	public SampleDataSelection sampleDataSelection = SampleDataSelection.MATCH;
-
-	public IValueFactory valueFactory;
+	@Param({ "MATCH" })
+	public SampleDataSelection sampleDataSelection;
 
 	@Param
 	public ValueFactoryFactory valueFactoryFactory;
@@ -68,8 +61,12 @@ public class JmhMapBenchmarks {
 	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096",
 					"8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576",
 					"2097152", "4194304", "8388608" })
-	// @Param({ "10", "100", "1000", "10000", "100000", "1000000" })
 	protected int size;
+
+	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+	protected int run;
+
+	public IValueFactory valueFactory;
 
 	public IMap testMap;
 	private IMap testMapRealDuplicate;
@@ -84,7 +81,7 @@ public class JmhMapBenchmarks {
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
-		setUpTestSetWithRandomContent(size);
+		setUpTestMapWithRandomContent(size, run);
 
 		switch (sampleDataSelection) {
 
@@ -106,8 +103,8 @@ public class JmhMapBenchmarks {
 		 */
 		case MATCH: {
 			// random data generator with fixed seed
-			/* seed == Mersenne Prime #9 */
-			Random rand = new Random(2305843009213693951L);
+			int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+			Random rand = new Random(seedForThisTrial);
 
 			if (CACHED_NUMBERS_SIZE < size) {
 				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
@@ -144,25 +141,43 @@ public class JmhMapBenchmarks {
 					}
 				}
 			}
+
+			// assert (contained)
+			for (IValue sample : cachedNumbers) {
+				if (!testMap.containsKey(sample)) {
+					throw new IllegalStateException();
+				}
+			}
+
+			// assert (not contained)
+			for (IValue sample : cachedNumbersNotContained) {
+				if (testMap.containsKey(sample)) {
+					throw new IllegalStateException();
+				}
+			}
 		}
 		}
+
+		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
+		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
+						Arrays.toString(cachedNumbersNotContained)));
 	}
 
-	protected void setUpTestSetWithRandomContent(int size) throws Exception {
+	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
 		valueFactory = valueFactoryFactory.getInstance();
 
 		IMapWriter writer1 = valueFactory.mapWriter();
 		IMapWriter writer2 = valueFactory.mapWriter();
 
-		Random rand = new Random();
-		// // random data generator with fixed seed
-		// Random rand = new Random(2305843009213693951L); // seed == Mersenne
-		// // Prime #9
+		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		Random rand = new Random(seedForThisTrial);
+
+		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
 		/*
 		 * randomly choose one element amongst the elements
 		 */
-		int existingValueIndex = rand.nextInt(size);
+		int existingValueIndex = new Random(seedForThisTrial + 13).nextInt(size);
 
 		for (int i = size - 1; i >= 0; i--) {
 			final int j = rand.nextInt();
