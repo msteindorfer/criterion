@@ -79,6 +79,9 @@ public class JmhMapBenchmarks {
 	public IValue[] cachedNumbers = new IValue[CACHED_NUMBERS_SIZE];
 	public IValue[] cachedNumbersNotContained = new IValue[CACHED_NUMBERS_SIZE];
 
+	private IMap singletonMapWithExistingValue;
+	private IMap singletonMapWithNotExistingValue;
+	
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
 		setUpTestMapWithRandomContent(size, run);
@@ -158,6 +161,14 @@ public class JmhMapBenchmarks {
 		}
 		}
 
+		final IMapWriter mapWriter1 = valueFactory.mapWriter();
+		mapWriter1.put(VALUE_EXISTING, VALUE_EXISTING);
+		singletonMapWithExistingValue = mapWriter1.done();
+
+		final IMapWriter mapWriter2 = valueFactory.mapWriter();
+		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
+		singletonMapWithNotExistingValue = mapWriter2.done();	
+		
 		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
 		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 						Arrays.toString(cachedNumbersNotContained)));
@@ -270,6 +281,11 @@ public class JmhMapBenchmarks {
 	public void timeEqualsDeltaDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapDeltaDuplicate));
 	}
+	
+	@Benchmark
+	public void timeJoin(Blackhole bh) {
+		bh.consume(testMap.join(singletonMapWithNotExistingValue));
+	}	
 
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());

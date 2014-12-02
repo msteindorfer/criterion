@@ -14,8 +14,6 @@ package nl.cwi.swat.jmh_dscg_benchmarks;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.eclipse.imp.pdb.facts.IMapWriter;
-import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 
 public class BenchmarkUtils {
@@ -31,12 +29,12 @@ public class BenchmarkUtils {
 				return org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
 			}
 		},
-//		VF_PDB_PERSISTENT {
-//			@Override
-//			IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-//			}
-//		},
+		VF_PDB_PERSISTENT {
+			@Override
+			IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+			}
+		},
 //		VF_CLOJURE {
 //			@Override IValueFactory getInstance() {
 //				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.ValueFactory.getInstance();
