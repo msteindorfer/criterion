@@ -307,6 +307,12 @@ benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 benchmarksCleaned <- benchmarks[benchmarks$Param_sampleDataSelection == "MATCH" & !grepl("@", benchmarks$Benchmark),c(-2,-3,-4,-7,-10)]
 # benchmarksCleaned[benchmarksCleaned$Param_valueFactoryFactory == "VF_PDB_PERSISTENT_BLEEDING_EDGE", ]$Param_valueFactoryFactory <- "VF_PDB_PERSISTENT_CURRENT"
 
+###
+# If there are more measurements for one size, calculate the median.
+# Currently we only have one measurment.
+##
+benchmarksCleaned = ddply(benchmarksCleaned, c("Benchmark", "Param_dataType", "Param_size", "Param_valueFactoryFactory"), function(x) c(Score = median(x$Score), ScoreError = median(x$ScoreError)))
+
 #benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory')) # 'Param_valueFactoryFactory'
 
 #ggplot(data=benchmarksByName, aes(x=variable, y=value, fill=as.factor(Param_valueFactoryFactory))) + geom_histogram(position="dodge", stat="identity")  + xlab("node branching factor") + ylab("value") + scale_x_discrete(labels=as.character(seq(1, 64)))

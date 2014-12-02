@@ -109,16 +109,10 @@ public class JmhMapBenchmarks {
 			int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 			Random rand = new Random(seedForThisTrial);
 
-			if (CACHED_NUMBERS_SIZE < size) {
-				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-					if (i >= size) {
-						cachedNumbers[i] = cachedNumbers[i % size];
-					} else {
-						cachedNumbers[i] = valueFactory.integer(rand.nextInt());
-					}
-				}
-			} else {
-				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+				if (i >= size) {
+					cachedNumbers[i] = cachedNumbers[i % size];
+				} else {
 					cachedNumbers[i] = valueFactory.integer(rand.nextInt());
 				}
 			}
@@ -291,9 +285,9 @@ public class JmhMapBenchmarks {
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeIteration)")
-						.forks(1).warmupIterations(5).measurementIterations(5)
+						.forks(0).warmupIterations(5).measurementIterations(5)
 						.mode(Mode.AverageTime).param("dataType", "MAP")
-						.param("sampleDataSelection", "MATCH").param("size", "8388608")
+						.param("sampleDataSelection", "MATCH").param("size", "16")
 						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT").build();
 
 		new Runner(opt).run();
