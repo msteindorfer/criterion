@@ -45,12 +45,12 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @State(Scope.Thread)
 public class JmhSetBenchmarks {
 
-	@Param
-	public DataType dataType = DataType.SET;
+	@Param({ "SET" })
+	public DataType dataType;
 
-	@Param
-	public SampleDataSelection sampleDataSelection = SampleDataSelection.MATCH;
-
+	@Param({ "MATCH" })
+	public SampleDataSelection sampleDataSelection;
+	
 	@Param
 	public ValueFactoryFactory valueFactoryFactory;
 
@@ -81,7 +81,7 @@ public class JmhSetBenchmarks {
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
-		setUpTestSetWithRandomContent(size);
+		setUpTestSetWithRandomContent(size, run);
 
 		switch (sampleDataSelection) {
 
@@ -97,25 +97,19 @@ public class JmhSetBenchmarks {
 				cachedNumbers[i] = valueFactory.integer(randForOperations.nextInt());
 			}
 		}
-		
+
 		/*
 		 * random integers are in the dataset
 		 */
 		case MATCH: {
 			// random data generator with fixed seed
-			/* seed == Mersenne Prime #9 */
-			Random rand = new Random(2305843009213693951L);
+			int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+			Random rand = new Random(seedForThisTrial);
 
-			if (CACHED_NUMBERS_SIZE < size) {
-				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-					if (i >= size) {
-						cachedNumbers[i] = cachedNumbers[i % size];
-					} else {
-						cachedNumbers[i] = valueFactory.integer(rand.nextInt());
-					}
-				}
-			} else {
-				for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+				if (i >= size) {
+					cachedNumbers[i] = cachedNumbers[i % size];
+				} else {
 					cachedNumbers[i] = valueFactory.integer(rand.nextInt());
 				}
 			}
@@ -141,25 +135,43 @@ public class JmhSetBenchmarks {
 					}
 				}
 			}
+
+			// assert (contained)
+			for (IValue sample : cachedNumbers) {
+				if (!testSet.contains(sample)) {
+					throw new IllegalStateException();
+				}
+			}
+
+			// assert (not contained)
+			for (IValue sample : cachedNumbersNotContained) {
+				if (testSet.contains(sample)) {
+					throw new IllegalStateException();
+				}
+			}
 		}
 		}
+		
+		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
+		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
+						Arrays.toString(cachedNumbersNotContained)));
 	}
 
-	protected void setUpTestSetWithRandomContent(int size) throws Exception {
+	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
 		valueFactory = valueFactoryFactory.getInstance();
 
 		ISetWriter writer1 = valueFactory.setWriter();
 		ISetWriter writer2 = valueFactory.setWriter();
 
-		Random rand = new Random();
-		// // random data generator with fixed seed
-		// Random rand = new Random(2305843009213693951L); // seed == Mersenne
-		//										// Prime #9
+		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		Random rand = new Random(seedForThisTrial);
+
+		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
 		/*
 		 * randomly choose one element amongst the elements
 		 */
-		int existingValueIndex = rand.nextInt(size);
+		int existingValueIndex = new Random(seedForThisTrial + 13).nextInt(size);
 
 		for (int i = size - 1; i >= 0; i--) {
 			final int j = rand.nextInt();
@@ -242,9 +254,13 @@ public class JmhSetBenchmarks {
 	}
 
 	public static void main(String[] args) throws RunnerException {
+		System.out.println(JmhSetBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-						.include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".*").forks(1)
-						.warmupIterations(5).measurementIterations(5).build();
+						.include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".(timeIteration)")
+						.forks(0).warmupIterations(5).measurementIterations(5)
+						.mode(Mode.AverageTime).param("dataType", "SET")
+						.param("sampleDataSelection", "MATCH").param("size", "16")
+						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT").build();
 
 		new Runner(opt).run();
 	}

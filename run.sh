@@ -389,10 +389,13 @@ do
 	cat $f | grep "Column 1:" | awk -F'[() ]' '{ print $6 }' >> $RESULTS_FILE_CYCLES
 done
 
+java -Xmx12G -XX:+UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-32bit-$TIMESTAMP.csv
+java -Xmx12G -XX:-UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-64bit-$TIMESTAMP.csv
+
 ARCHIVE_PATH=`pwd` # ~/Dropbox/Research/hamt-improved-results
 ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-$TIMESTAMP.tgz
 
 RESULTS_FILES=target/results/results.all-$TIMESTAMP*
 
 cp $RESULTS_FILES $ARCHIVE_PATH
-cd target && tar -cvf $ARCHIVE_NAME results result-logs
+cd target && tar -cvf $ARCHIVE_NAME results result-logs *.csv
