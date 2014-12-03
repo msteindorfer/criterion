@@ -437,7 +437,7 @@ public final class CalculateFootprints {
 	
 	public static void footprintMap__Random_Persistent() {	
 		
-		for (int exp = 0; exp <= 3; exp += 1) {
+		for (int exp = 0; exp <= 23; exp += 1) {
 			final int count = (int) Math.pow(2, exp);
 			
 			for (int run = 0; run < 4; run++) {

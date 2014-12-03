@@ -1,6 +1,8 @@
 #!/usr/bin/env Rscript
 setwd("~/tmp/jmh-dscg-benchmarks-results")
 
+timestamp <- "20141203_0738"
+
 # install.packages("vioplot")
 # install.packages("beanplot")
 # install.packages("ggplot2")
@@ -32,11 +34,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
-  dss32_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-32bit-20141117_1824.csv"
+  dss32_fileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics", "32bit", timestamp, sep="-"), "csv", sep=".")
   dss32_stats <- read.csv(dss32_fileName, sep=",", header=TRUE)
   dss32_stats <- within(dss32_stats, arch <- factor(32))
   #
-  dss64_fileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics-64bit-20141117_1824.csv"
+  dss64_fileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/map-sizes-and-statistics", "64bit", timestamp, sep="-"), "csv", sep=".")
   dss64_stats <- read.csv(dss64_fileName, sep=",", header=TRUE)
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
@@ -298,7 +300,7 @@ getBenchmarkMethodName__ <- function(arg) {
 getBenchmarkMethodName <- Vectorize(getBenchmarkMethodName__)
 
 
-benchmarksFileName <- "/Users/Michael/Dropbox/Research/hamt-improved-results/results.all-20141202_1823.log"
+benchmarksFileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/results.all", timestamp, sep="-"), "log", sep=".")
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
