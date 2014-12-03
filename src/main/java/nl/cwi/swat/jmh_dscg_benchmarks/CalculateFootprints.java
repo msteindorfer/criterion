@@ -151,8 +151,8 @@ public final class CalculateFootprints {
 			if (reportMap) ys = ys.__put(v, v);
 		}
 		
+		// statistics should exactly match, thus only printing them once
 		((TrieSet_5Bits) xs).printStatistics();
-		((TrieMap_5Bits) ys).printStatistics();		
 		
 		if (reportSet) measureAndReport(xs, "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits", DataType.SET, Archetype.PERSISTENT, false, elementCount, run);
 		if (reportMap) measureAndReport(ys, "org.eclipse.imp.pdb.facts.util.TrieMap_5Bits", DataType.MAP, Archetype.PERSISTENT, false, elementCount, run);
