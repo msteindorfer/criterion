@@ -284,11 +284,11 @@ public class JmhMapBenchmarks {
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeIteration)")
+						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeEqualsRealDuplicate)")
 						.forks(0).warmupIterations(5).measurementIterations(5)
 						.mode(Mode.AverageTime).param("dataType", "MAP")
-						.param("sampleDataSelection", "MATCH").param("size", "16")
-						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT").build();
+						.param("sampleDataSelection", "MATCH").param("size", "512")
+						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE").build();
 
 		new Runner(opt).run();
 	}

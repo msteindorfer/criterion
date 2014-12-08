@@ -252,15 +252,15 @@ public class JmhSetBenchmarks {
 	public void timeEqualsDeltaDuplicate(Blackhole bh) {
 		bh.consume(testSet.equals(testSetDeltaDuplicate));
 	}
-
+	
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(JmhSetBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".(timeIteration)")
 						.forks(0).warmupIterations(5).measurementIterations(5)
 						.mode(Mode.AverageTime).param("dataType", "SET")
-						.param("sampleDataSelection", "MATCH").param("size", "16")
-						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT").build();
+						.param("sampleDataSelection", "MATCH").param("size", "1048576").param("run", "0")
+						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE").build();
 
 		new Runner(opt).run();
 	}
