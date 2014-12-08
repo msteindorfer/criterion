@@ -16,7 +16,7 @@ mkdir -p target/result-logs
 export VALUE_FACTORY_FACTORY="VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE" # "VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE,VF_PDB_PERSISTENT_SPECIALIZED" # VF_PDB_PERSISTENT_CURRENT,VF_PDB_FAST,VF_PDB_PERSISTENT_BLEEDING_EDGE,VF_CLJ_DS,VF_PDB_PERSISTENT_SPECIALIZED
 
 export COMMON_JVM_SETTINGS="-Djmh.stack.period=1 -Djmh.perfasm.events=cycles,cache-misses"
-export COMMON_SETTINGS="-wi 10 -i 10 -f 1 -t 1 -r 1 -p run=0,1,2,3 -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -p sampleDataSelection=MATCH -gc true -rf csv -jvmArgs "-Xms4g -Xmx4g" -v EXTRA -foe true -bm avgt" # -prof perfasm
+export COMMON_SETTINGS="-wi 10 -i 10 -f 1 -t 1 -r 1 -p run=0,1,2,3 -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -p sampleDataSelection=MATCH -gc true -rf csv -jvmArgs "-Xms4g" -jvmArgsAppend "-Xmx4g" -v EXTRA -foe true -bm avgt" # -prof perfasm
 
 command java $COMMON_JVM_SETTINGS -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size8388608.log -p size=8388608 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 
 command java $COMMON_JVM_SETTINGS -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size4194304.log -p size=4194304 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size4194304.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size4194304.log 
