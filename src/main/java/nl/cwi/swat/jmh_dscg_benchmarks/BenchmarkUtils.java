@@ -70,7 +70,7 @@ public class BenchmarkUtils {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryGPCEDynamic.getInstance();
 			}
 		},
-		VF_PDB_PERSISTENT_BLEEDING_EDGE {
+		VF_PDB_PERSISTENT_BLEEDING_EDGE_WITHOUT_LOW_LEVEL_ITERATOR_AND_STRUCTURAL_EQUALITY {
 			@Override
 			IValueFactory getInstance() {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryBleedingEdge.getInstance();
@@ -88,7 +88,7 @@ public class BenchmarkUtils {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactorySpecializationWithUntypedVariables.getInstance();
 			}
 		},		
-		VF_PDB_PERSISTENT_CURRENT {
+		VF_PDB_PERSISTENT_CURRENT_WITHOUT_LOW_LEVEL_ITERATOR_AND_STRUCTURAL_EQUALITY {
 			@Override
 			IValueFactory getInstance() {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryCurrent.getInstance();
