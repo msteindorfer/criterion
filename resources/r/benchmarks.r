@@ -479,6 +479,25 @@ calculateMemoryFootprintSummary <- function(inputData) {
 # write.table(tableMapAll, file = "all-benchmarks-map.tex", sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 # write.table(tableSetAll, file = "all-benchmarks-set.tex", sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
 
+orderedBenchmarkNames <- function(dataType) {
+  candidates <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
+  
+  if (dataType == "MAP") {
+    candidates
+  } else {
+    candidates[candidates != "EntryIteration"]
+  }
+}
+
+orderedBenchmarkNamesForBoxplot <- function(dataType) {
+  candidates <- c("Lookup", "Insert", "Delete", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
+  
+  if (dataType == "MAP") {
+    candidates
+  } else {
+    candidates[candidates != "Iteration\n(Entry)"]
+  }
+}
 
 createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   lowerBoundExclusive <- 1
@@ -500,7 +519,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score)
   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score)
   
-  orderedBenchmarkNames <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
+  orderedBenchmarkNames <- orderedBenchmarkNames(dataType)
   orderedBenchmarkIDs <- seq(1:length(orderedBenchmarkNames))
   
   orderingByName <- data.frame(orderedBenchmarkIDs, orderedBenchmarkNames)
@@ -537,6 +556,32 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   fileName <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), sep="-"), "tex", sep=".")
   write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
+
+
+  ###
+  # Create boxplots as well
+  ##
+  outFileName <-paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
+  fontScalingFactor <- 1.3
+  pdf(outFileName, family = "Times", width = 9, height = 3.5)
+  
+  selection <- tableAll[2:NCOL(tableAll)]
+  names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
+  
+  par(mar = c(6.5,3.5,0,0) + 0.1)
+  boxplot(selection, ylim=range(-0.1, 1.0), las=2,
+          cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  
+#   abline(v =  5.5)
+  
+  #abline(h =  0.75, lty=3)
+  #abline(h =  0.5, lty=3)
+  #abline(h =  0.25, lty=3)
+  abline(h =  0)
+  abline(h = -0.5, lty=3)
+  dev.off()
+  embed_fonts(outFileName)
+  
 }
 
 # measureVars_Scala <- c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score')
