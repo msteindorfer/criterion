@@ -490,7 +490,7 @@ orderedBenchmarkNames <- function(dataType) {
 }
 
 orderedBenchmarkNamesForBoxplot <- function(dataType) {
-  candidates <- c("Lookup", "Insert", "Delete", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
+  candidates <- c("Lookup\n", "Insert\n", "Delete\n", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
   
   if (dataType == "MAP") {
     candidates
@@ -562,15 +562,23 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   # Create boxplots as well
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
-  fontScalingFactor <- 1.3
-  pdf(outFileName, family = "Times", width = 9, height = 3.5)
+  fontScalingFactor <- 1.2
+  pdf(outFileName, family = "Times", width = 10, height = 3)
   
   selection <- tableAll[2:NCOL(tableAll)]
   names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
   
-  par(mar = c(6.5,3.5,0,0) + 0.1)
-  boxplot(selection, ylim=range(-0.1, 1.0), las=2,
+  par(mar = c(3.5,4.75,0,0) + 0.1)
+  par(mgp=c(3.5, 1.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  
+  boxplot(selection, ylim=range(-0.1, 1.0), yaxt="n", las=0, ylab="savings (in %)", 
           cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  
+  z  <- c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+  zz <- c("0%", "20%", "40%", "60%", "80%", "100%")
+  par(mgp=c(0, 0.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  axis(2, at=z, labels=zz, las=2,
+       cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
   
 #   abline(v =  5.5)
   
