@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 setwd("~/tmp/jmh-dscg-benchmarks-results")
 
-timestamp <- "20141215_0357"
+timestamp <- "20141218_0337"
 
 # install.packages("vioplot")
 # install.packages("beanplot")
