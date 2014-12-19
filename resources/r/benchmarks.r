@@ -198,7 +198,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   theOther <- dss_stats_castByMedian[dss_stats_castByMedian$className == classNameTheOther & dss_stats_castByMedian$dataType == requestedDataType,]
   ours <- dss_stats_castByMedian[dss_stats_castByMedian$className == classNameOurs & dss_stats_castByMedian$dataType == requestedDataType,]
 
-  memorySavingComparedToTheOther <- 1 - (ours$footprintInBytes_median / theOther$footprintInBytes_median)
+  ###
+  # BE AWARE: hard-coded switching from 'memory savings in %' to 'speedup factor'.
+  ##
+  # memorySavingComparedToTheOther <- 1 - (ours$footprintInBytes_median / theOther$footprintInBytes_median)
+  memorySavingComparedToTheOther <- (theOther$footprintInBytes_median / ours$footprintInBytes_median)
 
   sel.tmp = data.frame(ours$elementCount, ours$arch, memorySavingComparedToTheOther)
   colnames(sel.tmp) <- c('elementCount', 'arch', 'memorySavingComparedToTheOther')
@@ -209,9 +213,24 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   res
 }
 
+formatFactor__ <- function(arg,rounding=F) {
+  if (is.nan(arg)) {
+    x <- "0"
+  } else {
+    digits = 2
+    
+    if (rounding==T) {
+      x <- format(round(arg, digits), nsmall=digits, digits=digits, scientific=FALSE)            
+    } else {
+      x <- format(arg, nsmall=digits, digits=digits, scientific=FALSE)      
+    }      
+  }
+  
+  # paste(x, "\\%", sep = "")
+  x
+}
 
-
-
+formatFactor <- Vectorize(formatFactor__)
 
 formatPercent__ <- function(arg,rounding=F) {
   if (is.nan(arg)) {
@@ -264,10 +283,12 @@ latexMath <- Vectorize(latexMath__)
 # }
 
 latexMathFactor__ <- function(arg) {  
+  arg_fmt <- formatFactor(arg, rounding=T)
+  
   if (as.numeric(arg) < 1) {
-    paste("${\\color{red}", arg, "}$", sep = "")
+    paste("${\\color{red}", arg_fmt, "}$", sep = "")
   } else {
-    paste("$", arg, "$", sep = "")
+    paste("$", arg_fmt, "$", sep = "")
   }
 }
 
@@ -499,7 +520,7 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
   }
 }
 
-createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
+createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataFormatter) {
   lowerBoundExclusive <- 1
   
   benchmarksCast <- dcast(input[input$Param_dataType == dataType & input$Param_size > lowerBoundExclusive,], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
@@ -533,7 +554,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   
   memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureOrigin) 
   memFootprint <- memFootprint[memFootprint$elementCount > lowerBoundExclusive,]
-  memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- latexMathPercent(memFootprint[,c(col_idx)])}))
+  memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- dataFormatter(memFootprint[,c(col_idx)])}))
   colnames(memFootprint_fmt) <- colnames(memFootprint)
     
   tableAll <- selectComparisionColumns(benchmarksCast, measureVars, orderingByName)
@@ -542,11 +563,11 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   
   tableAll_fmt <- data.frame(
     latexMath(paste("2^{", log2(tableAll$Param_size), "}", sep = "")),
-    sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- latexMathPercent(tableAll[,c(col_idx)])}))
+    sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- dataFormatter(tableAll[,c(col_idx)])}))
   colnames(tableAll_fmt) <- colnames(tableAll)
   
   tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
-  tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- latexMathPercent(tableAll_summary[,c(col_idx)])}))
+  tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- dataFormatter(tableAll_summary[,c(col_idx)])}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
 
   fileNameSummary <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "summary", sep="-"), "tex", sep=".")
@@ -592,13 +613,26 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars) {
   
 }
 
-# measureVars_Scala <- c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score')
-# measureVars_Clojure <- c('VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score')
+# ###
+# # Results as saving percentags
+# ##
+# measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
+# measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
+# dataFormatter <- latexMathPercent
+# 
+# createTable(benchmarksByNameOutput, "SET", "Scala", measureVars_Scala, dataFormatter)
+# createTable(benchmarksByNameOutput, "SET", "Clojure", measureVars_Clojure, dataFormatter)
+# createTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, dataFormatter)
+# createTable(benchmarksByNameOutput, "MAP", "Clojure", measureVars_Clojure, dataFormatter)
 
-measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
-measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
+###
+# Results as speedup factors
+##
+measureVars_Scala <- c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score')
+measureVars_Clojure <- c('VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score')
+dataFormatter <- latexMathFactor
 
-createTable(benchmarksByNameOutput, "SET", "Scala", measureVars_Scala)
-createTable(benchmarksByNameOutput, "SET", "Clojure", measureVars_Clojure)
-createTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala)
-createTable(benchmarksByNameOutput, "MAP", "Clojure", measureVars_Clojure)
+createTable(benchmarksByNameOutput, "SET", "Scala", measureVars_Scala, dataFormatter)
+createTable(benchmarksByNameOutput, "SET", "Clojure", measureVars_Clojure, dataFormatter)
+createTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, dataFormatter)
+createTable(benchmarksByNameOutput, "MAP", "Clojure", measureVars_Clojure, dataFormatter)
