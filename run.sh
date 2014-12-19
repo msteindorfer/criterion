@@ -15,7 +15,8 @@ mkdir -p target/result-logs
 
 export VALUE_FACTORY_FACTORY="VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE" # "VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE,VF_PDB_PERSISTENT_SPECIALIZED" # VF_PDB_PERSISTENT_CURRENT,VF_PDB_FAST,VF_PDB_PERSISTENT_BLEEDING_EDGE,VF_CLJ_DS,VF_PDB_PERSISTENT_SPECIALIZED
 
-export COMMON_JVM_SETTINGS="-Djmh.stack.period=1 -Djmh.perf.events=L1-dcache-loads,L1-dcache-load-misses,r530324,r530124,cache-references,cache-misses"
+export PERF_EVENTS="L1-dcache-loads,L1-dcache-load-misses,r530324,r530124,cache-references,cache-misses"
+export COMMON_JVM_SETTINGS="-Djmh.stack.period=1 -Djmh.perf.events=$PERF_EVENTS"
 export COMMON_SETTINGS="-wi 15 -i 15 -f 2 -t 1 -r 1 -p run=0,1,2,3,4 -p sampleDataSelection=MATCH -gc true -rf csv -jvmArgs "-Xms4g" -jvmArgsAppend "-Xmx4g" -v EXTRA -foe true -bm avgt"
 
 command java -Djmh.perf.output.file=./target/result-logs/results.perf-stat.JmhSetBenchmarks.timeContainsKey.size8388608.log $COMMON_JVM_SETTINGS -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" -p valueFactoryFactory=$VALUE_FACTORY_FACTORY $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size8388608.log -p size=8388608 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 
@@ -712,21 +713,16 @@ do
 done
 
 STD_CONSOLE_LOG_FILES=target/result-logs/results.std-console.*.log
-RESULTS_FILE_CACHE_MISSES=target/results/results.all-$TIMESTAMP-cache-misses.log
-RESULTS_FILE_CYCLES=target/results/results.all-$TIMESTAMP-cycles.result-logs
+PERF_STAT_LOG_FILES=target/result-logs/results.perf-stat.*.log
 
-echo "cache-misses" > $RESULTS_FILE_CACHE_MISSES
-for f in $STD_CONSOLE_LOG_FILES
-do
-	cat $f | grep "Column 2:" | awk -F'[() ]' '{ print $6 }' >  $f.cycles	
-	cat $f | grep "Column 2:" | awk -F'[() ]' '{ print $6 }' >> $RESULTS_FILE_CACHE_MISSES
-done
+RESULTS_FILE_PERF_STAT=target/results/results.all-$TIMESTAMP.perf-stat.log
 
-echo "cycles" > $RESULTS_FILE_CYCLES
-for f in $STD_CONSOLE_LOG_FILES
+echo $PERF_EVENTS > $RESULTS_FILE_PERF_STAT
+for f in $PERF_STAT_LOG_FILES
 do
-	cat $f | grep "Column 1:" | awk -F'[() ]' '{ print $6 }' >  $f.cycles
-	cat $f | grep "Column 1:" | awk -F'[() ]' '{ print $6 }' >> $RESULTS_FILE_CYCLES
+	head  -8 $f | tail -6 | awk -F'[,]' '{ print $1 }' | tr '\n' ',' | sed 's/,$/\n/' >> $RESULTS_FILE_PERF_STAT
+	head -16 $f | tail -6 | awk -F'[,]' '{ print $1 }' | tr '\n' ',' | sed 's/,$/\n/' >> $RESULTS_FILE_PERF_STAT
+	head -24 $f | tail -6 | awk -F'[,]' '{ print $1 }' | tr '\n' ',' | sed 's/,$/\n/' >> $RESULTS_FILE_PERF_STAT
 done
 
 java -Xmx12G -XX:+UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-32bit-$TIMESTAMP.csv
