@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 setwd("~/tmp/jmh-dscg-benchmarks-results")
 
-timestamp <- "20141220_1214"
+timestamp <- "20141221_0133"
 
 # install.packages("vioplot")
 # install.packages("beanplot")
@@ -374,19 +374,19 @@ ggplot(benchmarks[benchmarks$Param_size == 1000000,], aes(x=Param_valueFactoryFa
 ##
 benchmarksPerfStatFileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/results.all", timestamp, sep="-"), "perf-stat", "log", sep=".")
 benchmarksPerfStat <- read.csv(benchmarksPerfStatFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
-colnames(benchmarksPerfStat) <- c("L1_REF", "L1_MISSES", "L2_REF", "L2_HIT", "L3_REF", "L3_MISSES")
+colnames(benchmarksPerfStat) <- c("L1_REF", "L1_MISSES", "L3_REF", "L3_MISSES")
 
-benchmarksPerfStat$L2_MISSES <- benchmarksPerfStat$L2_REF - benchmarksPerfStat$L2_HIT
+# benchmarksPerfStat$L2_MISSES <- benchmarksPerfStat$L2_REF - benchmarksPerfStat$L2_HIT
 
 benchmarksPerfStat$L1_HIT <- benchmarksPerfStat$L1_REF - benchmarksPerfStat$L1_MISSES
 benchmarksPerfStat$L3_HIT <- benchmarksPerfStat$L3_REF - benchmarksPerfStat$L3_MISSES
 
 benchmarksPerfStat$L1_HIT_RATE <- benchmarksPerfStat$L1_HIT / benchmarksPerfStat$L1_REF
-benchmarksPerfStat$L2_HIT_RATE <- benchmarksPerfStat$L2_HIT / benchmarksPerfStat$L2_REF
+# benchmarksPerfStat$L2_HIT_RATE <- benchmarksPerfStat$L2_HIT / benchmarksPerfStat$L2_REF
 benchmarksPerfStat$L3_HIT_RATE <- benchmarksPerfStat$L3_HIT / benchmarksPerfStat$L3_REF
 
 benchmarksPerfStat$L1_MISS_RATE <- 1 - benchmarksPerfStat$L1_HIT_RATE
-benchmarksPerfStat$L2_MISS_RATE <- 1 - benchmarksPerfStat$L2_HIT_RATE
+# benchmarksPerfStat$L2_MISS_RATE <- 1 - benchmarksPerfStat$L2_HIT_RATE
 benchmarksPerfStat$L3_MISS_RATE <- 1 - benchmarksPerfStat$L3_HIT_RATE
 
 #data.frame(benchmarksCleaned, benchmarksPerfStat)
@@ -810,7 +810,7 @@ measureVars_Scala <- c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score')
 measureVars_Clojure <- c('VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score')
 dataFormatter <- latexMathFactor
 
-createCacheStatTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, "EntryIteration", dataFormatter)
+# createCacheStatTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, "EntryIteration", dataFormatter)
 createCacheStatTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, "Iteration", dataFormatter)
 createCacheStatTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, "EqualsRealDuplicate", dataFormatter)
 
