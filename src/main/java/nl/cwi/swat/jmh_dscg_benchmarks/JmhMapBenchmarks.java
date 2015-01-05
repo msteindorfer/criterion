@@ -34,6 +34,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -166,6 +167,8 @@ public class JmhMapBenchmarks {
 		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
 		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 						Arrays.toString(cachedNumbersNotContained)));
+		
+		OverseerUtils.setup();
 	}
 
 	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
@@ -214,6 +217,21 @@ public class JmhMapBenchmarks {
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
 						VALUE_EXISTING);
 	}
+	
+	@TearDown(Level.Trial)
+	public void tearDown() {
+		OverseerUtils.tearDown(); 
+	}	
+	
+	@Setup(Level.Iteration)
+	public void setupIteration() {
+		OverseerUtils.doRecord(true); 
+	}	
+	
+	@TearDown(Level.Iteration)
+	public void tearDownIteration() {
+		OverseerUtils.doRecord(false); 
+	}	
 
 	@Benchmark
 	public void timeContainsKeySingle(Blackhole bh) {
