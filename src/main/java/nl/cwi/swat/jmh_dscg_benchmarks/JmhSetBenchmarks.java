@@ -34,6 +34,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -155,6 +156,8 @@ public class JmhSetBenchmarks {
 		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
 		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 						Arrays.toString(cachedNumbersNotContained)));
+		
+		OverseerUtils.setup();
 	}
 
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
@@ -202,7 +205,33 @@ public class JmhSetBenchmarks {
 
 		testSetDeltaDuplicate = testSet.insert(VALUE_NOT_EXISTING).delete(VALUE_NOT_EXISTING);
 	}
-
+	
+	@TearDown(Level.Trial)
+	public void tearDown() {
+		OverseerUtils.tearDown(); 
+	}	
+	
+//	@Setup(Level.Iteration)
+//	public void setupIteration() {
+//		OverseerUtils.doRecord(true); 
+//	}	
+//	
+//	@TearDown(Level.Iteration)
+//	public void tearDownIteration() {
+//		OverseerUtils.doRecord(false); 
+//	}	
+	
+	@Setup(Level.Invocation)
+	public void setupInvocation() {
+		OverseerUtils.setup();
+		OverseerUtils.doRecord(true); 
+	}	
+	
+	@TearDown(Level.Invocation)
+	public void tearDownInvocation() {
+		OverseerUtils.doRecord(false); 
+	}
+	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeContainsKey(Blackhole bh) {

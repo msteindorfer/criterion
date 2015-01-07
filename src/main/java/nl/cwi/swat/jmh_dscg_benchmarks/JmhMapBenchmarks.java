@@ -223,13 +223,24 @@ public class JmhMapBenchmarks {
 		OverseerUtils.tearDown(); 
 	}	
 	
-	@Setup(Level.Iteration)
-	public void setupIteration() {
+//	@Setup(Level.Iteration)
+//	public void setupIteration() {
+//		OverseerUtils.doRecord(true); 
+//	}	
+//	
+//	@TearDown(Level.Iteration)
+//	public void tearDownIteration() {
+//		OverseerUtils.doRecord(false); 
+//	}	
+	
+	@Setup(Level.Invocation)
+	public void setupInvocation() {
+		OverseerUtils.setup();
 		OverseerUtils.doRecord(true); 
 	}	
 	
-	@TearDown(Level.Iteration)
-	public void tearDownIteration() {
+	@TearDown(Level.Invocation)
+	public void tearDownInvocation() {
 		OverseerUtils.doRecord(false); 
 	}	
 

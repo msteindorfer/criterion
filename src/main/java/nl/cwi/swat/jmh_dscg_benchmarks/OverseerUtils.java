@@ -15,35 +15,25 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import ch.usi.overseer.OverHpc;
 
 public class OverseerUtils {
 
-	private final static Map<String, String> EVENTS;
+	private static final boolean DO_START_STOP = true; // System.getProperties().containsKey("overseer.utils.doStartStop");
+	
+	private final static Set<String> EVENTS;
 
 	static {
-		Map<String, String> eventMap = new LinkedHashMap<>();
+		List<String> eventList = Arrays.asList(System.getProperty("overseer.utils.events",
+						"LLC_REFERENCES,LLC_MISSES").split(","));
 
-		eventMap.put("UNHALTED_CORE_CYCLES", "Cycles");
-		eventMap.put("INSTRUCTION_RETIRED", "Instructions");
+		Set<String> eventSet = new LinkedHashSet<>(eventList);
 
-		eventMap.put("L1-DCACHE-LOADS", "L1 hits");
-		eventMap.put("L1-DCACHE-LOAD-MISSES", "L1 misses");
-		
-//		eventMap.put("L2_RQSTS:LD_HIT", "L2 hits");
-//		eventMap.put("L2_RQSTS:LD_MISS", "L2 misses");
-
-		eventMap.put("LLC_REFERENCES", "LLC hits");
-		eventMap.put("LLC_MISSES", "LLC misses");
-
-//		eventMap.put("PERF_COUNT_SW_CPU_MIGRATIONS", "CPU migrations");
-//		eventMap.put("MEM_UNCORE_RETIRED:LOCAL_DRAM_AND_REMOTE_CACHE_HIT", "Local DRAM");
-//		eventMap.put("MEM_UNCORE_RETIRED:REMOTE_DRAM", "Remote DRAM");
-
-		EVENTS = Collections.unmodifiableMap(eventMap);
+		EVENTS = Collections.unmodifiableSet(eventSet);
 	}
 
 	private static long[] results = new long[EVENTS.size()];
@@ -55,44 +45,62 @@ public class OverseerUtils {
 		Collection<String> availableEvents = Collections.unmodifiableCollection(Arrays.asList(oHpc
 						.getAvailableEventsString().split("\n")));
 		
-		Collection<String> unavailableEvents = new HashSet<>(EVENTS.keySet());
+		Collection<String> unavailableEvents = new HashSet<>(EVENTS);
 		unavailableEvents.removeAll(availableEvents);
 
 		System.out.println("  AVAILABLE EVENTS: " + String.join(",", availableEvents));
 		System.out.println();
-		System.out.println("       USED EVENTS: " + String.join(",", EVENTS.keySet()));
+		System.out.println("       USED EVENTS: " + String.join(",", EVENTS));
 		System.out.println();
 		System.out.println("UNAVAILABLE EVENTS: " + String.join(",", unavailableEvents));
 		System.out.println();
 		
-		ASSERT_RESULT(availableEvents.containsAll(EVENTS.keySet()));
+		// msteindorfer: disabled, because it can only check events without options
+		// ASSERT_RESULT(availableEvents.containsAll(EVENTS));
 		
-		ASSERT_RESULT(oHpc.initEvents(String.join(",", EVENTS.keySet())));
+		ASSERT_RESULT(oHpc.initEvents(String.join(",", EVENTS)));
 		ASSERT_RESULT(oHpc.bindEventsToThread());
+		
+		if (!DO_START_STOP) {
+			System.out.println("OVERSEER [RECORD ON]");
+			ASSERT_RESULT(oHpc.start());
+		}
 	}
 
 	public static void doRecord(boolean doEnable) {
-		int tid = oHpc.getThreadId();
-
-		if (doEnable) {
-			System.out.println("OVERSEER [RECORD ON]");
-			ASSERT_RESULT(oHpc.start());
-		} else {
-			System.out.println("OVERSEER [RECORD OFF]");
-			ASSERT_RESULT(oHpc.stop());
-			for (int i = 0; i < EVENTS.size(); i++) {
-				results[i] = oHpc.getEventFromThread(tid, i);
+		if (DO_START_STOP) {	
+			int tid = oHpc.getThreadId();
+	
+			if (doEnable) {
+				System.out.println("OVERSEER [RECORD ON]");
+				ASSERT_RESULT(oHpc.start());
+			} else {
+				System.out.println("OVERSEER [RECORD OFF]");
+				ASSERT_RESULT(oHpc.stop());
+				for (int i = 0; i < EVENTS.size(); i++) {
+					results[i] = oHpc.getEventFromThread(tid, i);
+				}
+				
+				// intermediate results
+				// printResults();
 			}
-			
-			// intermediate results
-			// printResults();
 		}
 	}
 
 	public static void tearDown() {
 		System.out.println("OVERSEER [TEAR DOWN]");
 
-		ASSERT_RESULT(oHpc.logToFile("overseer.log"));
+		if (!DO_START_STOP) {
+			int tid = oHpc.getThreadId();
+			
+			System.out.println("OVERSEER [RECORD OFF]");
+			ASSERT_RESULT(oHpc.stop());
+			for (int i = 0; i < EVENTS.size(); i++) {
+				results[i] = oHpc.getEventFromThread(tid, i);
+			}			
+		}
+		
+		ASSERT_RESULT(oHpc.logToFile("overseer.log"));		
 		
 		OverHpc.shutdown();
 
@@ -100,11 +108,10 @@ public class OverseerUtils {
 		printResults();
 	}
 
-	private static void printResults() {		
+	private static void printResults() {
 		System.out.println();
 		for (int i = 0; i < EVENTS.size(); i++) {
-			System.out.println(EVENTS.values().toArray()[i] + ": "
-							+ String.format("%,d", results[i]));
+			System.out.println(EVENTS.toArray()[i] + ": " + String.format("%,d", results[i]));
 		}
 		System.out.println();
 	}
