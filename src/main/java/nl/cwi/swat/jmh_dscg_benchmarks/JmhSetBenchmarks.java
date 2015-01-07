@@ -157,7 +157,7 @@ public class JmhSetBenchmarks {
 		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 						Arrays.toString(cachedNumbersNotContained)));
 		
-		OverseerUtils.setup();
+		OverseerUtils.setup(JmhSetBenchmarks.class, this);
 	}
 
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
@@ -223,7 +223,7 @@ public class JmhSetBenchmarks {
 	
 	@Setup(Level.Invocation)
 	public void setupInvocation() {
-		OverseerUtils.setup();
+		OverseerUtils.setup(JmhSetBenchmarks.class, this);
 		OverseerUtils.doRecord(true); 
 	}	
 	

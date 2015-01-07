@@ -11,10 +11,21 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toMap;
+
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collector;
 
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
@@ -168,7 +179,7 @@ public class JmhMapBenchmarks {
 		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 						Arrays.toString(cachedNumbersNotContained)));
 		
-		OverseerUtils.setup();
+		OverseerUtils.setup(JmhMapBenchmarks.class, this);
 	}
 
 	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
@@ -235,7 +246,7 @@ public class JmhMapBenchmarks {
 	
 	@Setup(Level.Invocation)
 	public void setupInvocation() {
-		OverseerUtils.setup();
+		OverseerUtils.setup(JmhMapBenchmarks.class, this);
 		OverseerUtils.doRecord(true); 
 	}	
 	

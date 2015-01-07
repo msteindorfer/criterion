@@ -11,9 +11,13 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,9 +26,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
+
+import org.openjdk.jmh.annotations.Param;
 
 import ch.usi.overseer.OverHpc;
 
@@ -38,8 +48,8 @@ public class OverseerUtils {
 					"overseer.utils.output.separator", ",");
 
 	private static final String PERF_OUTPUT_FILE = System.getProperty("overseer.utils.output.file",
-					"perf_events.log");
-
+					"perf_events.log");	
+	
 	static {
 		List<String> eventList = Arrays.asList(System.getProperty("overseer.utils.events",
 						"LLC_REFERENCES,LLC_MISSES").split(","));
@@ -48,21 +58,25 @@ public class OverseerUtils {
 
 		PERF_EVENTS = Collections.unmodifiableSet(eventSet);
 		
-		try {
-			Path outputFilePath = Paths.get(PERF_OUTPUT_FILE);
-			Files.delete(outputFilePath);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			Path outputFilePath = Paths.get(PERF_OUTPUT_FILE);
+//			Files.delete(outputFilePath);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
-	private static Long[] results = new Long[PERF_EVENTS.size()];
+	private static long[] longResults = new long[PERF_EVENTS.size()];
 	private static OverHpc oHpc = OverHpc.getInstance();
 
-	public static void setup() {
+	private static Map<String, String> setupParamBindings = Collections.emptyMap();	
+	
+	public static void setup(final Class benchmarkClazz, final Object benchmarkInstance) {
 		System.out.println("OVERSEER [SETUP]");
 
+		setupParamBindings = caputureJmhBenchmarkParamsAndValues(benchmarkClazz, benchmarkInstance);
+		
 		Collection<String> availableEvents = Collections.unmodifiableCollection(Arrays.asList(oHpc
 						.getAvailableEventsString().split("\n")));
 
@@ -100,7 +114,7 @@ public class OverseerUtils {
 				System.out.println("OVERSEER [RECORD OFF]");
 				ASSERT_RESULT(oHpc.stop());
 				for (int i = 0; i < PERF_EVENTS.size(); i++) {
-					results[i] = oHpc.getEventFromThread(tid, i);
+					longResults[i] = oHpc.getEventFromThread(tid, i);
 				}
 
 				// intermediate results
@@ -118,7 +132,7 @@ public class OverseerUtils {
 			System.out.println("OVERSEER [RECORD OFF]");
 			ASSERT_RESULT(oHpc.stop());
 			for (int i = 0; i < PERF_EVENTS.size(); i++) {
-				results[i] = oHpc.getEventFromThread(tid, i);
+				longResults[i] = oHpc.getEventFromThread(tid, i);
 			}
 		}
 
@@ -131,32 +145,36 @@ public class OverseerUtils {
 	}
 
 	private static void printResults() {
-		System.out.println();
-		for (int i = 0; i < PERF_EVENTS.size(); i++) {
-			System.out.println(PERF_EVENTS.toArray()[i] + ": " + String.format("%,d", results[i]));
-		}
-		System.out.println();
+//		System.out.println();
+//		for (int i = 0; i < PERF_EVENTS.size(); i++) {
+//			System.out.println(PERF_EVENTS.toArray()[i] + ": " + String.format("%,d", longResults[i]));
+//		}
+//		System.out.println();
 
+		Map<String, Object> paramBindingPlusPerfEvents = new LinkedHashMap<>();
+		paramBindingPlusPerfEvents.putAll(setupParamBindings);
+
+		// TODO: replace longResults with a map from String -> Long
+		for (int i = 0; i < PERF_EVENTS.size(); i++) {
+			paramBindingPlusPerfEvents.put((String) PERF_EVENTS.toArray()[i], longResults[i]);
+		}
+		
+//		paramBindingPlusPerfEvents.forEach((key, value) -> System.out.println(key + " " + value));
+		
 		try {
 			Path outputFilePath = Paths.get(PERF_OUTPUT_FILE);
 
 			if (!Files.exists(outputFilePath)) {
 				Files.createFile(outputFilePath);
 
-				String outputFileHeader = String.join(PERF_OUTPUT_SEPARATOR, PERF_EVENTS);
+				String outputFileHeader = String.join(PERF_OUTPUT_SEPARATOR,
+								paramBindingPlusPerfEvents.keySet());
 
 				Files.write(outputFilePath, Collections.singleton(outputFileHeader),
 								StandardOpenOption.APPEND);
 			}
 
-			/*
-			 * TODO: doesn't work if results is long[] instead of Long[]
-			 * 
-			 * See:
-			 *   http://stackoverflow.com/questions/754294/convert-an-array-of-primitive-longs-into-a-list-of-longs/1974363#1974363
-			 *   http://stackoverflow.com/questions/1979767/converting-an-array-of-long-to-arraylistlong
-			 */
-			String measurements = Arrays.asList(results).stream().map(String::valueOf)
+			String measurements = paramBindingPlusPerfEvents.values().stream().map(String::valueOf)
 							.collect(joining(PERF_OUTPUT_SEPARATOR));
 
 			Files.write(outputFilePath, Collections.singleton(measurements),
@@ -172,5 +190,44 @@ public class OverseerUtils {
 			throw new RuntimeException("Problem with overseer library setup.");
 		}
 	}
+	
+	//
+	// Collecting pair of @Param field names and values.
+	//
+	
+	private static Map<String, String> caputureJmhBenchmarkParamsAndValues(final Class benchmarkClazz, final Object benchmarkInstance) {
+		Function<Field, String> getFieldValueAsString = (field) -> {		
+			try {
+				return field.get(benchmarkInstance).toString();
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				return "???";
+			}
+		};
+		
+		final Field[] declaredFields = benchmarkClazz.getDeclaredFields();
 
+		System.out.println(benchmarkClazz);
+		System.out.println(benchmarkInstance.getClass());
+		System.out.println("Declared fields:");
+		Arrays.asList(declaredFields).forEach(field -> System.out.println(field.getName()));
+		
+		final Map<String, String> paramBindings = stream(declaredFields)
+						.filter(field -> field.isAnnotationPresent(Param.class))
+						.collect(toUnmodifiableMap(Field::getName, getFieldValueAsString));
+		
+		System.out.println("Params with annotations:");
+		paramBindings.forEach((key, value) -> System.out.println(key + " " + value));
+		
+		return paramBindings;
+	}
+
+	/*
+	 * see http://stackoverflow.com/questions/22601660/java-8-lambda-specify-map-type-and-make-it-unmodifiable
+	 */
+	public static <T, K, U> Collector<T, ?, Map<K, U>> toUnmodifiableMap(
+					Function<? super T, ? extends K> keyMapper,
+					Function<? super T, ? extends U> valueMapper) {
+		return collectingAndThen(toMap(keyMapper, valueMapper), Collections::unmodifiableMap);
+	}
+	
 }
