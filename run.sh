@@ -11,7 +11,7 @@ export COMMON_JVM_SETTINGS="-Xms4g -Xmx4g -Doverseer.utils.events=$PERF_EVENTS"
 # export COMMON_SETTINGS="-wi 15 -i 15 -f 2 -t 1 -r 1 -p run=0,1,2,3,4 -p sampleDataSelection=MATCH -gc true -rf csv -v EXTRA -foe true -bm avgt"
 
 # Settings for cache measurements:
-export COMMON_SETTINGS="-wi 0 -i 1 -f 1 -t 1 -r 1 -p run=0,1,2,3,4 -p sampleDataSelection=MATCH -gc true -rf csv -v EXTRA -foe true -bm avgt"
+export COMMON_SETTINGS="-wi 5 -i 15 -f 1 -t 1 -r 1 -p run=0,1,2,3,4 -p sampleDataSelection=MATCH -gc true -rf csv -v EXTRA -foe true -bm sample"
 
 LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -jvmArgs "$COMMON_JVM_SETTINGS -Doverseer.utils.output.file=./target/result-logs/results.perf-stat.JmhSetBenchmarks.timeContainsKey.size8388608.log" $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size8388608.log -p size=8388608 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size8388608.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size8388608.log
 LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_benchmarks.JmhSetBenchmarks.timeContainsKey$" -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -jvmArgs "$COMMON_JVM_SETTINGS -Doverseer.utils.output.file=./target/result-logs/results.perf-stat.JmhSetBenchmarks.timeContainsKey.size4194304.log" $COMMON_SETTINGS -rff ./target/results/results.JmhSetBenchmarks.timeContainsKey.size4194304.log -p size=4194304 1>./target/result-logs/results.std-console.JmhSetBenchmarks.timeContainsKey.size4194304.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.timeContainsKey.size4194304.log
@@ -353,47 +353,35 @@ LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_ben
 
 TIMESTAMP=`date +"%Y%m%d_%H%M"`
 
-INPUT_FILES=target/results/results.jmh*.log
+INPUT_FILES=target/results/results.Jmh*.log
 RESULTS_FILE=target/results/results.all-$TIMESTAMP.log
 
-for f in $INPUT_FILES
-do
-	head -n 1 $f > $RESULTS_FILE
-done
-
-for f in $INPUT_FILES
-do
-	tail -n +2 $f >> $RESULTS_FILE
-done
+RESULT_HEADER=`echo $INPUT_FILES | xargs -n 1 head -n 1 | head -n 1`
+{
+	for f in $INPUT_FILES
+	do
+		tail -n +2 $f
+	done
+} | cat <(echo $RESULT_HEADER) - > $RESULTS_FILE
 
 STD_CONSOLE_LOG_FILES=target/result-logs/results.std-console.*.log
 PERF_STAT_LOG_FILES=target/result-logs/results.perf-stat.*.log
 
 RESULTS_FILE_PERF_STAT=target/results/results.all-$TIMESTAMP.perf-stat.log
 
-# echo $PERF_EVENTS > $RESULTS_FILE_PERF_STAT
-# for f in $PERF_STAT_LOG_FILES
-# do
-# 	head  -8 $f | tail -6 | awk -F'[,]' '{ print $1 }' | tr '\n' ',' | sed 's/,$/\n/' >> $RESULTS_FILE_PERF_STAT
-# 	head -16 $f | tail -6 | awk -F'[,]' '{ print $1 }' | tr '\n' ',' | sed 's/,$/\n/' >> $RESULTS_FILE_PERF_STAT
-# 	head -24 $f | tail -6 | awk -F'[,]' '{ print $1 }' | tr '\n' ',' | sed 's/,$/\n/' >> $RESULTS_FILE_PERF_STAT
-# done
+PERF_HEADER=`echo $PERF_STAT_LOG_FILES | xargs -n 1 head -n 1 | head -n 1 | sed -e 's/^/benchmark,/'`
+{
+	for f in $PERF_STAT_LOG_FILES
+	do
+		CURRENT_BENCHMARK=`echo "$f" | sed 's/.*\.time\([^.]*\)\(.*\)/\1/'`
+		tail -n +2 $f | sed -e "s/^/$CURRENT_BENCHMARK,/"
+	done
+} | pv -l -cN 'merging' | gsort | cat <(echo $PERF_HEADER) - | pv -s 60M -cN 'merged' | xz -9 | pv -cN 'compressing' > $RESULTS_FILE_PERF_STAT.xz
 
-for f in $PERF_STAT_LOG_FILES
-do
-	head -n 1 $f | sed -e 's/^/benchmark,/' > $RESULTS_FILE_PERF_STAT
-done
+# java -Xmx12G -XX:+UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-32bit-$TIMESTAMP.csv
+# java -Xmx12G -XX:-UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-64bit-$TIMESTAMP.csv
 
-for f in $PERF_STAT_LOG_FILES
-do
-	CURRENT_BENCHMARK=`echo "$f" | sed 's/.*\.time\([^.]*\)\(.*\)/\1/'`
-	tail -n +2 $f | sed -e "s/^/$CURRENT_BENCHMARK,/" >> $RESULTS_FILE_PERF_STAT
-done
-
-java -Xmx12G -XX:+UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-32bit-$TIMESTAMP.csv
-java -Xmx12G -XX:-UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-64bit-$TIMESTAMP.csv
-
-ARCHIVE_PATH=`pwd` # ~/Dropbox/Research/hamt-improved-results
+ARCHIVE_PATH=`pwd`
 ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-$TIMESTAMP.tar.xz
 
 RESULTS_FILES=target/results/results.all-$TIMESTAMP*
