@@ -175,9 +175,10 @@ public class JmhMapBenchmarks {
 		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 		singletonMapWithNotExistingValue = mapWriter2.done();	
 		
-		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
-		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
-						Arrays.toString(cachedNumbersNotContained)));
+		// System.out.println(String.format("\n\ncachedNumbers = %s",
+		// Arrays.toString(cachedNumbers)));
+		// System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
+		// Arrays.toString(cachedNumbersNotContained)));
 		
 		OverseerUtils.setup(JmhMapBenchmarks.class, this);
 	}

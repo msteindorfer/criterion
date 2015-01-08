@@ -153,9 +153,10 @@ public class JmhSetBenchmarks {
 		}
 		}
 		
-		System.out.println(String.format("\n\ncachedNumbers = %s", Arrays.toString(cachedNumbers)));
-		System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
-						Arrays.toString(cachedNumbersNotContained)));
+		// System.out.println(String.format("\n\ncachedNumbers = %s",
+		// Arrays.toString(cachedNumbers)));
+		// System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
+		// Arrays.toString(cachedNumbersNotContained)));
 		
 		OverseerUtils.setup(JmhSetBenchmarks.class, this);
 	}
