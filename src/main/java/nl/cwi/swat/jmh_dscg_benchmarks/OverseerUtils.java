@@ -73,7 +73,7 @@ public class OverseerUtils {
 	private static Map<String, String> setupParamBindings = Collections.emptyMap();	
 	
 	public static void setup(final Class benchmarkClazz, final Object benchmarkInstance) {
-		System.out.println("OVERSEER [SETUP]");
+//		System.out.println("OVERSEER [SETUP]");
 
 		setupParamBindings = caputureJmhBenchmarkParamsAndValues(benchmarkClazz, benchmarkInstance);
 		
@@ -83,12 +83,12 @@ public class OverseerUtils {
 		Collection<String> unavailableEvents = new HashSet<>(PERF_EVENTS);
 		unavailableEvents.removeAll(availableEvents);
 
-		System.out.println("  AVAILABLE EVENTS: " + String.join(",", availableEvents));
-		System.out.println();
-		System.out.println("       USED EVENTS: " + String.join(",", PERF_EVENTS));
-		System.out.println();
-		System.out.println("UNAVAILABLE EVENTS: " + String.join(",", unavailableEvents));
-		System.out.println();
+//		System.out.println("  AVAILABLE EVENTS: " + String.join(",", availableEvents));
+//		System.out.println();
+//		System.out.println("       USED EVENTS: " + String.join(",", PERF_EVENTS));
+//		System.out.println();
+//		System.out.println("UNAVAILABLE EVENTS: " + String.join(",", unavailableEvents));
+//		System.out.println();
 
 		// msteindorfer: disabled, because it can only check events without
 		// options
@@ -98,7 +98,7 @@ public class OverseerUtils {
 		ASSERT_RESULT(oHpc.bindEventsToThread());
 
 		if (!DO_START_STOP) {
-			System.out.println("OVERSEER [RECORD ON]");
+//			System.out.println("OVERSEER [RECORD ON]");
 			ASSERT_RESULT(oHpc.start());
 		}
 	}
@@ -108,10 +108,10 @@ public class OverseerUtils {
 			int tid = oHpc.getThreadId();
 
 			if (doEnable) {
-				System.out.println("OVERSEER [RECORD ON]");
+//				System.out.println("OVERSEER [RECORD ON]");
 				ASSERT_RESULT(oHpc.start());
 			} else {
-				System.out.println("OVERSEER [RECORD OFF]");
+//				System.out.println("OVERSEER [RECORD OFF]");
 				ASSERT_RESULT(oHpc.stop());
 				for (int i = 0; i < PERF_EVENTS.size(); i++) {
 					longResults[i] = oHpc.getEventFromThread(tid, i);
@@ -124,12 +124,12 @@ public class OverseerUtils {
 	}
 
 	public static void tearDown() {
-		System.out.println("OVERSEER [TEAR DOWN]");
+//		System.out.println("OVERSEER [TEAR DOWN]");
 
 		if (!DO_START_STOP) {
 			int tid = oHpc.getThreadId();
 
-			System.out.println("OVERSEER [RECORD OFF]");
+//			System.out.println("OVERSEER [RECORD OFF]");
 			ASSERT_RESULT(oHpc.stop());
 			for (int i = 0; i < PERF_EVENTS.size(); i++) {
 				longResults[i] = oHpc.getEventFromThread(tid, i);
@@ -206,17 +206,17 @@ public class OverseerUtils {
 		
 		final Field[] declaredFields = benchmarkClazz.getDeclaredFields();
 
-		System.out.println(benchmarkClazz);
-		System.out.println(benchmarkInstance.getClass());
-		System.out.println("Declared fields:");
-		Arrays.asList(declaredFields).forEach(field -> System.out.println(field.getName()));
+//		System.out.println(benchmarkClazz);
+//		System.out.println(benchmarkInstance.getClass());
+//		System.out.println("Declared fields:");
+//		Arrays.asList(declaredFields).forEach(field -> System.out.println(field.getName()));
 		
 		final Map<String, String> paramBindings = stream(declaredFields)
 						.filter(field -> field.isAnnotationPresent(Param.class))
 						.collect(toUnmodifiableMap(Field::getName, getFieldValueAsString));
 		
-		System.out.println("Params with annotations:");
-		paramBindings.forEach((key, value) -> System.out.println(key + " " + value));
+//		System.out.println("Params with annotations:");
+//		paramBindings.forEach((key, value) -> System.out.println(key + " " + value));
 		
 		return paramBindings;
 	}
