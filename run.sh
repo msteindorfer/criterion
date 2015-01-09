@@ -376,7 +376,7 @@ PERF_HEADER=`echo $PERF_STAT_LOG_FILES | xargs -n 1 head -n 1 | head -n 1 | sed 
 		CURRENT_BENCHMARK=`echo "$f" | sed 's/.*\.time\([^.]*\)\(.*\)/\1/'`
 		tail -n +2 $f | sed -e "s/^/$CURRENT_BENCHMARK,/"
 	done
-} | pv -l -cN 'merging' | gsort | cat <(echo $PERF_HEADER) - | pv -s 60M -cN 'merged' | xz -9 | pv -cN 'compressing' > $RESULTS_FILE_PERF_STAT.xz
+} | cat <(echo $PERF_HEADER) - | xz -9 > $RESULTS_FILE_PERF_STAT.xz
 
 # java -Xmx12G -XX:+UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-32bit-$TIMESTAMP.csv
 # java -Xmx12G -XX:-UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-64bit-$TIMESTAMP.csv
