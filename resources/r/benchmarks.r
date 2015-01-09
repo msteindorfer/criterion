@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 setwd("~/tmp/jmh-dscg-benchmarks-results")
 
-timestamp <- "20141221_0133"
+timestamp <- "20150109_1718"
 
 # install.packages("vioplot")
 # install.packages("beanplot")
@@ -372,7 +372,7 @@ ggplot(benchmarks[benchmarks$Param_size == 1000000,], aes(x=Param_valueFactoryFa
 ### 
 # Cache Statistics
 ##
-benchmarksPerfStatFileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/results.all", timestamp, sep="-"), "perf-stat", "log", sep=".")
+benchmarksPerfStatFileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/results.all", timestamp, sep="-"), "perf-stat", "log.xz", sep=".")
 benchmarksPerfStat <- read.csv(benchmarksPerfStatFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 colnames(benchmarksPerfStat) <- c("L1_REF", "L1_MISSES", "L3_REF", "L3_MISSES")
 
