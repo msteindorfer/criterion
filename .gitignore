@@ -2,6 +2,7 @@ target/
 
 *.log
 *.tgz
+*.xz
 
 results.tmp.log
 results.tmp.txt
