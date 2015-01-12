@@ -373,21 +373,40 @@ ggplot(benchmarks[benchmarks$Param_size == 1000000,], aes(x=Param_valueFactoryFa
 # Cache Statistics
 ##
 benchmarksPerfStatFileName <- paste(paste("/Users/Michael/Dropbox/Research/hamt-improved-results/results.all", timestamp, sep="-"), "perf-stat", "log.xz", sep=".")
-benchmarksPerfStat <- read.csv(benchmarksPerfStatFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
-colnames(benchmarksPerfStat) <- c("L1_REF", "L1_MISSES", "L3_REF", "L3_MISSES")
+benchmarksPerfStat.all <- read.csv(benchmarksPerfStatFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
+colnames(benchmarksPerfStat.all) <- c("Benchmark", "Param_size", "Param_valueFactoryFactory", "Param_dataType", "Param_run", "Param_sampleDataSelection", "L1_REF", "L1_MISSES", "L2_REF", "L2_HIT", "L3_REF", "L3_MISSES", "L3_MISSES_ALT")
+#
+benchmarksPerfStat <- subset(benchmarksPerfStat.all, select=-c(Param_sampleDataSelection))
 
-# benchmarksPerfStat$L2_MISSES <- benchmarksPerfStat$L2_REF - benchmarksPerfStat$L2_HIT
+benchmarksPerfStat$L2_MISSES <- benchmarksPerfStat$L2_REF - benchmarksPerfStat$L2_HIT
 
 benchmarksPerfStat$L1_HIT <- benchmarksPerfStat$L1_REF - benchmarksPerfStat$L1_MISSES
 benchmarksPerfStat$L3_HIT <- benchmarksPerfStat$L3_REF - benchmarksPerfStat$L3_MISSES
 
 benchmarksPerfStat$L1_HIT_RATE <- benchmarksPerfStat$L1_HIT / benchmarksPerfStat$L1_REF
-# benchmarksPerfStat$L2_HIT_RATE <- benchmarksPerfStat$L2_HIT / benchmarksPerfStat$L2_REF
+benchmarksPerfStat$L2_HIT_RATE <- benchmarksPerfStat$L2_HIT / benchmarksPerfStat$L2_REF
 benchmarksPerfStat$L3_HIT_RATE <- benchmarksPerfStat$L3_HIT / benchmarksPerfStat$L3_REF
 
 benchmarksPerfStat$L1_MISS_RATE <- 1 - benchmarksPerfStat$L1_HIT_RATE
-# benchmarksPerfStat$L2_MISS_RATE <- 1 - benchmarksPerfStat$L2_HIT_RATE
+benchmarksPerfStat$L2_MISS_RATE <- 1 - benchmarksPerfStat$L2_HIT_RATE
 benchmarksPerfStat$L3_MISS_RATE <- 1 - benchmarksPerfStat$L3_HIT_RATE
+
+benchmarksPerfStat.xxx = ddply(benchmarksPerfStat, c("Benchmark", "Param_dataType", "Param_size", "Param_valueFactoryFactory"), function(x) c(L1_REF = median(x$L1_REF), L1_HIT = median(x$L1_HIT), L1_MISSES = median(x$L1_MISSES), L1_HIT_RATE = median(x$L1_HIT_RATE), L1_MISS_RATE = median(x$L1_MISS_RATE), L2_REF = median(x$L2_REF), L2_HIT = median(x$L2_HIT), L2_MISSES = median(x$L2_MISSES), L2_HIT_RATE = median(x$L2_HIT_RATE), L2_MISS_RATE = median(x$L2_MISS_RATE), L3_REF = median(x$L3_REF), L3_HIT = median(x$L3_HIT), L3_MISSES = median(x$L3_MISSES), L3_HIT_RATE = median(x$L3_HIT_RATE), L3_MISS_RATE = median(x$L3_MISS_RATE), L3_MISSES_ALT = median(x$L3_MISSES_ALT)))
+#ggplot(benchmarksPerfStat, aes(x=benchmarksPerfStat$benchmark, y=benchmarksPerfStat$L1.DCACHE.LOADS)) + geom_boxplot()
+#ggplot(benchmarksPerfStat, aes(x=Param_valueFactoryFactory, y=Score, group=Benchmark, fill=Param_valueFactoryFactory)) + geom_bar(position="dodge", stat="identity") + facet_grid(Benchmark ~ Param_size, scales = "free")
+
+benchmarksPerfStat.xxx.sub <- subset(benchmarksPerfStat.xxx, Param_dataType == "SET" & (Benchmark == "Iteration" | Benchmark == "EqualsRealDuplicate") & Param_size >= 1048576) #  & (Param_size == 2097152 | Param_size == 8388608)
+
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_valueFactoryFactory, y=L3_REF, group=Benchmark, fill=Param_valueFactoryFactory)) + geom_bar(position="dodge", stat="identity") + facet_grid(Benchmark + Param_dataType ~ Param_size, scales = "free")
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_valueFactoryFactory, y=L3_REF, group=Benchmark, fill=Param_valueFactoryFactory)) + geom_bar(position="dodge", stat="identity") + facet_grid(Benchmark + Param_dataType ~ ., scales = "free")
+
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_size, y=L3_REF, colour=Param_valueFactoryFactory)) + geom_line() + facet_grid(Benchmark + Param_dataType ~ ., scales = "free") + scale_x_log10()
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_size, y=L3_MISSES, colour=Param_valueFactoryFactory)) + geom_line() + facet_grid(Benchmark + Param_dataType ~ ., scales = "free") + scale_x_log10()
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_size, y=L3_MISSES_ALT, colour=Param_valueFactoryFactory)) + geom_line() + facet_grid(Benchmark + Param_dataType ~ ., scales = "free") + scale_x_log10()
+
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_valueFactoryFactory, y=L3_REF, group=Benchmark, fill=Param_valueFactoryFactory)) + geom_bar(position="dodge", stat="identity") + facet_grid(Benchmark + Param_dataType ~ Param_size, scales = "free") # + scale_y_log10()
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_valueFactoryFactory, y=L3_MISSES, group=Benchmark, fill=Param_valueFactoryFactory)) + geom_bar(position="dodge", stat="identity") + facet_grid(Benchmark + Param_dataType ~ Param_size, scales = "free") # + scale_y_log10()
+ggplot(benchmarksPerfStat.xxx.sub, aes(x=Param_valueFactoryFactory, y=L3_MISSES_ALT, group=Benchmark, fill=Param_valueFactoryFactory)) + geom_bar(position="dodge", stat="identity") + facet_grid(Benchmark + Param_dataType ~ Param_size, scales = "free") # + scale_y_log10()
 
 #data.frame(benchmarksCleaned, benchmarksPerfStat)
 
