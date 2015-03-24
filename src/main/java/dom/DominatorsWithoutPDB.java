@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.eclipse.imp.pdb.facts.IConstructor;
 import org.eclipse.imp.pdb.facts.IMap;
@@ -70,7 +71,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 			}
 		}
 
-		throw new RuntimeException("no entry?");
+		throw new NoSuchElementException("No candidate found.");
 	}
 
 	public ImmutableMap<IConstructor, ImmutableSet<IConstructor>> calculateDominators(
@@ -311,7 +312,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
 			try {
 				bh.consume(new DominatorsWithoutPDB().calculateDominators(graph));
-			} catch (RuntimeException e) {
+			} catch (NoSuchElementException e) {
 				System.err.println(e.getMessage());
 			}
 		}

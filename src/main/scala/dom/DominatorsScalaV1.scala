@@ -52,7 +52,7 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 				}
 		}
 
-		throw new RuntimeException("no entry?")
+		throw new NoSuchElementException("No candidate found.")
 	}
 
 	def calculateDominators(graph: HashSet[ITuple]): HashMap[IConstructor, HashSet[IConstructor]] = {
@@ -102,7 +102,7 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 			try {
 				bh.consume(new DominatorsScalaV1().calculateDominators(graph))
 			} catch {
-				case e: RuntimeException => System.err.println(e.getMessage)
+				case e: NoSuchElementException => System.err.println(e.getMessage)
 			}
 		}
 	}

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 
 import org.eclipse.imp.pdb.facts.IConstructor;
 import org.eclipse.imp.pdb.facts.IMap;
@@ -78,7 +79,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 			}
 		}
 
-		throw new RuntimeException("no entry?");
+		throw new NoSuchElementException("No candidate found.");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -317,7 +318,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 		for (PersistentHashSet graph : (ArrayList<PersistentHashSet>) sampledGraphsNative) {
 			try {
 				bh.consume(new DominatorsClojure().calculateDominators(graph));
-			} catch (RuntimeException e) {
+			} catch (NoSuchElementException e) {
 				System.err.println(e.getMessage());
 			}
 		}

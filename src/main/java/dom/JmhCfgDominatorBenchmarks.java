@@ -102,7 +102,11 @@ public class JmhCfgDominatorBenchmarks {
 	}
 	
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
-		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		// int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		
+		// same seed for different sizes to achieve subsume relationship
+		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(0, run);
+		
 		Random rand = new Random(seedForThisTrial);
 		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
@@ -137,9 +141,10 @@ public class JmhCfgDominatorBenchmarks {
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
-										+ ".(timeDominatorCalculation)").warmupIterations(10)
-						.measurementIterations(15).mode(Mode.AverageTime).forks(1)
-						.timeUnit(TimeUnit.SECONDS).param("size", "128").param("run", "0").shouldDoGC(true).build();
+										+ ".(timeDominatorCalculation)").warmupIterations(3)
+						.measurementIterations(5).mode(Mode.AverageTime).forks(1)
+						.timeUnit(TimeUnit.SECONDS).param("size", "128").param("run", "0")
+						.param("dominatorBenchmarkEnum", "SCALA").shouldDoGC(true).build();
 
 		new Runner(opt).run();
 	}
