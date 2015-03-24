@@ -11,6 +11,7 @@
  *******************************************************************************/
 package dom;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,13 +25,9 @@ import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils;
 
 import org.eclipse.imp.pdb.facts.IMap;
 import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ITuple;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieSet;
-import org.eclipse.imp.pdb.facts.util.ImmutableSet;
-import org.eclipse.imp.pdb.facts.util.TransientSet;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -46,26 +43,35 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
+
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 public class JmhCfgDominatorBenchmarks {
 
+	@Param
+	public DominatorBenchmarkEnum dominatorBenchmarkEnum;
+	
 	/*
 	 * (for (i <- 0 to 23) yield
 	 * s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
+	 * 
+	 * 	Note: total entries in DATA_SET_FULL_FILE_NAME: 5018
 	 */
 	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096" })
 	protected int size;
 
 	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
 	protected int run;
-
+	
+	private DominatorBenchmark dominatorBenchmark;
+	
 	private final String DATA_SET_FULL_FILE_NAME = "data/wordpress-cfgs-as-graphs.bin";
 	private IMap DATA_SET_FULL;
 
 	private ArrayList<ISet> sampledGraphs;
-	private ArrayList<ImmutableSet<ITuple>> sampledGraphsNativeToChart;
+	private ArrayList<?> sampledGraphsNative;
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
@@ -73,43 +79,26 @@ public class JmhCfgDominatorBenchmarks {
 		setUpTestSetWithRandomContent(size, run);
 
 		// convert data to remove PDB dependency
-		sampledGraphsNativeToChart = convertedDataToNativeFormatOfChart(sampledGraphs);
-
-		// OverseerUtils.setup(JmhCfgDominatorBenchmarks.class, this);
-	}
-
-	private static ArrayList<ImmutableSet<ITuple>> convertedDataToNativeFormatOfChart(
-					ArrayList<ISet> sampledGraphs) {
-		// convert data to remove PDB dependency
-		ArrayList<ImmutableSet<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
-
-		for (ISet graph : sampledGraphs) {
-			TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
-
-			for (IValue tuple : graph) {
-				convertedValue.__insert((ITuple) tuple);
-			}
-
-			sampledGraphsNative.add(convertedValue.freeze());
-		}
-
-		return sampledGraphsNative;
+		dominatorBenchmark = dominatorBenchmarkEnum.getBenchmark();
+		sampledGraphsNative = dominatorBenchmark.convertDataToNativeFormat(sampledGraphs);
 	}
 
 	protected void deseriaizeFullDataSet() {
 		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
 
 		try {
-			DATA_SET_FULL = (IMap) new BinaryValueReader().read(vf, new FileInputStream(
-							DATA_SET_FULL_FILE_NAME));
+			int bufferSize = 512 * 1024 * 1024;
+			
+			DATA_SET_FULL = (IMap) new BinaryValueReader().read(vf, new BufferedInputStream(
+							new FileInputStream(DATA_SET_FULL_FILE_NAME), bufferSize));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		System.err.println("Global data initialized.");
-		System.err.println("Total number of entries: " + DATA_SET_FULL.size());
-		System.err.println();
-
+		// System.err.println("Global data initialized.");
+		// System.err.println("Total number of entries: " +
+		// DATA_SET_FULL.size());
+		// System.err.println();
 	}
 	
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
@@ -140,48 +129,17 @@ public class JmhCfgDominatorBenchmarks {
 		}
 	}
 
-	// @TearDown(Level.Trial)
-	// public void tearDown() {
-	// OverseerUtils.tearDown();
-	// }
-
-	// @Setup(Level.Iteration)
-	// public void setupIteration() {
-	// OverseerUtils.doRecord(true);
-	// }
-	//
-	// @TearDown(Level.Iteration)
-	// public void tearDownIteration() {
-	// OverseerUtils.doRecord(false);
-	// }
-
-	// @Setup(Level.Invocation)
-	// public void setupInvocation() {
-	// OverseerUtils.setup(JmhCfgDominatorBenchmarks.class, this);
-	// OverseerUtils.doRecord(true);
-	// }
-	//
-	// @TearDown(Level.Invocation)
-	// public void tearDownInvocation() {
-	// OverseerUtils.doRecord(false);
-	// }
-
 	@Benchmark
 	public void timeDominatorCalculation(Blackhole bh) {
-		for (ImmutableSet<ITuple> graph : sampledGraphsNativeToChart) {
-			try {
-				bh.consume(new DominatorsWithoutPDB().calculateDominators(graph));
-			} catch (RuntimeException e) {
-				System.err.println(e.getMessage());
-			}
-		}
+		dominatorBenchmark.performBenchmark(bh, sampledGraphsNative);
 	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
-		.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName() + ".(timeDominatorCalculation)")
-						.warmupIterations(5).measurementIterations(5).mode(Mode.SingleShotTime).forks(1)
-						.param("run", "0").build();
+						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
+										+ ".(timeDominatorCalculation)").warmupIterations(10)
+						.measurementIterations(15).mode(Mode.AverageTime).forks(1)
+						.timeUnit(TimeUnit.SECONDS).param("size", "128").param("run", "0").shouldDoGC(true).build();
 
 		new Runner(opt).run();
 	}

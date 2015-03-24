@@ -31,6 +31,10 @@ import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
 import org.eclipse.imp.pdb.facts.io.BinaryValueWriter;
 import org.eclipse.imp.pdb.facts.io.StandardTextWriter;
+import org.eclipse.imp.pdb.facts.util.DefaultTrieSet;
+import org.eclipse.imp.pdb.facts.util.ImmutableSet;
+import org.eclipse.imp.pdb.facts.util.TransientSet;
+import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
 
 import clojure.set$difference;
@@ -45,7 +49,7 @@ import clojure.lang.PersistentHashMap;
 import clojure.lang.PersistentHashSet;
 
 @SuppressWarnings("deprecation")
-public class DominatorsClojure {
+public class DominatorsClojure implements DominatorBenchmark {
 
 	private PersistentHashSet setofdomsets(PersistentHashMap dom, PersistentHashSet preds) {
 		ITransientSet result = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
@@ -305,6 +309,36 @@ public class DominatorsClojure {
 		if (!dominatorsRascal.equals(dominatorsJava)) {
 			throw new Error("Dominator calculations do differ!");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
+		for (PersistentHashSet graph : (ArrayList<PersistentHashSet>) sampledGraphsNative) {
+			try {
+				bh.consume(new DominatorsClojure().calculateDominators(graph));
+			} catch (RuntimeException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+	}
+
+	@Override
+	public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
+		// convert data to remove PDB dependency
+		ArrayList<PersistentHashSet> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
+
+		for (ISet graph : sampledGraphs) {
+			ITransientSet convertedValue = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
+
+			for (IValue tuple : graph) {
+				convertedValue.conj((ITuple) tuple);
+			}
+
+			sampledGraphsNative.add((PersistentHashSet) convertedValue.persistent());
+		}
+
+		return sampledGraphsNative;
 	}
 
 }

@@ -4,14 +4,12 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.util.ArrayList
-
 import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.collection.JavaConverters.asScalaSetConverter
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.immutable.HashMap
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.Builder
-
 import org.eclipse.imp.pdb.facts.IConstructor
 import org.eclipse.imp.pdb.facts.IMap
 import org.eclipse.imp.pdb.facts.ISet
@@ -21,19 +19,18 @@ import org.eclipse.imp.pdb.facts.io.BinaryValueReader
 import org.eclipse.imp.pdb.facts.io.BinaryValueWriter
 import org.eclipse.imp.pdb.facts.io.StandardTextWriter
 import org.rascalmpl.interpreter.utils.Timing
-
 import dom.AllDominatorsRunner.CURRENT_DATA_SET
 import dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME
 import dom.AllDominatorsRunner.LOG_BINARY_RESULTS
 import dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS
-
 import dom.DominatorsScalaV1._
+import org.openjdk.jmh.infra.Blackhole
 
 /**
  * Port from CHART implementation. Uses immutable.{HashSet,HashMap} instead of CHART's {TrieSet,TrieMap}.
  * Transients became Builders. 
  */
-class DominatorsScalaV1 {
+class DominatorsScalaV1 extends DominatorBenchmark {
 
 	def setofdomsets(dom: HashMap[IConstructor, HashSet[IConstructor]], ps: HashSet[IConstructor]): HashSet[HashSet[IConstructor]] = {
 		val bldr = HashSet.newBuilder[HashSet[IConstructor]]
@@ -100,6 +97,30 @@ class DominatorsScalaV1 {
 		dom
 	}
 
+	def performBenchmark(bh: Blackhole, sampledGraphsNative: ArrayList[_]): Unit = {
+		for (graph <- sampledGraphsNative.asInstanceOf[ArrayList[HashSet[ITuple]]].asScala) {
+			try {
+				bh.consume(new DominatorsScalaV1().calculateDominators(graph))
+			} catch {
+				case e: RuntimeException => System.err.println(e.getMessage)
+			}
+		}
+	}
+	
+	def convertDataToNativeFormat(sampledGraphs: ArrayList[ISet]): ArrayList[_] = {
+		val graphs: ArrayList[HashSet[ITuple]] = new ArrayList(sampledGraphs.size())
+
+		for (graph <- sampledGraphs.asScala) {
+			val convertedValueBldr = HashSet.newBuilder[ITuple]
+			for (tuple <- graph.asScala) {
+				convertedValueBldr += tuple.asInstanceOf[ITuple]
+			}
+			graphs add convertedValueBldr.result
+		}
+
+		graphs	
+	}
+	
 }
 
 object DominatorsScalaV1 {

@@ -38,10 +38,11 @@ import org.eclipse.imp.pdb.facts.util.ImmutableMap;
 import org.eclipse.imp.pdb.facts.util.ImmutableSet;
 import org.eclipse.imp.pdb.facts.util.TransientMap;
 import org.eclipse.imp.pdb.facts.util.TransientSet;
+import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
 
 @SuppressWarnings("deprecation")
-public class DominatorsWithoutPDB {
+public class DominatorsWithoutPDB implements DominatorBenchmark {
 
 	private ImmutableSet setofdomsets(ImmutableMap dom, ImmutableSet preds) {
 		TransientSet result = DefaultTrieSet.transientOf();
@@ -302,6 +303,36 @@ public class DominatorsWithoutPDB {
 		if (!dominatorsRascal.equals(dominatorsJava)) {
 			throw new Error("Dominator calculations do differ!");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
+		for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
+			try {
+				bh.consume(new DominatorsWithoutPDB().calculateDominators(graph));
+			} catch (RuntimeException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+	}
+
+	@Override
+	public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
+		// convert data to remove PDB dependency
+		ArrayList<ImmutableSet<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
+
+		for (ISet graph : sampledGraphs) {
+			TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
+
+			for (IValue tuple : graph) {
+				convertedValue.__insert((ITuple) tuple);
+			}
+
+			sampledGraphsNative.add(convertedValue.freeze());
+		}
+
+		return sampledGraphsNative;
 	}
 
 }
