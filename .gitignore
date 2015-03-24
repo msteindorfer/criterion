@@ -6,3 +6,9 @@ target/
 
 results.tmp.log
 results.tmp.txt
+
+.cache
+map-sizes-and-statistics.csv
+
+data/wordpress-cfgs-as-graphs.bin
+data/wordpress-cfgs-as-graphs-sampled.bin

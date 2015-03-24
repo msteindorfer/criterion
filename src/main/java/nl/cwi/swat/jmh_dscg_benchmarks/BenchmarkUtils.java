@@ -18,6 +18,21 @@ import org.eclipse.imp.pdb.facts.IValueFactory;
 
 public class BenchmarkUtils {
 	public static enum ValueFactoryFactory {
+//		VF_CLOJURE {
+//			@Override IValueFactory getInstance() {
+//				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessValueFactory.getInstance();
+//			}
+//		},
+//		VF_CLJ_DS {
+//			@Override IValueFactory getInstance() {
+//				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
+//			}
+//		},		
+//		VF_SCALA {
+//			@Override IValueFactory getInstance() {
+//				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.TypelessValueFactory();
+//			}
+//		},
 //		VF_PDB_REFERENCE {
 //			@Override IValueFactory getInstance() {
 //				return org.eclipse.imp.pdb.facts.impl.reference.ValueFactory.getInstance();
@@ -92,21 +107,6 @@ public class BenchmarkUtils {
 			@Override
 			IValueFactory getInstance() {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryCurrent.getInstance();
-			}
-		},		
-		VF_CLOJURE {
-			@Override IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessValueFactory.getInstance();
-			}
-		},
-		VF_CLJ_DS {
-			@Override IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
-			}
-		},		
-		VF_SCALA {
-			@Override IValueFactory getInstance() {
-				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.TypelessValueFactory();
 			}
 		};
 
