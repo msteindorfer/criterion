@@ -24,24 +24,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
+import org.eclipse.imp.pdb.facts.IInteger;
 import org.eclipse.imp.pdb.facts.ISet;
 import org.eclipse.imp.pdb.facts.ISetWriter;
+import org.eclipse.imp.pdb.facts.ITuple;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory;
 import org.eclipse.imp.pdb.facts.util.ImmutableMap;
 import org.eclipse.imp.pdb.facts.util.ImmutableSet;
+import org.eclipse.imp.pdb.facts.util.ImmutableSetMultimap;
 import org.eclipse.imp.pdb.facts.util.TransientMap;
 import org.eclipse.imp.pdb.facts.util.TransientSet;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge;
+import org.eclipse.imp.pdb.facts.util.TrieSetMultimap_BleedingEdge;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge;
+import org.eclipse.imp.pdb.facts.util.ImmutableSetMultimapAsImmutableSetView;
 
 import scala.Tuple2;
 import clojure.lang.IPersistentMap;
@@ -64,6 +70,7 @@ public final class CalculateFootprints {
 	}
 
 	public enum DataType {
+		MULTIMAP,
 		MAP,
 		SET
 	}
@@ -73,6 +80,8 @@ public final class CalculateFootprints {
 	private static boolean reportSet = true;
 	private static boolean reportMap = true;
 
+	private static int multimapValueCount = 6;
+	
 	private final static String csvHeader = "elementCount,run,className,dataType,archetype,supportsStagedMutability,footprintInBytes,footprintInObjects,footprintInReferences"; // ,footprintInPrimitives
 
 	//	public static ISet setUpTestSetWithRandomContent(int size) throws Exception {
@@ -92,6 +101,27 @@ public final class CalculateFootprints {
 //
 //		return setWriter.done();
 //	}
+	
+	
+	public static ISet setUpTestRelationWithRandomContent(int size, int run) throws Exception {
+		// TrieMapVsOthersFootprint.size = size;
+
+		ISetWriter setWriter = valueFactory.setWriter();
+	
+		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		Random rand = new Random(seedForThisTrial);
+
+		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
+
+		for (int i = size; i > 0; i--) {
+			final int j = rand.nextInt();
+			final IValue current = valueFactory.integer(j); 
+						
+			setWriter.insert(valueFactory.tuple(current, current));
+		}
+
+		return setWriter.done();
+	}	
 	
 	public static ISet setUpTestSetWithRandomContent(int size, int run) throws Exception {
 		// TrieMapVsOthersFootprint.size = size;
@@ -151,11 +181,63 @@ public final class CalculateFootprints {
 			if (reportMap) ys = ys.__put(v, v);
 		}
 		
-		// statistics should exactly match, thus only printing them once
-		((TrieSet_5Bits) xs).printStatistics();
+//		// statistics should exactly match, thus only printing them once
+//		((TrieSet_5Bits) xs).printStatistics();
 		
 		if (reportSet) measureAndReport(xs, "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits", DataType.SET, Archetype.PERSISTENT, false, elementCount, run);
 		if (reportMap) measureAndReport(ys, "org.eclipse.imp.pdb.facts.util.TrieMap_5Bits", DataType.MAP, Archetype.PERSISTENT, false, elementCount, run);
+	}
+	
+	public static void timeTrieMultimap(final ISet testSet, int elementCount, int run) {		
+//		ImmutableSet<IValue> xs = TrieSet_5Bits.<IValue>of();
+		ImmutableSetMultimap<IValue, IValue> ys = TrieSetMultimap_BleedingEdge.<IValue, IValue>of();
+				
+		for (IValue v : testSet) {
+//			if (reportSet) xs = xs.__insert(v);
+			
+			for(int i = 0; i < multimapValueCount; i++) {				
+				if (reportMap) ys = ys.__put(v, valueFactory.integer(i));
+			}
+		}
+		
+//		// statistics should exactly match, thus only printing them once
+//		((TrieSet_5Bits) xs).printStatistics();
+		
+//		if (reportSet) measureAndReport(xs, "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits", DataType.SET, Archetype.PERSISTENT, false, elementCount, run);
+		if (reportMap) measureAndReport(ys, "org.eclipse.imp.pdb.facts.util.TrieSetMultimap_BleedingEdge", DataType.MULTIMAP, Archetype.PERSISTENT, false, elementCount, run);
+	}	
+	
+	public static void timeImmutableSetMultimapAsImmutableSetView(final ISet testSet, int elementCount, int run) {		
+		final ImmutableSetMultimap<IValue, IValue> multimap = TrieSetMultimap_BleedingEdge.<IValue, IValue>of();
+
+		final BiFunction<IValue, IValue, ITuple> tupleOf = (first, second) -> org.eclipse.imp.pdb.facts.impl.fast.Tuple
+						.newTuple(first, second);
+
+		final BiFunction<ITuple, Integer, Object> tupleElementAt = (tuple, position) -> {
+			switch (position) {
+			case 0:
+				return tuple.get(0);
+			case 1:
+				return tuple.get(1);
+			default:
+				throw new IllegalStateException();
+			}
+		};	
+		
+		ImmutableSet<ITuple> xs = new ImmutableSetMultimapAsImmutableSetView<IValue, IValue, ITuple>(multimap, tupleOf,
+						tupleElementAt);
+//		ImmutableMap<IValue, IValue> ys = TrieMap_5Bits.<IValue, IValue>of();
+				
+		for (IValue v : testSet) {
+			if (reportSet) xs = xs.__insert((ITuple) v);
+//			if (reportMap) ys = ys.__put(v, v);
+		}
+		
+//		// statistics should exactly match, thus only printing them once
+//		((TrieSet_5Bits) xs).printStatistics();
+		
+		if (reportSet) measureAndReport(xs, "org.eclipse.imp.pdb.facts.util.ImmutableSetMultimapAsImmutableSetView", DataType.SET, Archetype.PERSISTENT, false, elementCount, run);
+//		if (reportMap) measureAndReport(ys, "org.eclipse.imp.pdb.facts.util.ImmutableSetMultimapAsImmutableMapView", DataType.MAP, Archetype.PERSISTENT, false, elementCount, run);
 	}	
 	
 	public void timeTrieSet0To4(final ISet testSet, int elementCount, int run) {
@@ -302,6 +384,40 @@ public final class CalculateFootprints {
 		if (reportSet) measureAndReport(xs, "com.google.common.collect.ImmutableSet", DataType.SET, Archetype.IMMUTABLE, false, elementCount, run);
 		if (reportMap) measureAndReport(ys, "com.google.common.collect.ImmutableMap", DataType.MAP, Archetype.IMMUTABLE, false, elementCount, run);
 	}
+	
+	public static void timeGuavaImmutableSetMultimap(final ISet testSet, int elementCount, int run) {
+//		com.google.common.collect.ImmutableSet.Builder<IValue> xsBldr = com.google.common.collect.ImmutableSet.builder();
+		com.google.common.collect.ImmutableSetMultimap.Builder<IValue, IValue> ysBldr = com.google.common.collect.ImmutableSetMultimap.builder();
+		
+		for (IValue v : testSet) {
+//			if (reportSet) xsBldr.add(v);
+			for(int i = 0; i < multimapValueCount; i++) {				
+				if (reportMap) ysBldr.put(v, valueFactory.integer(i));
+			}			
+		}
+		
+//		com.google.common.collect.ImmutableSet<IValue> xs = xsBldr.build();
+		com.google.common.collect.ImmutableMultimap<IValue, IValue> ys = ysBldr.build();
+		
+//		if (reportSet) measureAndReport(xs, "com.google.common.collect.ImmutableSet", DataType.SET, Archetype.IMMUTABLE, false, elementCount, run);
+		if (reportMap) measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run);
+	}
+	
+	/* Note: immutable creation that uses newWith(...) is tremendously slow. */
+	public static void timeGSImmutableSetMultimap(final ISet testSet, int elementCount, int run) {
+		com.gs.collections.api.multimap.set.MutableSetMultimap<IValue, IValue> mutableYs = com.gs.collections.impl.factory.Multimaps.mutable.set.with();
+		
+		for (IValue v : testSet) {
+			for(int i = 0; i < multimapValueCount; i++) {				
+				if (reportMap) mutableYs.put(v, valueFactory.integer(i));
+			}			
+		}
+		
+		com.gs.collections.api.multimap.set.ImmutableSetMultimap<IValue, IValue> ys = mutableYs.toImmutable();
+			
+		if (reportMap) measureAndReport(ys, "com.gs.collections.api.multimap.set.ImmutableSetMultimap", DataType.MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run);
+	}	
+	
 
 //	@Test
 //	public void timeSetWriter() {
@@ -389,7 +505,10 @@ public final class CalculateFootprints {
 //}	
 	
 	private static void measureAndReport(final Object objectToMeasure, final String className, DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run) {
-		Predicate<Object> jointPredicate = Predicates.not(Predicates.instanceOf(IValue.class));
+		/*
+		 * ITuple, etc should be measured. Only excluding IInteger (actual elements).
+		 */
+		Predicate<Object> jointPredicate = Predicates.not(Predicates.instanceOf(IInteger.class));
 		
 		long memoryInBytes = objectexplorer.MemoryMeasurer.measureBytes(objectToMeasure,
 						jointPredicate);
@@ -477,9 +596,41 @@ public final class CalculateFootprints {
 		}		
 	}
 	
+	public static void footprintBinaryRelation__Random_Persistent() {	
+		
+		for (int exp = 13; exp <= 13; exp += 1) { // int exp = 0; exp <= 23; exp += 1
+			final int count = (int) Math.pow(2, exp);
+			
+			for (int run = 0; run < 1; run++) {
+			
+				ISet tmpSet = null;
+				ISet tmpRelation = null;
+				
+				try {
+					tmpSet = setUpTestSetWithRandomContent(count, run);
+					tmpRelation = setUpTestRelationWithRandomContent(count, run);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				final ISet testSet = tmpSet;
+				final ISet testRelaton = tmpRelation;
+				final int currentRun = run;
+				
+//				timeTrieSet(testSet, count, currentRun);
+//				timeTrieSet(testRelaton, count, currentRun);				
+//				timeImmutableSetMultimapAsImmutableSetView(testRelaton, count, currentRun);								
+				timeTrieMultimap(testSet, count, currentRun);
+				timeGuavaImmutableSetMultimap(testSet, count, currentRun);
+				timeGSImmutableSetMultimap(testSet, count, currentRun);
+			}
+		}		
+	}	
+	
 	public static void main(String[] args) throws Exception {
 		writeToFile(false, csvHeader);		
-		footprintMap__Random_Persistent();
+//		footprintMap__Random_Persistent();
+		footprintBinaryRelation__Random_Persistent();
 	}
 	
 }
