@@ -136,9 +136,9 @@ object DominatorsScalaV1 {
 		return pdbResults;
 	}
 
-	def testAll: ISet = {
+	def testAll(sampledGraphs: IMap): ISet = {
 		// convert data to remove PDB dependency
-		val graphs: ArrayList[HashSet[ITuple]] = pdbMapToArrayListOfValues(CURRENT_DATA_SET);
+		val graphs: ArrayList[HashSet[ITuple]] = pdbMapToArrayListOfValues(sampledGraphs);
 
 		val resultBldr = HashSet.newBuilder[HashMap[IConstructor, HashSet[IConstructor]]]
 

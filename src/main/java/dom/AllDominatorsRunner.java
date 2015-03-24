@@ -63,9 +63,9 @@ public class AllDominatorsRunner {
 			System.err.println("[CHART and Clojure] are equal!\n\n");
 		}		
 		
-		ISet resultsBareMetal = DominatorsWithoutPDB.testAll();
-		ISet resultsClojure = DominatorsClojure.testAll();
-		ISet resultsScala = DominatorsScalaV1.testAll();
+		ISet resultsBareMetal = DominatorsWithoutPDB.testAll(CURRENT_DATA_SET);
+		ISet resultsClojure = DominatorsClojure.testAll(CURRENT_DATA_SET);
+		ISet resultsScala = DominatorsScalaV1.testAll(CURRENT_DATA_SET);
 //		ISet resultsPdbPersistent = DominatorsPDB.testAll(org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance());
 // 		ISet resultsPdbFast = DominatorsPDB.testAll(org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance());		
 //		

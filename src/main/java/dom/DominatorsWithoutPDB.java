@@ -1,6 +1,5 @@
 package dom;
 
-import static dom.AllDominatorsRunner.CURRENT_DATA_SET;
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
 import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
@@ -43,7 +42,7 @@ import org.rascalmpl.interpreter.utils.Timing;
 
 @SuppressWarnings("deprecation")
 public class DominatorsWithoutPDB {
-	
+
 	private ImmutableSet setofdomsets(ImmutableMap dom, ImmutableSet preds) {
 		TransientSet result = DefaultTrieSet.transientOf();
 
@@ -73,7 +72,7 @@ public class DominatorsWithoutPDB {
 		throw new RuntimeException("no entry?");
 	}
 
-	public ImmutableMap<IConstructor, ImmutableSet<IConstructor>> jDominators(
+	public ImmutableMap<IConstructor, ImmutableSet<IConstructor>> calculateDominators(
 					ImmutableSet<ITuple> graph) {
 		IConstructor n0 = getTop(graph);
 		ImmutableSet<IConstructor> nodes = carrier(graph);
@@ -121,7 +120,7 @@ public class DominatorsWithoutPDB {
 				// intersected.getType());
 				// }
 				ImmutableSet newValue = union(intersected, DefaultTrieSet.of(n));
-//				ImmutableSet newValue = intersected.__insert(n);
+				// ImmutableSet newValue = intersected.__insert(n);
 				// if (!newValue.getElementType().isAbstractData()) {
 				// System.err.println("problem");
 				// }
@@ -147,14 +146,15 @@ public class DominatorsWithoutPDB {
 	public static IMap testOne() throws IOException, FileNotFoundException {
 		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
 
-		ISet data = (ISet) new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME));
+		ISet data = (ISet) new BinaryValueReader().read(vf, new FileInputStream(
+						DATA_SET_SINGLE_FILE_NAME));
 
 		// convert data to remove PDB dependency
 		ImmutableSet<ITuple> graph = pdbSetToImmutableSet(data);
 
 		long before = Timing.getCpuTime();
 		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> results = new DominatorsWithoutPDB()
-						.jDominators(graph);
+						.calculateDominators(graph);
 		System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: "
 						+ ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
 
@@ -167,20 +167,20 @@ public class DominatorsWithoutPDB {
 		if (LOG_TEXTUAL_RESULTS)
 			new StandardTextWriter().write(pdbResults, new FileWriter(
 							"data/dominators-java-without-pdb-single.txt"));
-		
+
 		return pdbResults;
 	}
 
-	public static ISet testAll() throws IOException, FileNotFoundException {
+	public static ISet testAll(IMap sampledGraphs) throws IOException, FileNotFoundException {
 		// convert data to remove PDB dependency
-		ArrayList<ImmutableSet<ITuple>> graphs = pdbMapToArrayListOfValues(CURRENT_DATA_SET);
+		ArrayList<ImmutableSet<ITuple>> graphs = pdbMapToArrayListOfValues(sampledGraphs);
 
 		TransientSet<ImmutableMap<IConstructor, ImmutableSet<IConstructor>>> result = DefaultTrieSet
 						.transientOf();
 		long before = Timing.getCpuTime();
 		for (ImmutableSet<ITuple> graph : graphs) {
 			try {
-				result.__insert(new DominatorsWithoutPDB().jDominators(graph));
+				result.__insert(new DominatorsWithoutPDB().calculateDominators(graph));
 			} catch (RuntimeException e) {
 				System.err.println(e.getMessage());
 			}
@@ -253,7 +253,7 @@ public class DominatorsWithoutPDB {
 
 		return builder.done();
 	}
-	
+
 	private static <K extends IValue> ISet immutableSetToPdbSet(ImmutableSet<K> set) {
 		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
 
@@ -266,18 +266,20 @@ public class DominatorsWithoutPDB {
 		return builder.done();
 	}
 
-//	private static <K extends IValue, V extends IValue> IMap immutableMapToPdbMap(
-//					ImmutableMap<K, V> map) {
-//		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-//
-//		IMapWriter builder = vf.mapWriter();
-//
-//		for (Map.Entry<K, V> entry : map.entrySet()) {
-//			builder.put(entry.getKey(), entry.getValue());
-//		}
-//
-//		return builder.done();
-//	}
+	// private static <K extends IValue, V extends IValue> IMap
+	// immutableMapToPdbMap(
+	// ImmutableMap<K, V> map) {
+	// IValueFactory vf =
+	// org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+	//
+	// IMapWriter builder = vf.mapWriter();
+	//
+	// for (Map.Entry<K, V> entry : map.entrySet()) {
+	// builder.put(entry.getKey(), entry.getValue());
+	// }
+	//
+	// return builder.done();
+	// }
 
 	private static ImmutableSet<ITuple> pdbSetToImmutableSet(ISet set) {
 		TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
@@ -448,10 +450,8 @@ class Util {
 	}
 
 	/*
-	 * Flattening of a set (of ITuple elements).
-	 * 
-	 * Because of the untyped nature of ITuple, the implementation is not
-	 * strongly typed.
+	 * Flattening of a set (of ITuple elements). Because of the untyped nature
+	 * of ITuple, the implementation is not strongly typed.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <K extends Iterable<?>, T> ImmutableSet<T> carrier(ImmutableSet<K> set1) {

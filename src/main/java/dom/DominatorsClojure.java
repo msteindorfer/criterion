@@ -174,16 +174,15 @@ public class DominatorsClojure {
 		return pdbResults;
 	}
 
-	public static ISet testAll() throws IOException, FileNotFoundException {
+	public static ISet testAll(IMap sampledGraphs) throws IOException, FileNotFoundException {
 		// convert data to remove PDB dependency
-		ArrayList<PersistentHashSet> graphs = pdbMapToArrayListOfValues(CURRENT_DATA_SET);
+		ArrayList<PersistentHashSet> graphs = pdbMapToArrayListOfValues(sampledGraphs);
 
 		ITransientSet result = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 		long before = Timing.getCpuTime();
 		for (PersistentHashSet graph : graphs) {
 			try {
-				result.conj(new DominatorsClojure()
-								.calculateDominators(graph));
+				result.conj(new DominatorsClojure().calculateDominators(graph));
 			} catch (RuntimeException e) {
 				System.err.println(e.getMessage());
 			}
