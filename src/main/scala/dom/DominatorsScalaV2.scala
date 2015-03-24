@@ -51,6 +51,7 @@ class DominatorsScalaV2 {
 			candidate =>
 				candidate.getName match {
 					case "methodEntry" | "functionEntry" | "scriptEntry" => return candidate
+					case _: String => {}
 				}
 		}
 

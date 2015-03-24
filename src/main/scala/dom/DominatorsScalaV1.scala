@@ -28,7 +28,7 @@ import org.openjdk.jmh.infra.Blackhole
 
 /**
  * Port from CHART implementation. Uses immutable.{HashSet,HashMap} instead of CHART's {TrieSet,TrieMap}.
- * Transients became Builders. 
+ * Transients became Builders.
  */
 class DominatorsScalaV1 extends DominatorBenchmark {
 
@@ -42,6 +42,22 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 		bldr.result
 	}
 
+	def listofdomsets(dom: HashMap[IConstructor, HashSet[IConstructor]], ps: HashSet[IConstructor]): Option[ArrayList[HashSet[IConstructor]]] = {
+		val resultList = new ArrayList[HashSet[IConstructor]](dom.size)
+
+		for (p <- ps) {
+			val value = dom.get(p)
+
+			if (value.isDefined && !value.get.isEmpty) {
+				resultList add value.get
+			} else {
+				return None
+			}
+		}
+
+		Some(resultList)
+	}
+
 	def top(graph: HashSet[ITuple]): HashSet[IConstructor] = project(graph, 0) -- project(graph, 1)
 
 	def getTop(graph: HashSet[ITuple]): IConstructor = {
@@ -49,6 +65,7 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 			candidate =>
 				candidate.getName match {
 					case "methodEntry" | "functionEntry" | "scriptEntry" => return candidate
+					case _: String => {}
 				}
 		}
 
@@ -82,10 +99,11 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 				val ps = preds.getOrElse(n, HashSet.empty)
 
 				val sos = setofdomsets(dom, ps)
-
 				val intersected = if (sos == null || sos.isEmpty || sos.contains(HashSet.empty)) HashSet.empty[IConstructor] else sos reduce { _ intersect _ }
-
 				val newValue = intersected union HashSet(n)
+
+//				val alos = listofdomsets(dom, ps)
+//				val intersected = if (alos.isEmpty || alos.get.isEmpty) HashSet.empty[IConstructor] else alos.get.asScala reduce { _ intersect _ }
 //				val newValue = intersected + n
 
 				domBldr += ((n, newValue))
@@ -106,7 +124,7 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 			}
 		}
 	}
-	
+
 	def convertDataToNativeFormat(sampledGraphs: ArrayList[ISet]): ArrayList[_] = {
 		val graphs: ArrayList[HashSet[ITuple]] = new ArrayList(sampledGraphs.size())
 
@@ -118,9 +136,9 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 			graphs add convertedValueBldr.result
 		}
 
-		graphs	
+		graphs
 	}
-	
+
 }
 
 object DominatorsScalaV1 {

@@ -52,21 +52,21 @@ public class JmhCfgDominatorBenchmarks {
 
 	@Param
 	public DominatorBenchmarkEnum dominatorBenchmarkEnum;
-	
+
 	/*
 	 * (for (i <- 0 to 23) yield
-	 * s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
+	 * s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"") 
 	 * 
-	 * 	Note: total entries in DATA_SET_FULL_FILE_NAME: 5018
+	 * Note: total entries in DATA_SET_FULL_FILE_NAME: 5018
 	 */
 	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096" })
 	protected int size;
 
 	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
 	protected int run;
-	
+
 	private DominatorBenchmark dominatorBenchmark;
-	
+
 	private final String DATA_SET_FULL_FILE_NAME = "data/wordpress-cfgs-as-graphs.bin";
 	private IMap DATA_SET_FULL;
 
@@ -88,7 +88,7 @@ public class JmhCfgDominatorBenchmarks {
 
 		try {
 			int bufferSize = 512 * 1024 * 1024;
-			
+
 			DATA_SET_FULL = (IMap) new BinaryValueReader().read(vf, new BufferedInputStream(
 							new FileInputStream(DATA_SET_FULL_FILE_NAME), bufferSize));
 		} catch (IOException e) {
@@ -100,13 +100,13 @@ public class JmhCfgDominatorBenchmarks {
 		// DATA_SET_FULL.size());
 		// System.err.println();
 	}
-	
+
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
 		// int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
-		
+
 		// same seed for different sizes to achieve subsume relationship
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(0, run);
-		
+
 		Random rand = new Random(seedForThisTrial);
 		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
@@ -143,7 +143,7 @@ public class JmhCfgDominatorBenchmarks {
 						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
 										+ ".(timeDominatorCalculation)").warmupIterations(3)
 						.measurementIterations(5).mode(Mode.AverageTime).forks(1)
-						.timeUnit(TimeUnit.SECONDS).param("size", "128").param("run", "0")
+						.timeUnit(TimeUnit.SECONDS).param("size", "16").param("run", "0")
 						.param("dominatorBenchmarkEnum", "SCALA").shouldDoGC(true).build();
 
 		new Runner(opt).run();
