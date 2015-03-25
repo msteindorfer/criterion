@@ -4,12 +4,12 @@ mvn clean install
 mkdir -p target/results
 mkdir -p target/result-logs
 
-export DOMINATOR_BENCHMARK_ENUM="CHART,CLOJURE" # SCALA
+export DOMINATOR_BENCHMARK_ENUM="CLOJURE,CHART"
 
 export COMMON_JVM_SETTINGS="-Xms12g -Xmx12g"
 
 # Settings for cache measurements:
-export COMMON_SETTINGS="-wi 1 -i 3 -r 10 -f 1 -t 1 -tu s -to 30m -p run=0 -gc true -rf latex -v EXTRA -foe true -bm ss"
+export COMMON_SETTINGS="-wi 1 -i 3 -r 10 -f 1 -t 1 -tu s -to 120m -p run=0 -gc true -rf latex -v EXTRA -foe false -bm ss"
 
 # # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "dom.JmhCfgDominatorBenchmarks.timeDominatorCalculation$" -p dominatorBenchmarkEnum=$DOMINATOR_BENCHMARK_ENUM -jvmArgs "$COMMON_JVM_SETTINGS -Doverseer.utils.output.file=./target/result-logs/results.perf-stat.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size1.log" $COMMON_SETTINGS -rff ./target/results/results.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size1.log -p size=1 1>./target/result-logs/results.std-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size1.log 2>./target/result-logs/results.err-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size1.log
 # # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "dom.JmhCfgDominatorBenchmarks.timeDominatorCalculation$" -p dominatorBenchmarkEnum=$DOMINATOR_BENCHMARK_ENUM -jvmArgs "$COMMON_JVM_SETTINGS -Doverseer.utils.output.file=./target/result-logs/results.perf-stat.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size2.log" $COMMON_SETTINGS -rff ./target/results/results.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size2.log -p size=2 1>./target/result-logs/results.std-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size2.log 2>./target/result-logs/results.err-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.size2.log
