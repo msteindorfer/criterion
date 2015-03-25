@@ -45,7 +45,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
 
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Thread)
 public class JmhCfgDominatorBenchmarks {
@@ -59,11 +59,11 @@ public class JmhCfgDominatorBenchmarks {
 	 * 
 	 * Note: total entries in DATA_SET_FULL_FILE_NAME: 5018
 	 */
-	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096" })
+	@Param({ "128", "256", "512", "1024", "2048", "4096" })
 	protected int size;
 
-	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
-	protected int run;
+	// @Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+	protected int run = 0;
 
 	private DominatorBenchmark dominatorBenchmark;
 
