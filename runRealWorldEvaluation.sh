@@ -4,7 +4,7 @@ mvn clean install
 mkdir -p target/results
 mkdir -p target/result-logs
 
-export DOMINATOR_BENCHMARK_ENUM="CLOJURE,CHART"
+export DOMINATOR_BENCHMARK_ENUM="SCALA,CLOJURE,CHART"
 
 export COMMON_JVM_SETTINGS="-Xms12g -Xmx12g"
 

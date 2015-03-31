@@ -63,11 +63,9 @@ class DominatorsScalaV2 {
 		val nodes: Set[IConstructor] = carrier(graph)
 		val preds: Map[IConstructor, Set[IConstructor]] = toMap(project(graph, 1, 0))
 
-		// desired way to write, but does not work ...
-		// val dom: Map[IConstructor, Set[IConstructor]] = for (n <- (nodes - n0)) yield (n, nodes);
-
 		var dom: Map[IConstructor, Set[IConstructor]] = {
 			val domBldr = Map.newBuilder[IConstructor, Set[IConstructor]]
+			domBldr += ((n0, Set(n0)))
 			for (n <- (nodes - n0)) {
 				domBldr += ((n, nodes))
 			}

@@ -68,6 +68,7 @@ class DominatorsScalaV3 {
 		// val dom: HashMap[IConstructor, HashSet[IConstructor]] = for (n <- (nodes - n0)) yield (n, nodes);
 
 		var dom = HashMap.empty[IConstructor, HashSet[IConstructor]]
+		dom += ((n0, HashSet(n0)))
 		for (n <- (nodes - n0)) {
 			dom += ((n, nodes))
 		}

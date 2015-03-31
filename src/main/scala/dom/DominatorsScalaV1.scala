@@ -77,11 +77,9 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 		val nodes: HashSet[IConstructor] = carrier(graph)
 		val preds: HashMap[IConstructor, HashSet[IConstructor]] = toMap(project(graph, 1, 0))
 
-		// desired way to write, but does not work ...
-		// val dom: HashMap[IConstructor, HashSet[IConstructor]] = for (n <- (nodes - n0)) yield (n, nodes);
-
 		var dom: HashMap[IConstructor, HashSet[IConstructor]] = {
 			val domBldr = HashMap.newBuilder[IConstructor, HashSet[IConstructor]]
+			domBldr += ((n0, HashSet(n0)))
 			for (n <- (nodes - n0)) {
 				domBldr += ((n, nodes))
 			}
