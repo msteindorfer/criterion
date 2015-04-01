@@ -3,13 +3,13 @@ package dom;
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
 import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
-import static dom.Util.EMPTY;
-import static dom.Util.carrier;
-import static dom.Util.intersect;
-import static dom.Util.project;
-import static dom.Util.subtract;
-import static dom.Util.toMap;
-import static dom.Util.union;
+import static dom.Util_LazyHashCode.EMPTY;
+import static dom.Util_LazyHashCode.carrier;
+import static dom.Util_LazyHashCode.intersect;
+import static dom.Util_LazyHashCode.project;
+import static dom.Util_LazyHashCode.subtract;
+import static dom.Util_LazyHashCode.toMap;
+import static dom.Util_LazyHashCode.union;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,8 +33,8 @@ import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
 import org.eclipse.imp.pdb.facts.io.BinaryValueWriter;
 import org.eclipse.imp.pdb.facts.io.StandardTextWriter;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieMap;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieSet;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_LazyHashCode;
+import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_LazyHashCode;
 import org.eclipse.imp.pdb.facts.util.ImmutableMap;
 import org.eclipse.imp.pdb.facts.util.ImmutableSet;
 import org.eclipse.imp.pdb.facts.util.TransientMap;
@@ -43,10 +43,10 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
 
 @SuppressWarnings("deprecation")
-public class DominatorsWithoutPDB implements DominatorBenchmark {
+public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
 
 	private ImmutableSet setofdomsets(ImmutableMap dom, ImmutableSet preds) {
-		TransientSet result = DefaultTrieSet.transientOf();
+		TransientSet result = TrieSet_5Bits_LazyHashCode.transientOf();
 
 		for (Object p : preds) {
 			ImmutableSet ps = (ImmutableSet) dom.get(p);
@@ -84,14 +84,14 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> preds = toMap(project(graph, 1, 0));
 		// nodes = nodes.delete(n0);
 
-		TransientMap<IConstructor, ImmutableSet<IConstructor>> w = DefaultTrieMap.transientOf();
-		w.__put(n0, DefaultTrieSet.of(n0));
+		TransientMap<IConstructor, ImmutableSet<IConstructor>> w = TrieMap_5Bits_LazyHashCode.transientOf();
+		w.__put(n0, TrieSet_5Bits_LazyHashCode.of(n0));
 		for (IConstructor n : nodes.__remove(n0)) {
 			w.__put(n, nodes);
 		}
 		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> dom = w.freeze();
 
-		ImmutableMap prev = DefaultTrieMap.of();
+		ImmutableMap prev = TrieMap_5Bits_LazyHashCode.of();
 		/*
 		 * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <-
 		 * preds[n]?{}});
@@ -99,7 +99,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		while (!prev.equals(dom)) {
 			prev = dom;
 
-			TransientMap<IConstructor, ImmutableSet<IConstructor>> newDom = DefaultTrieMap
+			TransientMap<IConstructor, ImmutableSet<IConstructor>> newDom = TrieMap_5Bits_LazyHashCode
 							.transientOf();
 
 			for (IConstructor n : nodes) {
@@ -121,7 +121,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 				// throw new RuntimeException("not the right type: " +
 				// intersected.getType());
 				// }
-				ImmutableSet newValue = union(intersected, DefaultTrieSet.of(n));
+				ImmutableSet newValue = union(intersected, TrieSet_5Bits_LazyHashCode.of(n));
 				// ImmutableSet newValue = intersected.__insert(n);
 				// if (!newValue.getElementType().isAbstractData()) {
 				// System.err.println("problem");
@@ -155,7 +155,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		ImmutableSet<ITuple> graph = pdbSetToImmutableSet(data);
 
 		long before = Timing.getCpuTime();
-		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> results = new DominatorsWithoutPDB()
+		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> results = new DominatorsWithoutPDB_LazyHashCode()
 						.calculateDominators(graph);
 		System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: "
 						+ ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
@@ -177,12 +177,12 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		// convert data to remove PDB dependency
 		ArrayList<ImmutableSet<ITuple>> graphs = pdbMapToArrayListOfValues(sampledGraphs);
 
-		TransientSet<ImmutableMap<IConstructor, ImmutableSet<IConstructor>>> result = DefaultTrieSet
+		TransientSet<ImmutableMap<IConstructor, ImmutableSet<IConstructor>>> result = TrieSet_5Bits_LazyHashCode
 						.transientOf();
 		long before = Timing.getCpuTime();
 		for (ImmutableSet<ITuple> graph : graphs) {
 			try {
-				result.__insert(new DominatorsWithoutPDB().calculateDominators(graph));
+				result.__insert(new DominatorsWithoutPDB_LazyHashCode().calculateDominators(graph));
 			} catch (RuntimeException e) {
 				System.err.println(e.getMessage());
 			}
@@ -210,7 +210,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		for (IValue key : data) {
 			ISet value = (ISet) data.get(key);
 
-			TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
+			TransientSet<ITuple> convertedValue = TrieSet_5Bits_LazyHashCode.transientOf();
 			for (IValue tuple : value) {
 				convertedValue.__insert((ITuple) tuple);
 			}
@@ -284,7 +284,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 	// }
 
 	private static ImmutableSet<ITuple> pdbSetToImmutableSet(ISet set) {
-		TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
+		TransientSet<ITuple> builder = TrieSet_5Bits_LazyHashCode.transientOf();
 
 		for (IValue tuple : set) {
 			builder.__insert((ITuple) tuple);
@@ -311,7 +311,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
 		for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
 			try {
-				bh.consume(new DominatorsWithoutPDB().calculateDominators(graph));
+				bh.consume(new DominatorsWithoutPDB_LazyHashCode().calculateDominators(graph));
 			} catch (NoSuchElementException e) {
 				System.err.println(e.getMessage());
 			}
@@ -324,7 +324,7 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 		ArrayList<ImmutableSet<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
 
 		for (ISet graph : sampledGraphs) {
-			TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
+			TransientSet<ITuple> convertedValue = TrieSet_5Bits_LazyHashCode.transientOf();
 
 			for (IValue tuple : graph) {
 				convertedValue.__insert((ITuple) tuple);
@@ -338,10 +338,10 @@ public class DominatorsWithoutPDB implements DominatorBenchmark {
 
 }
 
-class Util {
+class Util_LazyHashCode {
 
 	@SuppressWarnings("rawtypes")
-	public final static ImmutableSet EMPTY = DefaultTrieSet.of();
+	public final static ImmutableSet EMPTY = TrieSet_5Bits_LazyHashCode.of();
 
 	/*
 	 * Intersect many sets.
@@ -357,7 +357,7 @@ class Util {
 
 		ImmutableSet<K> result = first;
 		for (ImmutableSet<K> elem : sets) {
-			result = Util.intersect(result, elem);
+			result = Util_LazyHashCode.intersect(result, elem);
 		}
 
 		return result;
@@ -370,9 +370,9 @@ class Util {
 		if (set1 == set2)
 			return set1;
 		if (set1 == null)
-			return DefaultTrieSet.of();
+			return TrieSet_5Bits_LazyHashCode.of();
 		if (set2 == null)
-			return DefaultTrieSet.of();
+			return TrieSet_5Bits_LazyHashCode.of();
 
 		final ImmutableSet<K> smaller;
 		final ImmutableSet<K> bigger;
@@ -412,11 +412,11 @@ class Util {
 	 */
 	public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
 		if (set1 == null && set2 == null)
-			return DefaultTrieSet.of();
+			return TrieSet_5Bits_LazyHashCode.of();
 		if (set1 == set2)
-			return DefaultTrieSet.of();
+			return TrieSet_5Bits_LazyHashCode.of();
 		if (set1 == null)
-			return DefaultTrieSet.of();
+			return TrieSet_5Bits_LazyHashCode.of();
 		if (set2 == null)
 			return set1;
 
@@ -441,7 +441,7 @@ class Util {
 	 */
 	public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
 		if (set1 == null && set2 == null)
-			return DefaultTrieSet.of();
+			return TrieSet_5Bits_LazyHashCode.of();
 		if (set1 == null)
 			return set2;
 		if (set2 == null)
@@ -487,7 +487,7 @@ class Util {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <K extends Iterable<?>, T> ImmutableSet<T> carrier(ImmutableSet<K> set1) {
-		TransientSet<Object> builder = DefaultTrieSet.transientOf();
+		TransientSet<Object> builder = TrieSet_5Bits_LazyHashCode.transientOf();
 
 		for (K iterable : set1) {
 			for (Object nested : iterable) {
@@ -503,7 +503,7 @@ class Util {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <K extends IValue> ImmutableSet<K> project(ImmutableSet<ITuple> set1, int field) {
-		TransientSet<K> builder = DefaultTrieSet.transientOf();
+		TransientSet<K> builder = TrieSet_5Bits_LazyHashCode.transientOf();
 
 		for (ITuple tuple : set1) {
 			builder.__insert((K) tuple.select(field));
@@ -517,7 +517,7 @@ class Util {
 	 * of fields.
 	 */
 	public static ImmutableSet<ITuple> project(ImmutableSet<ITuple> set1, int field1, int field2) {
-		TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
+		TransientSet<ITuple> builder = TrieSet_5Bits_LazyHashCode.transientOf();
 
 		for (ITuple tuple : set1) {
 			builder.__insert((ITuple) tuple.select(field1, field2));
@@ -539,13 +539,13 @@ class Util {
 			V val = (V) t.get(1);
 			TransientSet<V> wValSet = hm.get(key);
 			if (wValSet == null) {
-				wValSet = DefaultTrieSet.transientOf();
+				wValSet = TrieSet_5Bits_LazyHashCode.transientOf();
 				hm.put(key, wValSet);
 			}
 			wValSet.__insert(val);
 		}
 
-		TransientMap<K, ImmutableSet<V>> w = DefaultTrieMap.transientOf();
+		TransientMap<K, ImmutableSet<V>> w = TrieMap_5Bits_LazyHashCode.transientOf();
 		for (K k : hm.keySet()) {
 			w.__put(k, hm.get(k).freeze());
 		}

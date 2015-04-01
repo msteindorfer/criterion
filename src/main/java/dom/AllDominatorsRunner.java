@@ -39,7 +39,7 @@ public class AllDominatorsRunner {
 	
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		IMap resultsBareMetalOne = DominatorsWithoutPDB.testOne();
+		IMap resultsBareMetalOne = DominatorsWithoutPDB_Default.testOne();
 		IMap resultsClojureOne = DominatorsClojure.testOne();
 		IMap resultsScalaOne = DominatorsScalaV1.testOne();
 //		IMap resultsPdbPersistentOne = DominatorsPDB.testOne(org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance());
@@ -63,7 +63,7 @@ public class AllDominatorsRunner {
 			System.err.println("[CHART and Clojure] are equal!\n\n");
 		}		
 		
-		ISet resultsBareMetal = DominatorsWithoutPDB.testAll(CURRENT_DATA_SET);
+		ISet resultsBareMetal = DominatorsWithoutPDB_Default.testAll(CURRENT_DATA_SET);
 		ISet resultsClojure = DominatorsClojure.testAll(CURRENT_DATA_SET);
 		ISet resultsScala = DominatorsScalaV1.testAll(CURRENT_DATA_SET);
 //		ISet resultsPdbPersistent = DominatorsPDB.testAll(org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance());
