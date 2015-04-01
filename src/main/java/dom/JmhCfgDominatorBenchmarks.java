@@ -23,8 +23,11 @@ import java.util.concurrent.TimeUnit;
 
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils;
 
+import org.eclipse.imp.pdb.facts.IConstructor;
 import org.eclipse.imp.pdb.facts.IMap;
 import org.eclipse.imp.pdb.facts.ISet;
+import org.eclipse.imp.pdb.facts.ISetWriter;
+import org.eclipse.imp.pdb.facts.ITuple;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
@@ -126,6 +129,23 @@ public class JmhCfgDominatorBenchmarks {
 				IValue mapKey = dataSetIterator.next();
 				ISet mapValue = (ISet) DATA_SET_FULL.get(mapKey);
 
+//				/**** REMOVE ANNOTATIONS ***/
+//				IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+//				
+//				ISetWriter bldr = vf.setWriter();
+//				for (IValue untypedTuple : mapValue) {
+//					ITuple tuple = (ITuple) untypedTuple;
+//					
+//					IConstructor keyCleaned = ((IConstructor) tuple.get(0)).asAnnotatable().removeAnnotations();
+//					IConstructor valCleaned = ((IConstructor) tuple.get(1)).asAnnotatable().removeAnnotations();
+//					
+//					ITuple cleanedTuple = vf.tuple(keyCleaned, valCleaned);
+//					
+//					bldr.insert(cleanedTuple);
+//				}
+//				mapValue = bldr.done();
+//				/***************************/
+				
 				sampledGraphs.add(mapValue);
 			} else {
 				dataSetIterator.next();
