@@ -7,15 +7,9 @@ public class DominatorBenchmarkUtils {
 		CHART {
 			@Override
 			public DominatorBenchmark getBenchmark() {
-				return new DominatorsWithoutPDB_Default();
+				return new DominatorsChart();
 			}
 		},
-		CHART_LAZY {
-			@Override
-			public DominatorBenchmark getBenchmark() {
-				return new DominatorsWithoutPDB_LazyHashCode();
-			}
-		},		
 		CLOJURE_LAZY {
 			@Override
 			public DominatorBenchmark getBenchmark() {
@@ -26,12 +20,6 @@ public class DominatorBenchmarkUtils {
 			@Override
 			public DominatorBenchmark getBenchmark() {
 				return new DominatorsScala_Default();
-			}
-		},
-		SCALA_LAZY {
-			@Override
-			public DominatorBenchmark getBenchmark() {
-				return new DominatorsScala_LazyHashCode();
 			}
 		};
 

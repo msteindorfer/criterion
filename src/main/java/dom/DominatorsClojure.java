@@ -1,47 +1,25 @@
 package dom;
 
-import static dom.AllDominatorsRunner.CURRENT_DATA_SET;
-import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
-import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
-import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
 import static dom.UtilClojure.EMPTY;
 import static dom.UtilClojure.carrier;
 import static dom.UtilClojure.intersect;
 import static dom.UtilClojure.project;
 import static dom.UtilClojure.toMap;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import org.eclipse.imp.pdb.facts.IConstructor;
-import org.eclipse.imp.pdb.facts.IMap;
-import org.eclipse.imp.pdb.facts.IMapWriter;
 import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ISetWriter;
 import org.eclipse.imp.pdb.facts.ITuple;
 import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
-import org.eclipse.imp.pdb.facts.io.BinaryValueWriter;
-import org.eclipse.imp.pdb.facts.io.StandardTextWriter;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieSet;
-import org.eclipse.imp.pdb.facts.util.ImmutableSet;
-import org.eclipse.imp.pdb.facts.util.TransientSet;
 import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
 
 import clojure.set$difference;
 import clojure.set$intersection;
 import clojure.set$union;
-import clojure.lang.APersistentMap;
 import clojure.lang.IFn;
 import clojure.lang.IPersistentSet;
 import clojure.lang.ITransientMap;
@@ -49,7 +27,6 @@ import clojure.lang.ITransientSet;
 import clojure.lang.PersistentHashMap;
 import clojure.lang.PersistentHashSet;
 
-@SuppressWarnings("deprecation")
 public class DominatorsClojure implements DominatorBenchmark {
 
 	private PersistentHashSet setofdomsets(PersistentHashMap dom, PersistentHashSet preds) {
@@ -147,171 +124,6 @@ public class DominatorsClojure implements DominatorBenchmark {
 		return dom;
 	}
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		testOne();
-		assertDominatorsEqual();
-	}
-
-	public static IMap testOne() throws IOException, FileNotFoundException {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-
-		ISet data = (ISet) new BinaryValueReader().read(vf, new FileInputStream(
-						DATA_SET_SINGLE_FILE_NAME));
-
-		// convert data to remove PDB dependency
-		PersistentHashSet graph = pdbSetToPersistentHashSet(data);
-
-		long before = Timing.getCpuTime();
-		PersistentHashMap results = new DominatorsClojure().calculateDominators(graph);
-		System.err.println("CLOJURE" + "\nDuration: "
-						+ ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
-
-		IMap pdbResults = persistentHashMapToPdbMap(results);
-
-		if (LOG_BINARY_RESULTS)
-			new BinaryValueWriter().write(pdbResults, new FileOutputStream(
-							"data/dominators-java-without-pdb-single.bin"));
-
-		if (LOG_TEXTUAL_RESULTS)
-			new StandardTextWriter().write(pdbResults, new FileWriter(
-							"data/dominators-java-without-pdb-single.txt"));
-
-		return pdbResults;
-	}
-
-	public static ISet testAll(IMap sampledGraphs) throws IOException, FileNotFoundException {
-		// convert data to remove PDB dependency
-		ArrayList<PersistentHashSet> graphs = pdbMapToArrayListOfValues(sampledGraphs);
-
-		ITransientSet result = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
-		long before = Timing.getCpuTime();
-		for (PersistentHashSet graph : graphs) {
-			try {
-				result.conj(new DominatorsClojure().calculateDominators(graph));
-			} catch (RuntimeException e) {
-				System.err.println(e.getMessage());
-			}
-		}
-		System.err.println("CLOJURE" + "\nDuration: "
-						+ ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
-
-		// convert back to PDB for serialization
-		ISet pdbResults = persistentHashSetOfMapsToSetOfMapValues((PersistentHashSet) result
-						.persistent());
-
-		if (LOG_BINARY_RESULTS)
-			new BinaryValueWriter().write(pdbResults, new FileOutputStream(
-							"data/dominators-java.bin"));
-
-		if (LOG_TEXTUAL_RESULTS)
-			new StandardTextWriter().write(pdbResults, new FileWriter(
-							"data/dominators-java-without-pdb.txt"));
-
-		return pdbResults;
-	}
-
-	private static ArrayList<PersistentHashSet> pdbMapToArrayListOfValues(IMap data) {
-		// convert data to remove PDB dependency
-		ArrayList<PersistentHashSet> graphs = new ArrayList<>(data.size());
-		for (IValue key : data) {
-			ISet value = (ISet) data.get(key);
-
-			ITransientSet convertedValue = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
-			for (IValue tuple : value) {
-				convertedValue.conj((ITuple) tuple);
-			}
-
-			graphs.add((PersistentHashSet) convertedValue.persistent());
-		}
-
-		return graphs;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static ISet persistentHashSetOfMapsToSetOfMapValues(PersistentHashSet result) {
-		// convert back to PDB for serialization
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-
-		ISetWriter resultBuilder = vf.setWriter();
-
-		for (PersistentHashMap dominatorResult : (Iterable<PersistentHashMap>) result) {
-			IMapWriter builder = vf.mapWriter();
-
-			for (Object object : ((APersistentMap) dominatorResult).entrySet()) {
-				Map.Entry<IConstructor, PersistentHashSet> entry = (Entry<IConstructor, PersistentHashSet>) object;
-				builder.put(entry.getKey(), persistentHashSetToPdbSet(entry.getValue()));
-			}
-
-			resultBuilder.insert(builder.done());
-		}
-
-		return resultBuilder.done();
-	}
-
-	private static IMap persistentHashMapToPdbMap(PersistentHashMap result) {
-		// convert back to PDB for serialization
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-
-		IMapWriter builder = vf.mapWriter();
-
-		for (Object object : (Iterable<PersistentHashMap>) result.entrySet()) {
-			Map.Entry<IConstructor, PersistentHashSet> entry = (Entry<IConstructor, PersistentHashSet>) object;
-			builder.put(entry.getKey(), persistentHashSetToPdbSet(entry.getValue()));
-		}
-
-		return builder.done();
-	}
-
-	private static <K extends IValue> ISet persistentHashSetToPdbSet(PersistentHashSet set) {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-
-		ISetWriter builder = vf.setWriter();
-
-		for (K key : (Iterable<K>) set) {
-			builder.insert(key);
-		}
-
-		return builder.done();
-	}
-
-	// private static <K extends IValue, V extends IValue> IMap
-	// PersistentHashMapToPdbMap(
-	// PersistentHashMap<K, V> map) {
-	// IValueFactory vf =
-	// org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-	//
-	// IMapWriter builder = vf.mapWriter();
-	//
-	// for (Map.Entry<K, V> entry : map.entrySet()) {
-	// builder.put(entry.getKey(), entry.getValue());
-	// }
-	//
-	// return builder.done();
-	// }
-
-	private static PersistentHashSet pdbSetToPersistentHashSet(ISet set) {
-		ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
-
-		for (IValue tuple : set) {
-			builder.conj((ITuple) tuple);
-		}
-
-		return (PersistentHashSet) builder.persistent();
-	}
-
-	public static void assertDominatorsEqual() throws FileNotFoundException, IOException {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-
-		ISet dominatorsRascal = (ISet) new BinaryValueReader().read(vf, new FileInputStream(
-						"data/dominators-rascal.bin"));
-		ISet dominatorsJava = (ISet) new BinaryValueReader().read(vf, new FileInputStream(
-						"data/dominators-java.bin"));
-
-		if (!dominatorsRascal.equals(dominatorsJava)) {
-			throw new Error("Dominator calculations do differ!");
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
@@ -346,7 +158,6 @@ public class DominatorsClojure implements DominatorBenchmark {
 
 class UtilClojure {
 
-	@SuppressWarnings("rawtypes")
 	public final static PersistentHashSet EMPTY = PersistentHashSet.create();
 
 	/*
@@ -539,6 +350,7 @@ class UtilClojure {
 	 * Projection from a tuple to another tuple with (possible reordered) subset
 	 * of fields.
 	 */
+	@SuppressWarnings("unchecked")
 	public static PersistentHashSet project(PersistentHashSet set1, int field1, int field2) {
 		ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 

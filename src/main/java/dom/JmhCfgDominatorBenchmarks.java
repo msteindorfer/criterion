@@ -23,11 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils;
 
-import org.eclipse.imp.pdb.facts.IConstructor;
 import org.eclipse.imp.pdb.facts.IMap;
 import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ISetWriter;
-import org.eclipse.imp.pdb.facts.ITuple;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
@@ -128,23 +125,6 @@ public class JmhCfgDominatorBenchmarks {
 			if (sampledIndices.contains(dataSetCursor)) {
 				IValue mapKey = dataSetIterator.next();
 				ISet mapValue = (ISet) DATA_SET_FULL.get(mapKey);
-
-//				/**** REMOVE ANNOTATIONS ***/
-//				IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-//				
-//				ISetWriter bldr = vf.setWriter();
-//				for (IValue untypedTuple : mapValue) {
-//					ITuple tuple = (ITuple) untypedTuple;
-//					
-//					IConstructor keyCleaned = ((IConstructor) tuple.get(0)).asAnnotatable().removeAnnotations();
-//					IConstructor valCleaned = ((IConstructor) tuple.get(1)).asAnnotatable().removeAnnotations();
-//					
-//					ITuple cleanedTuple = vf.tuple(keyCleaned, valCleaned);
-//					
-//					bldr.insert(cleanedTuple);
-//				}
-//				mapValue = bldr.done();
-//				/***************************/
 				
 				sampledGraphs.add(mapValue);
 			} else {
@@ -156,17 +136,6 @@ public class JmhCfgDominatorBenchmarks {
 	@Benchmark
 	public void timeDominatorCalculation(Blackhole bh) {
 		dominatorBenchmark.performBenchmark(bh, sampledGraphsNative);
-	}
-
-	public static void main(String[] args) throws RunnerException {
-		Options opt = new OptionsBuilder()
-						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
-										+ ".(timeDominatorCalculation)").warmupIterations(3)
-						.measurementIterations(5).mode(Mode.AverageTime).forks(1)
-						.timeUnit(TimeUnit.SECONDS).param("size", "16").param("run", "0")
-						.param("dominatorBenchmarkEnum", "SCALA").shouldDoGC(true).build();
-
-		new Runner(opt).run();
 	}
 
 }
