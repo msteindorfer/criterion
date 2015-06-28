@@ -299,13 +299,13 @@ public class JmhMapBenchmarks {
 		}
 	}
 
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeRemoveKey(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.removeKey(cachedNumbers[i]));
-		}
-	}
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeRemoveKey(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.removeKey(cachedNumbers[i]));
+//		}
+//	}
 
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {
