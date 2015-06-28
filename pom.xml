@@ -110,7 +110,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jmh.version>1.7</jmh.version>
+		<jmh.version>1.10.1</jmh.version>
 		<gs-collections.version>5.0.0</gs-collections.version>
 	</properties>
 
