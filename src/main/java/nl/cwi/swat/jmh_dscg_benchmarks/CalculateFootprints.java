@@ -11,6 +11,9 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
+import gnu.trove.map.hash.TIntIntHashMap;
+
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +21,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +29,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints.MemoryFootprintPreset;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
 import org.eclipse.imp.pdb.facts.IInteger;
@@ -38,8 +43,10 @@ import org.eclipse.imp.pdb.facts.util.ImmutableSet;
 import org.eclipse.imp.pdb.facts.util.TransientMap;
 import org.eclipse.imp.pdb.facts.util.TransientSet;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge;
+import org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge;
@@ -72,7 +79,7 @@ public final class CalculateFootprints {
 
 	private static final IValueFactory valueFactory = ValueFactory.getInstance();
 
-	private static boolean reportSet = true;
+	private static boolean reportSet = false;
 	private static boolean reportMap = true;
 
 	private static int multimapValueCount = 6;
@@ -169,11 +176,11 @@ public final class CalculateFootprints {
 //		ImmutableMap<IValue, IValue> ys = transientMap.freeze();
 		
 		ImmutableSet<IValue> xs = TrieSet_5Bits.<IValue>of();
-		ImmutableMap<IValue, IValue> ys = TrieMap_5Bits.<IValue, IValue>of();
+		ImmutableMap<Integer, Integer> ys = TrieMap_5Bits.of();
 				
 		for (IValue v : testSet) {
 			if (reportSet) xs = xs.__insert(v);
-			if (reportMap) ys = ys.__put(v, v);
+			if (reportMap) ys = ys.__put(((IInteger) v).intValue(), ((IInteger) v).intValue());
 		}
 		
 //		// statistics should exactly match, thus only printing them once
@@ -499,16 +506,38 @@ public final class CalculateFootprints {
 //}
 //}	
 	
-	private static void measureAndReport(final Object objectToMeasure, final String className, DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run) {
-		/*
-		 * ITuple, etc should be measured. Only excluding IInteger (actual elements).
-		 */
-		Predicate<Object> jointPredicate = Predicates.not(Predicates.instanceOf(IInteger.class));
+	enum MemoryFootprintPreset {
+		RETAINED_SIZE,
+		DATA_STRUCTURE_OVERHEAD
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static void measureAndReport(final Object objectToMeasure, final String className, DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run, MemoryFootprintPreset preset) {
+		final Predicate<Object> predicate;
 		
+		switch (preset) {
+		case DATA_STRUCTURE_OVERHEAD:
+			predicate = Predicates.not(Predicates.or(Predicates.instanceOf(Integer.class), Predicates.instanceOf(BigInteger.class), Predicates.instanceOf(IValue.class)));
+			break;
+		case RETAINED_SIZE:
+			predicate = Predicates.alwaysTrue();
+			break;
+		default:
+			throw new IllegalStateException();
+		}
+		
+		measureAndReport(objectToMeasure, className, dataType, archetype, supportsStagedMutability, size, run, predicate);
+	}
+	
+	private static void measureAndReport(final Object objectToMeasure, final String className, DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run) {
+		measureAndReport(objectToMeasure, className, dataType, archetype, supportsStagedMutability, size, run, MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
+	}
+	
+	private static void measureAndReport(final Object objectToMeasure, final String className, DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run, Predicate<Object> predicate) {
 		long memoryInBytes = objectexplorer.MemoryMeasurer.measureBytes(objectToMeasure,
-						jointPredicate);
+						predicate);
 		Footprint memoryFootprint = objectexplorer.ObjectGraphMeasurer.measure(objectToMeasure,
-						jointPredicate);
+						predicate);
 
 		final String statString = String.format("%d\t %60s\t\t %s", memoryInBytes, className,
 						memoryFootprint);
@@ -624,8 +653,172 @@ public final class CalculateFootprints {
 	
 	public static void main(String[] args) throws Exception {
 		writeToFile(false, csvHeader);		
-		footprintMap__Random_Persistent();
+//		footprintMap__Random_Persistent();
 //		footprintBinaryRelation__Random_Persistent();
+		
+		testPrintStatsRandomSmallAndBigIntegers();
 	}
 	
+	enum Split {
+		_100_0_,
+		_50_50_,
+		_33_66_,
+		_25_75_,
+		_20_80_,
+		_05_95_
+	};
+	
+	static final int moduloordinal(Split splitEnum) {
+		switch (splitEnum) {
+		case _100_0_:
+			return 1;
+		case _50_50_:
+			return 2;			
+		case _33_66_:
+			return 3;
+		case _25_75_:
+			return 4;
+		case _20_80_:
+			return 5;
+		case _05_95_:
+			return 20;
+		default:
+			throw new IllegalStateException(String.format("Not (yet) supported enum value %s.", splitEnum));
+		}
+	}
+	
+	public static void testPrintStatsRandomSmallAndBigIntegers() throws Exception {
+		int size = 1024;
+		double percentageOfPrimitives = 1.00;
+		
+		Object[] data = new Object[size];
+		
+		int countForPrimitives = (int) ((percentageOfPrimitives) * size);
+		int smallCount = 0;
+		int bigCount = 0;
+		
+		Random rand = new Random(13);
+		for (int i = 0; i < size; i++) {
+			final int j = rand.nextInt();
+			final BigInteger bigJ = BigInteger.valueOf(j).multiply(BigInteger.valueOf(j));
+
+			if (i < countForPrimitives) {
+				// System.out.println("SMALL");
+				smallCount++;
+				data[i] = j;
+			} else {
+				// System.out.println("BIG");
+				bigCount++;
+				data[i] = bigJ;
+			}
+		}
+		
+		System.out.println();		
+		System.out.println(String.format("PRIMITIVE:   %10d (%.2f percent)", smallCount, 100. * smallCount / (smallCount + bigCount)));
+		System.out.println(String.format("BIG_INTEGER: %10d (%.2f percent)", bigCount, 100. * bigCount / (smallCount + bigCount)));
+		// System.out.println(String.format("UNIQUE:      %10d (%.2f percent)", map.size(), 100. * map.size() / (smallCount + bigCount)));
+		System.out.println();
+
+		EnumSet<MemoryFootprintPreset> presets = EnumSet.of(
+				MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD, MemoryFootprintPreset.RETAINED_SIZE);
+		
+		for (MemoryFootprintPreset preset : presets) {
+			createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true);
+			createAndMeasureTrieMapHomogeneous(data, size, 0, preset, false);
+			createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false);
+			createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true);
+			createAndMeasureTrove4jIntArrayList(data, size, 0, preset);
+			System.out.println();
+		}
+	}
+	
+	public static void createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount,
+			int run, MemoryFootprintPreset preset, boolean isSpecialized) {
+		ImmutableMap<Object, Object> ys = null;
+		
+		if (isSpecialized) {
+			ys = TrieMap_5Bits_Spec0To8.of();
+//			ys = TrieMap_BleedingEdge.of();
+		} else {
+			ys = TrieMap_5Bits.of();
+		}
+
+		for (Object v : data) {
+			ys = ys.__put(v, v);
+			assert ys.containsKey(v);
+		}
+
+		String shortName = String.format("TrieMap[%13s, isSpecialized = %5s]", "homogeneous", isSpecialized);
+
+		String longName = String.format(
+				"org.eclipse.imp.pdb.facts.util.TrieMap_5Bits[isSpecialized = %5s]", isSpecialized);
+		
+		measureAndReport(ys, shortName, DataType.MAP,
+				Archetype.PERSISTENT, false, elementCount, run, preset);
+	}
+
+	public static void createAndMeasureTrieMapHeterogeneous(final Object[] data, int elementCount,
+			int run, MemoryFootprintPreset preset, boolean isSpecialized) {
+		TrieMap_Heterogeneous.IS_SPECIALIZED = isSpecialized;
+		ImmutableMap<Object, Object> ys = TrieMap_Heterogeneous.of();
+
+		for (Object v : data) {
+			ys = ys.__put(v, v);
+			assert ys.containsKey(v);
+		}
+		
+		String shortName = String.format("TrieMap[%13s, isSpecialized = %5s]",
+				"heterogeneous", isSpecialized);
+
+		String longName = String.format(
+				"org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous[isSpecialized = %5s]",
+				isSpecialized);
+		
+		measureAndReport(ys, shortName, DataType.MAP, Archetype.PERSISTENT, false, elementCount,
+				run, preset);
+	}
+
+	public static void createAndMeasureTrove4jIntArrayList(final Object[] data, int elementCount,
+			int run, MemoryFootprintPreset preset) {
+		TIntIntHashMap ys = new TIntIntHashMap(elementCount);
+
+		int[] convertedData = new int[elementCount];
+
+		for (int i = 0; i < elementCount; i++) {
+			final Object v = data[i];
+			final int convertedValue;
+			
+			if (v instanceof Integer) {
+				convertedValue = (Integer) v;
+			} else if (v instanceof BigInteger) {
+				convertedValue = ((BigInteger) v).intValue();
+			} else {
+				throw new IllegalStateException("Expecting input data of type Integer or BigInteger.");
+			}
+		
+			convertedData[i] = convertedValue;
+		}
+		
+		for (int value : convertedData) {
+			ys.put(value, value);
+			assert ys.containsKey(value);
+		}
+
+		measureAndReport(ys, "gnu.trove.map.hash.TIntIntHashMap", DataType.MAP,
+				Archetype.MUTABLE, false, elementCount, run, preset);
+	}
+	
+}
+
+//measureAndReport(new NestedBigInteger(), "NestedBigInteger", DataType.MAP, Archetype.PERSISTENT, true, size, run);
+//measureAndReport(new NestedPrimitiveInteger(), "NestedPrimitiveInteger", DataType.MAP, Archetype.PERSISTENT, true, size, run);
+
+class NestedBigInteger {
+	private BigInteger bigInt0 = BigInteger.valueOf(10);
+	private BigInteger bigInt1 = BigInteger.valueOf(11);
+}
+
+class NestedPrimitiveInteger {
+	private int smallInt0 = 10;
+	private int smallInt1 = 11;
 }
