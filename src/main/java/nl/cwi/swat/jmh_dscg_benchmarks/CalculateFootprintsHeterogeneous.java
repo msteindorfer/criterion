@@ -56,7 +56,7 @@ public final class CalculateFootprintsHeterogeneous {
 		writeToFile(Paths.get("map_sizes_heterogeneous_large.csv"), false, createLinearRange(100_000, 8_100_000, 100_000).stream()
 				.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));		
 		
-		writeToFile(Paths.get("map_sizes_heterogeneous_exponential.csv"), false, createExponentialRange(0, 10).stream()
+		writeToFile(Paths.get("map_sizes_heterogeneous_exponential.csv"), false, createExponentialRange(0, 24).stream()
 				.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 	}
 
