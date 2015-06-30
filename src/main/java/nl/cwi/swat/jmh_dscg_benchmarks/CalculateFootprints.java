@@ -50,6 +50,7 @@ import org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge;
+import org.openjdk.jol.info.GraphLayout;
 
 import scala.Tuple2;
 import clojure.lang.IPersistentMap;
@@ -517,7 +518,7 @@ public final class CalculateFootprints {
 		
 		switch (preset) {
 		case DATA_STRUCTURE_OVERHEAD:
-			predicate = Predicates.not(Predicates.or(Predicates.instanceOf(Integer.class), Predicates.instanceOf(BigInteger.class), Predicates.instanceOf(IValue.class)));
+			predicate = Predicates.not(Predicates.or(Predicates.instanceOf(Integer.class), Predicates.instanceOf(BigInteger.class), Predicates.instanceOf(IValue.class), Predicates.instanceOf(NonUnboxableInteger.class)));
 			break;
 		case RETAINED_SIZE:
 			predicate = Predicates.alwaysTrue();
@@ -534,6 +535,8 @@ public final class CalculateFootprints {
 	}
 	
 	private static void measureAndReport(final Object objectToMeasure, final String className, DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run, Predicate<Object> predicate) {
+//		System.out.println(GraphLayout.parseInstance(objectToMeasure).totalSize());
+		
 		long memoryInBytes = objectexplorer.MemoryMeasurer.measureBytes(objectToMeasure,
 						predicate);
 		Footprint memoryFootprint = objectexplorer.ObjectGraphMeasurer.measure(objectToMeasure,
@@ -657,6 +660,9 @@ public final class CalculateFootprints {
 //		footprintBinaryRelation__Random_Persistent();
 		
 		testPrintStatsRandomSmallAndBigIntegers();
+		
+//		measureAndReport(new NestedBigInteger(), "NestedBigInteger", DataType.MAP, Archetype.PERSISTENT, true, 0, 0, MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
+//		measureAndReport(new NestedPrimitiveInteger(), "NestedPrimitiveInteger", DataType.MAP, Archetype.PERSISTENT, true, 0, 0, MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
 	}
 	
 	enum Split {
@@ -688,7 +694,22 @@ public final class CalculateFootprints {
 	}
 	
 	public static void testPrintStatsRandomSmallAndBigIntegers() throws Exception {
-		int size = 1024;
+		int measurements = 4;
+		
+		for (int exp = 0; exp <= 23; exp += 1) {
+			final int thisExpSize = (int) Math.pow(2, exp);
+			final int prevExpSize = (int) Math.pow(2, exp-1);
+			
+			int stride = (thisExpSize - prevExpSize) / measurements;
+			
+			if (stride == 0) {
+				measurements = 1;
+			}
+			
+			for (int m = measurements - 1; m >= 0; m--) {
+				int size = thisExpSize - m * stride;
+				
+		// int size = 32;
 		double percentageOfPrimitives = 1.00;
 		
 		Object[] data = new Object[size];
@@ -720,15 +741,21 @@ public final class CalculateFootprints {
 		System.out.println();
 
 		EnumSet<MemoryFootprintPreset> presets = EnumSet.of(
-				MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD, MemoryFootprintPreset.RETAINED_SIZE);
+//					MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD
+//					,
+					MemoryFootprintPreset.RETAINED_SIZE
+				);
 		
 		for (MemoryFootprintPreset preset : presets) {
-			createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true);
-			createAndMeasureTrieMapHomogeneous(data, size, 0, preset, false);
-			createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false);
+//			createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true);
+//			createAndMeasureTrieMapHomogeneous(data, size, 0, preset, false);
+			createAndMeasureJavaUtilHashMap(data, size, 0, preset);
 			createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true);
+			createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false);
 			createAndMeasureTrove4jIntArrayList(data, size, 0, preset);
 			System.out.println();
+		}
+		}
 		}
 	}
 	
@@ -751,33 +778,60 @@ public final class CalculateFootprints {
 		String shortName = String.format("TrieMap[%13s, isSpecialized = %5s]", "homogeneous", isSpecialized);
 
 		String longName = String.format(
-				"org.eclipse.imp.pdb.facts.util.TrieMap_5Bits[isSpecialized = %5s]", isSpecialized);
+				"org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To8", isSpecialized);
 		
-		measureAndReport(ys, shortName, DataType.MAP,
+		measureAndReport(ys, longName, DataType.MAP,
 				Archetype.PERSISTENT, false, elementCount, run, preset);
 	}
 
 	public static void createAndMeasureTrieMapHeterogeneous(final Object[] data, int elementCount,
-			int run, MemoryFootprintPreset preset, boolean isSpecialized) {
-		TrieMap_Heterogeneous.IS_SPECIALIZED = isSpecialized;
+			int run, MemoryFootprintPreset preset, boolean storePrimivesBoxed) {
+		TrieMap_Heterogeneous.IS_SPECIALIZED = true;
 		ImmutableMap<Object, Object> ys = TrieMap_Heterogeneous.of();
 
 		for (Object v : data) {
-			ys = ys.__put(v, v);
-			assert ys.containsKey(v);
+			if (v instanceof Integer && storePrimivesBoxed) {
+				NonUnboxableInteger convertedValue = new NonUnboxableInteger(
+						((Integer) v).intValue());
+
+				ys = ys.__put(convertedValue, convertedValue);
+				assert ys.containsKey(convertedValue);
+			} else {
+				ys = ys.__put(v, v);
+				assert ys.containsKey(v);
+			}
 		}
 		
-		String shortName = String.format("TrieMap[%13s, isSpecialized = %5s]",
-				"heterogeneous", isSpecialized);
-
-		String longName = String.format(
-				"org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous[isSpecialized = %5s]",
-				isSpecialized);
+		final String shortName = storePrimivesBoxed ? "HTrieMap [Boxed]" : "HTrieMap [Primitive]";
+		
+//		String shortName = String.format("TrieMap[%13s, storePrimivesBoxed = %5s]",
+//				"heterogeneous", storePrimivesBoxed);
+//
+//		String longName = String.format(
+//				"org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous[storePrimivesBoxed = %5s]",
+//				storePrimivesBoxed);
 		
 		measureAndReport(ys, shortName, DataType.MAP, Archetype.PERSISTENT, false, elementCount,
 				run, preset);
 	}
+	
+	public static void createAndMeasureJavaUtilHashMap(final Object[] data, int elementCount,
+			int run, MemoryFootprintPreset preset) {
+		Map<Object, Object> ys = new HashMap<>();
+		
+		for (Object v : data) {
+			ys.put(v, v);
+			assert ys.containsKey(v);
+		}
 
+		String shortName = String.format("HashMap");
+
+		String longName = String.format("java.util.HashMap");
+		
+		measureAndReport(ys, shortName, DataType.MAP,
+				Archetype.MUTABLE, false, elementCount, run, preset);
+	}	
+	
 	public static void createAndMeasureTrove4jIntArrayList(final Object[] data, int elementCount,
 			int run, MemoryFootprintPreset preset) {
 		TIntIntHashMap ys = new TIntIntHashMap(elementCount);
@@ -804,7 +858,11 @@ public final class CalculateFootprints {
 			assert ys.containsKey(value);
 		}
 
-		measureAndReport(ys, "gnu.trove.map.hash.TIntIntHashMap", DataType.MAP,
+		String shortName = "TIntIntHashMap";
+		
+		String longName = "gnu.trove.map.hash.TIntIntHashMap";
+		
+		measureAndReport(ys, shortName, DataType.MAP,
 				Archetype.MUTABLE, false, elementCount, run, preset);
 	}
 	
@@ -821,4 +879,13 @@ class NestedBigInteger {
 class NestedPrimitiveInteger {
 	private int smallInt0 = 10;
 	private int smallInt1 = 11;
+}
+
+class NonUnboxableInteger {
+	final int value;
+
+	NonUnboxableInteger(int value) {
+		this.value = value;
+	}
+
 }
