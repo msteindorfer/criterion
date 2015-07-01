@@ -11,21 +11,9 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toMap;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collector;
 
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
@@ -71,8 +59,8 @@ public class JmhMapBenchmarks {
 	 * s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
 	 */
 	@Param({ "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096",
-					"8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576",
-					"2097152", "4194304", "8388608" })
+			"8192", "16384", "32768", "65536", "131072", "262144", "524288", "1048576", "2097152",
+			"4194304", "8388608" })
 	protected int size;
 
 	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
@@ -93,7 +81,7 @@ public class JmhMapBenchmarks {
 
 	private IMap singletonMapWithExistingValue;
 	private IMap singletonMapWithNotExistingValue;
-	
+
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
 		setUpTestMapWithRandomContent(size, run);
@@ -173,41 +161,55 @@ public class JmhMapBenchmarks {
 
 		final IMapWriter mapWriter2 = valueFactory.mapWriter();
 		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
-		singletonMapWithNotExistingValue = mapWriter2.done();	
-		
+		singletonMapWithNotExistingValue = mapWriter2.done();
+
 		// System.out.println(String.format("\n\ncachedNumbers = %s",
 		// Arrays.toString(cachedNumbers)));
 		// System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 		// Arrays.toString(cachedNumbersNotContained)));
-		
+
 		OverseerUtils.setup(JmhMapBenchmarks.class, this);
 	}
 
-	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
-		valueFactory = valueFactoryFactory.getInstance();
-
-		IMapWriter writer1 = valueFactory.mapWriter();
-		IMapWriter writer2 = valueFactory.mapWriter();
+	protected int[] generateTestData(int size, int run) {
+		int[] data = new int[size];
 
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial);
 
 		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
+		for (int i = size - 1; i >= 0; i--) {
+			data[i] = rand.nextInt();
+		}
+
+		return data;
+	}
+
+	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
+
+		valueFactory = valueFactoryFactory.getInstance();
+
+		IMapWriter writer1 = valueFactory.mapWriter();
+		IMapWriter writer2 = valueFactory.mapWriter();
+
 		/*
 		 * randomly choose one element amongst the elements
 		 */
-		int existingValueIndex = new Random(seedForThisTrial + 13).nextInt(size);
+		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
+		Random rand = new Random(seedForThisTrial + 13);
+		int existingValueIndex = rand.nextInt(size);
+
+		int[] data = generateTestData(size, run);
 
 		for (int i = size - 1; i >= 0; i--) {
-			final int j = rand.nextInt();
-			final IValue current = valueFactory.integer(j);
+			final IValue current = valueFactory.integer(data[i]);
 
 			writer1.put(current, current);
 			writer2.put(current, current);
 
 			if (i == existingValueIndex) {
-				VALUE_EXISTING = valueFactory.integer(j);
+				VALUE_EXISTING = valueFactory.integer(data[i]);
 			}
 		}
 
@@ -227,34 +229,34 @@ public class JmhMapBenchmarks {
 		}
 
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
-						VALUE_EXISTING);
+				VALUE_EXISTING);
 	}
-	
+
 	@TearDown(Level.Trial)
 	public void tearDown() {
-		OverseerUtils.tearDown(); 
-	}	
-	
-//	@Setup(Level.Iteration)
-//	public void setupIteration() {
-//		OverseerUtils.doRecord(true); 
-//	}	
-//	
-//	@TearDown(Level.Iteration)
-//	public void tearDownIteration() {
-//		OverseerUtils.doRecord(false); 
-//	}	
-	
+		OverseerUtils.tearDown();
+	}
+
+	// @Setup(Level.Iteration)
+	// public void setupIteration() {
+	// OverseerUtils.doRecord(true);
+	// }
+	//
+	// @TearDown(Level.Iteration)
+	// public void tearDownIteration() {
+	// OverseerUtils.doRecord(false);
+	// }
+
 	@Setup(Level.Invocation)
 	public void setupInvocation() {
 		OverseerUtils.setup(JmhMapBenchmarks.class, this);
-		OverseerUtils.doRecord(true); 
-	}	
-	
+		OverseerUtils.doRecord(true);
+	}
+
 	@TearDown(Level.Invocation)
 	public void tearDownInvocation() {
-		OverseerUtils.doRecord(false); 
-	}	
+		OverseerUtils.doRecord(false);
+	}
 
 	@Benchmark
 	public void timeContainsKeySingle(Blackhole bh) {
@@ -280,7 +282,7 @@ public class JmhMapBenchmarks {
 	@Benchmark
 	public void timeEntryIteration(Blackhole bh) {
 		for (Iterator<java.util.Map.Entry<IValue, IValue>> iterator = testMap.entryIterator(); iterator
-						.hasNext();) {
+				.hasNext();) {
 			bh.consume(iterator.next());
 		}
 	}
@@ -299,13 +301,13 @@ public class JmhMapBenchmarks {
 		}
 	}
 
-//	@Benchmark
-//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-//	public void timeRemoveKey(Blackhole bh) {
-//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-//			bh.consume(testMap.removeKey(cachedNumbers[i]));
-//		}
-//	}
+	// @Benchmark
+	// @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	// public void timeRemoveKey(Blackhole bh) {
+	// for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+	// bh.consume(testMap.removeKey(cachedNumbers[i]));
+	// }
+	// }
 
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {
@@ -316,20 +318,21 @@ public class JmhMapBenchmarks {
 	public void timeEqualsDeltaDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapDeltaDuplicate));
 	}
-	
+
 	@Benchmark
 	public void timeJoin(Blackhole bh) {
 		bh.consume(testMap.join(singletonMapWithNotExistingValue));
-	}	
+	}
 
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-						.include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeEqualsRealDuplicate)")
-						.forks(0).warmupIterations(5).measurementIterations(5)
-						.mode(Mode.AverageTime).param("dataType", "MAP")
-						.param("sampleDataSelection", "MATCH").param("size", "512")
-						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE").build();
+				.include(
+						".*" + JmhMapBenchmarks.class.getSimpleName()
+								+ ".(timeEqualsRealDuplicate)").forks(0).warmupIterations(5)
+				.measurementIterations(5).mode(Mode.AverageTime).param("dataType", "MAP")
+				.param("sampleDataSelection", "MATCH").param("size", "512")
+				.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE").build();
 
 		new Runner(opt).run();
 	}
