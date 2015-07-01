@@ -9,6 +9,9 @@ benchmark_data <- read.csv(paste0(benchmark_fileName, ".csv"), sep=",", header=T
 benchmark_data.m <- melt(benchmark_data, id.vars=c('elementCount', 'className'), measure.vars=c('footprintInBytes'))
 benchmark_data.c <- dcast(benchmark_data.m,  className ~ elementCount, median, fill=0)
 
+# http://r.789695.n4.nabble.com/Is-there-any-R-function-for-data-normalization-td4644768.html
+# http://stackoverflow.com/questions/5294955/how-to-scale-down-a-range-of-numbers-with-a-known-min-and-max-value
+# http://math.stackexchange.com/questions/362918/value-range-of-normalization-methods-min-max-z-score-decimal-scaling
 normalize <- function(x) { 
   x <- sweep(x, 2, apply(x, 2, min)) 
   sweep(x, 2, apply(x, 2, max), "/") 
