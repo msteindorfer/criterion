@@ -18,21 +18,21 @@ import org.eclipse.imp.pdb.facts.IValueFactory;
 
 public class BenchmarkUtils {
 	public static enum ValueFactoryFactory {
-//		VF_CLOJURE {
-//			@Override public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessValueFactory.getInstance();
-//			}
-//		},
+		VF_CLOJURE {
+			@Override public IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessValueFactory.getInstance();
+			}
+		},
 //		VF_CLJ_DS {
 //			@Override public IValueFactory getInstance() {
 //				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
 //			}
 //		},		
-//		VF_SCALA {
-//			@Override public IValueFactory getInstance() {
-//				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.TypelessValueFactory();
-//			}
-//		},
+		VF_SCALA {
+			@Override public IValueFactory getInstance() {
+				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.TypelessValueFactory();
+			}
+		},
 //		VF_PDB_REFERENCE {
 //			@Override public IValueFactory getInstance() {
 //				return org.eclipse.imp.pdb.facts.impl.reference.ValueFactory.getInstance();
@@ -44,12 +44,12 @@ public class BenchmarkUtils {
 				return org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
 			}
 		},
-		VF_PDB_PERSISTENT {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
-			}
-		},
+//		VF_PDB_PERSISTENT {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+//			}
+//		},
 //		VF_CLOJURE {
 //			@Override public IValueFactory getInstance() {
 //				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.ValueFactory.getInstance();
@@ -107,6 +107,24 @@ public class BenchmarkUtils {
 			@Override
 			public IValueFactory getInstance() {
 				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryCurrent.getInstance();
+			}
+		},
+		VF_PDB_PERSISTENT_LAZY {
+			@Override
+			public IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryLazy.getInstance();
+			}
+		},
+		VF_PDB_PERSISTENT_MEMOIZED {
+			@Override
+			public IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryMemoized.getInstance();
+			}
+		},
+		VF_PDB_PERSISTENT_MEMOIZED_LAZY {
+			@Override
+			public IValueFactory getInstance() {
+				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryMemoizedLazy.getInstance();
 			}
 		};
 

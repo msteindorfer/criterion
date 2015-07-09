@@ -35,6 +35,8 @@ import objectexplorer.ObjectGraphMeasurer.Footprint;
 import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.util.ImmutableMap;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To16;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To16_IntKey_IntValue;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous;
 
@@ -47,6 +49,8 @@ public final class CalculateFootprintsHeterogeneous {
 	private final static String CSV_HEADER = "elementCount,run,className,dataType,archetype,supportsStagedMutability,footprintInBytes,footprintInObjects,footprintInReferences"; // ,footprintInPrimitives
 	
 	public static void main(String[] args) {
+//		testOneConfiguration(2097152);
+		
 		writeToFile(Paths.get("map_sizes_heterogeneous_small.csv"), false, createLinearRange(0, 10_100, 100).stream()
 				.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));		
 		
@@ -154,32 +158,55 @@ public final class CalculateFootprintsHeterogeneous {
 								createAndMeasureJavaUtilHashMap(data, size, 0, preset),
 								createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true),
 								createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false),
-								createAndMeasureTrove4jIntArrayList(data, size, 0, preset) }))
+								createAndMeasureTrove4jIntArrayList(data, size, 0, preset),
+								createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true)}))
 				.collect(Collectors.toList());
 	}
 	
 	public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount,
 			int run, MemoryFootprintPreset preset, boolean isSpecialized) {
-		ImmutableMap<Object, Object> ys = null;
+		ImmutableMap<Integer, Integer> ys = null;
 		
 		if (isSpecialized) {
-			ys = TrieMap_5Bits_Spec0To8.of();
+			ys = TrieMap_5Bits_Spec0To16_IntKey_IntValue.of();
 //			ys = TrieMap_BleedingEdge.of();
 		} else {
-			ys = TrieMap_5Bits.of();
+			ys = TrieMap_5Bits_Spec0To16.of();
 		}
 
-		for (Object v : data) {
-			ys = ys.__put(v, v);
-			assert ys.containsKey(v);
-		}
+//		for (Object v : data) {
+//			ys = ys.__put(v, v);
+//			assert ys.containsKey(v);
+//		}
+	
+		int[] convertedData = new int[elementCount];
 
-		String shortName = String.format("TrieMap[%13s, isSpecialized = %5s]", "homogeneous", isSpecialized);
-
-		String longName = String.format(
-				"org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To8", isSpecialized);
+		for (int i = 0; i < elementCount; i++) {
+			final Object v = data[i];
+			final int convertedValue;
+			
+			if (v instanceof Integer) {
+				convertedValue = (Integer) v;
+			} else if (v instanceof BigInteger) {
+				convertedValue = ((BigInteger) v).intValue();
+			} else {
+				throw new IllegalStateException("Expecting input data of type Integer or BigInteger.");
+			}
 		
-		return measureAndReport(ys, longName, DataType.MAP,
+			convertedData[i] = convertedValue;
+		}
+		
+		for (int value : convertedData) {
+			ys = ys.__put(value, value);
+			assert ys.containsKey(value);
+		}		
+		
+		String shortName = "TrieMapIntInt";
+
+//		String longName = String.format(
+//				"org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To8", isSpecialized);
+		
+		return measureAndReport(ys, shortName, DataType.MAP,
 				Archetype.PERSISTENT, false, elementCount, run, preset);
 	}
 

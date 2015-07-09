@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory;
+import nl.cwi.swat.jmh_dscg_benchmarks.profiler.CountingIntegerProfiler;
 
 import org.eclipse.imp.pdb.facts.IMap;
 import org.eclipse.imp.pdb.facts.IMapWriter;
@@ -25,7 +26,9 @@ import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.CompilerControl;
 import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OperationsPerInvocation;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -33,14 +36,16 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
+import org.openjdk.jmh.runner.options.WarmupMode;
 
-@BenchmarkMode(Mode.SampleTime)
+@BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class JmhMapBenchmarks {
@@ -63,8 +68,11 @@ public class JmhMapBenchmarks {
 			"4194304", "8388608" })
 	protected int size;
 
-	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+	@Param({ "0" }) // "1", "2", "3", "4", "5", "6", "7", "8", "9"
 	protected int run;
+	
+	@Param // ({ "SLEEPING_INTEGER" })
+	public ElementProducer producer;
 
 	public IValueFactory valueFactory;
 
@@ -72,6 +80,8 @@ public class JmhMapBenchmarks {
 	private IMap testMapRealDuplicate;
 	private IMap testMapDeltaDuplicate;
 
+	private IMap testMapRealDuplicateSameSizeButDifferent;
+	
 	public IValue VALUE_EXISTING;
 	public IValue VALUE_NOT_EXISTING;
 
@@ -84,6 +94,10 @@ public class JmhMapBenchmarks {
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
+		// TODO: look for right place where to put this
+		SleepingInteger.IS_SLEEP_ENABLED_IN_HASHCODE = false;
+		SleepingInteger.IS_SLEEP_ENABLED_IN_EQUALS = false;
+		
 		setUpTestMapWithRandomContent(size, run);
 
 		switch (sampleDataSelection) {
@@ -97,7 +111,7 @@ public class JmhMapBenchmarks {
 			Random randForOperations = new Random(2147483647L);
 
 			for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-				cachedNumbers[i] = valueFactory.integer(randForOperations.nextInt());
+				cachedNumbers[i] = producer.createFromInt(randForOperations.nextInt());
 			}
 		}
 
@@ -113,7 +127,7 @@ public class JmhMapBenchmarks {
 				if (i >= size) {
 					cachedNumbers[i] = cachedNumbers[i % size];
 				} else {
-					cachedNumbers[i] = valueFactory.integer(rand.nextInt());
+					cachedNumbers[i] = producer.createFromInt(rand.nextInt());
 				}
 			}
 
@@ -128,7 +142,7 @@ public class JmhMapBenchmarks {
 				 */
 				boolean found = false;
 				while (!found) {
-					final IValue candidate = valueFactory.integer(anotherRand.nextInt());
+					final IValue candidate = producer.createFromInt(anotherRand.nextInt());
 
 					if (testMap.containsKey(candidate)) {
 						continue;
@@ -168,7 +182,11 @@ public class JmhMapBenchmarks {
 		// System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 		// Arrays.toString(cachedNumbersNotContained)));
 
-		OverseerUtils.setup(JmhMapBenchmarks.class, this);
+		// TODO: look for right place where to put this
+		SleepingInteger.IS_SLEEP_ENABLED_IN_HASHCODE = false;
+		SleepingInteger.IS_SLEEP_ENABLED_IN_EQUALS = false;
+		
+		// OverseerUtils.setup(JmhMapBenchmarks.class, this);
 	}
 
 	protected int[] generateTestData(int size, int run) {
@@ -203,13 +221,13 @@ public class JmhMapBenchmarks {
 		int[] data = generateTestData(size, run);
 
 		for (int i = size - 1; i >= 0; i--) {
-			final IValue current = valueFactory.integer(data[i]);
+//			final IValue current = producer.createFromInt(data[i]);
 
-			writer1.put(current, current);
-			writer2.put(current, current);
+			writer1.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
+			writer2.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
 
 			if (i == existingValueIndex) {
-				VALUE_EXISTING = valueFactory.integer(data[i]);
+				VALUE_EXISTING = producer.createFromInt(data[i]);
 			}
 		}
 
@@ -221,7 +239,7 @@ public class JmhMapBenchmarks {
 		 * found
 		 */
 		while (VALUE_NOT_EXISTING == null) {
-			final IValue candidate = valueFactory.integer(rand.nextInt());
+			final IValue candidate = producer.createFromInt(rand.nextInt());
 
 			if (!testMap.containsKey(candidate)) {
 				VALUE_NOT_EXISTING = candidate;
@@ -230,38 +248,42 @@ public class JmhMapBenchmarks {
 
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
 				VALUE_EXISTING);
+		
+		
+		testMapRealDuplicateSameSizeButDifferent = testMapRealDuplicate.removeKey(VALUE_EXISTING)
+				.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 	}
 
-	@TearDown(Level.Trial)
-	public void tearDown() {
-		OverseerUtils.tearDown();
-	}
+//	@TearDown(Level.Trial)
+//	public void tearDown() {
+//		OverseerUtils.tearDown();
+//	}
+//
+//	// @Setup(Level.Iteration)
+//	// public void setupIteration() {
+//	// OverseerUtils.doRecord(true);
+//	// }
+//	//
+//	// @TearDown(Level.Iteration)
+//	// public void tearDownIteration() {
+//	// OverseerUtils.doRecord(false);
+//	// }
+//
+//	@Setup(Level.Invocation)
+//	public void setupInvocation() {
+//		OverseerUtils.setup(JmhMapBenchmarks.class, this);
+//		OverseerUtils.doRecord(true);
+//	}
+//
+//	@TearDown(Level.Invocation)
+//	public void tearDownInvocation() {
+//		OverseerUtils.doRecord(false);
+//	}
 
-	// @Setup(Level.Iteration)
-	// public void setupIteration() {
-	// OverseerUtils.doRecord(true);
-	// }
-	//
-	// @TearDown(Level.Iteration)
-	// public void tearDownIteration() {
-	// OverseerUtils.doRecord(false);
-	// }
-
-	@Setup(Level.Invocation)
-	public void setupInvocation() {
-		OverseerUtils.setup(JmhMapBenchmarks.class, this);
-		OverseerUtils.doRecord(true);
-	}
-
-	@TearDown(Level.Invocation)
-	public void tearDownInvocation() {
-		OverseerUtils.doRecord(false);
-	}
-
-	@Benchmark
-	public void timeContainsKeySingle(Blackhole bh) {
-		bh.consume(testMap.containsKey(VALUE_EXISTING));
-	}
+//	@Benchmark
+//	public void timeContainsKeySingle(Blackhole bh) {
+//		bh.consume(testMap.containsKey(VALUE_EXISTING));
+//	}
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -269,8 +291,15 @@ public class JmhMapBenchmarks {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.containsKey(cachedNumbers[i]));
 		}
-		// bh.consume(testMap.containsKey(VALUE_EXISTING));
 	}
+	
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeContainsKeyNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.containsKey(cachedNumbersNotContained[i]));
+		}
+	}	
 
 	@Benchmark
 	public void timeIteration(Blackhole bh) {
@@ -287,36 +316,65 @@ public class JmhMapBenchmarks {
 		}
 	}
 
+//	@Benchmark
+//	public void timeInsertSingle(Blackhole bh) {
+//		bh.consume(testMap.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING));
+//	}	
+	
 	@Benchmark
-	public void timeInsertSingle(Blackhole bh) {
-		bh.consume(testMap.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING));
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	@CompilerControl(org.openjdk.jmh.annotations.CompilerControl.Mode.DONT_INLINE)
+	public void timeInsert(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
+		}
+	}
+	
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeInsertContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.put(cachedNumbers[i], cachedNumbers[i]));
+		}
+	}	
+
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeRemoveKeyNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.removeKey(cachedNumbersNotContained[i]));
+		}
 	}
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeInsert(Blackhole bh) {
+	public void timeRemoveKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
-
+			bh.consume(testMap.removeKey(cachedNumbers[i]));
 		}
 	}
-
-	// @Benchmark
-	// @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	// public void timeRemoveKey(Blackhole bh) {
-	// for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-	// bh.consume(testMap.removeKey(cachedNumbers[i]));
-	// }
-	// }
-
+	
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapRealDuplicate));
 	}
 
 	@Benchmark
+	public void timeEqualsRealDuplicateModified(Blackhole bh) {
+		bh.consume(testMap.equals(testMapRealDuplicateSameSizeButDifferent));
+	}	 	
+
+	@Benchmark
 	public void timeEqualsDeltaDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapDeltaDuplicate));
+	}
+
+	@Benchmark
+	@BenchmarkMode(Mode.SingleShotTime)
+//	@Warmup(iterations = 0)
+//	@Measurement(iterations = 1)
+	public void timeHashCode(Blackhole bh) {
+		bh.consume(testMap.hashCode());
 	}
 
 	@Benchmark
@@ -329,10 +387,28 @@ public class JmhMapBenchmarks {
 		Options opt = new OptionsBuilder()
 				.include(
 						".*" + JmhMapBenchmarks.class.getSimpleName()
-								+ ".(timeEqualsRealDuplicate)").forks(0).warmupIterations(5)
-				.measurementIterations(5).mode(Mode.AverageTime).param("dataType", "MAP")
-				.param("sampleDataSelection", "MATCH").param("size", "512")
-				.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE").build();
+								+ ".(timeInsert)")
+				.timeUnit(TimeUnit.NANOSECONDS)
+				.forks(1)
+				//.warmupMode(WarmupMode.INDI)
+				.warmupIterations(30)
+				.warmupTime(TimeValue.seconds(3))
+				.mode(Mode.AverageTime)
+				.measurementIterations(45)
+				.param("dataType", "MAP")
+				.param("run", "0")
+//				.param("run", "1")
+//				.param("run", "2")
+//				.param("run", "3")
+				//.addProfiler(CountingIntegerProfiler.class)
+				//.param("producer", "SLEEPING_INTEGER")
+				.param("producer", "COUNTING_INTEGER")
+				.param("sampleDataSelection", "MATCH").param("size", "1024") // 1048576
+				//.param("valueFactoryFactory", "VF_PDB_PERSISTENT_SPECIALIZED")
+				.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT")
+				.param("valueFactoryFactory", "VF_SCALA")
+				//.param("valueFactoryFactory", "VF_CLOJURE")
+				.build();
 
 		new Runner(opt).run();
 	}
