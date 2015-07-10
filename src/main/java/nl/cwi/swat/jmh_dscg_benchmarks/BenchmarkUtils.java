@@ -175,4 +175,19 @@ public class BenchmarkUtils {
 		return randomNumbers;
 	}
 
+	static int[] generateTestData(int size, int run) {
+		int[] data = new int[size];
+	
+		int seedForThisTrial = seedFromSizeAndRun(size, run);
+		Random rand = new Random(seedForThisTrial);
+	
+		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
+	
+		for (int i = size - 1; i >= 0; i--) {
+			data[i] = rand.nextInt();
+		}
+	
+		return data;
+	}
+
 }

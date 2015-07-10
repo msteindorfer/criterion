@@ -11,7 +11,6 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -34,14 +33,13 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-@BenchmarkMode(Mode.SampleTime)
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class JmhSetBenchmarks {
@@ -64,14 +62,19 @@ public class JmhSetBenchmarks {
 					"2097152", "4194304", "8388608" })
 	protected int size;
 
-	@Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+	@Param({ "0" }) // "1", "2", "3", "4", "5", "6", "7", "8", "9"
 	protected int run;
+	
+	@Param
+	public ElementProducer producer;	
 	
 	public IValueFactory valueFactory;
 	
 	public ISet testSet;
 	private ISet testSetRealDuplicate;
 	private ISet testSetDeltaDuplicate;
+	
+	private ISet testSetRealDuplicateSameSizeButDifferent;
 
 	public IValue VALUE_EXISTING;
 	public IValue VALUE_NOT_EXISTING;
@@ -158,7 +161,7 @@ public class JmhSetBenchmarks {
 		// System.out.println(String.format("cachedNumbersNotContained = %s\n\n",
 		// Arrays.toString(cachedNumbersNotContained)));
 		
-		OverseerUtils.setup(JmhSetBenchmarks.class, this);
+		// OverseerUtils.setup(JmhSetBenchmarks.class, this);
 	}
 
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
@@ -168,24 +171,19 @@ public class JmhSetBenchmarks {
 		ISetWriter writer2 = valueFactory.setWriter();
 
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
-		Random rand = new Random(seedForThisTrial);
-
-		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
-
-		/*
-		 * randomly choose one element amongst the elements
-		 */
-		int existingValueIndex = new Random(seedForThisTrial + 13).nextInt(size);
-
+		Random rand = new Random(seedForThisTrial + 13);
+		int existingValueIndex = rand.nextInt(size);
+		
+		int[] data = BenchmarkUtils.generateTestData(size, run);
+		
 		for (int i = size - 1; i >= 0; i--) {
-			final int j = rand.nextInt();
-			final IValue current = valueFactory.integer(j);
-
-			writer1.insert(current);
-			writer2.insert(current);
+//			final IValue current = producer.createFromInt(data[i]);
+			
+			writer1.insert(producer.createFromInt(data[i]));
+			writer2.insert(producer.createFromInt(data[i]));
 
 			if (i == existingValueIndex) {
-				VALUE_EXISTING = valueFactory.integer(j);
+				VALUE_EXISTING = producer.createFromInt(data[i]);
 			}
 		}
 
@@ -197,7 +195,7 @@ public class JmhSetBenchmarks {
 		 * found
 		 */
 		while (VALUE_NOT_EXISTING == null) {
-			final IValue candidate = valueFactory.integer(rand.nextInt());
+			final IValue candidate = producer.createFromInt(rand.nextInt());
 
 			if (!testSet.contains(candidate)) {
 				VALUE_NOT_EXISTING = candidate;
@@ -205,33 +203,36 @@ public class JmhSetBenchmarks {
 		}
 
 		testSetDeltaDuplicate = testSet.insert(VALUE_NOT_EXISTING).delete(VALUE_NOT_EXISTING);
+		
+		testSetRealDuplicateSameSizeButDifferent = testSetRealDuplicate.insert(VALUE_NOT_EXISTING)
+				.delete(VALUE_EXISTING);
 	}
 	
-	@TearDown(Level.Trial)
-	public void tearDown() {
-		OverseerUtils.tearDown(); 
-	}	
-	
-//	@Setup(Level.Iteration)
-//	public void setupIteration() {
+//	@TearDown(Level.Trial)
+//	public void tearDown() {
+//		OverseerUtils.tearDown(); 
+//	}	
+//	
+////	@Setup(Level.Iteration)
+////	public void setupIteration() {
+////		OverseerUtils.doRecord(true); 
+////	}	
+////	
+////	@TearDown(Level.Iteration)
+////	public void tearDownIteration() {
+////		OverseerUtils.doRecord(false); 
+////	}	
+//	
+//	@Setup(Level.Invocation)
+//	public void setupInvocation() {
+//		OverseerUtils.setup(JmhSetBenchmarks.class, this);
 //		OverseerUtils.doRecord(true); 
 //	}	
 //	
-//	@TearDown(Level.Iteration)
-//	public void tearDownIteration() {
+//	@TearDown(Level.Invocation)
+//	public void tearDownInvocation() {
 //		OverseerUtils.doRecord(false); 
-//	}	
-	
-	@Setup(Level.Invocation)
-	public void setupInvocation() {
-		OverseerUtils.setup(JmhSetBenchmarks.class, this);
-		OverseerUtils.doRecord(true); 
-	}	
-	
-	@TearDown(Level.Invocation)
-	public void tearDownInvocation() {
-		OverseerUtils.doRecord(false); 
-	}
+//	}
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -241,6 +242,14 @@ public class JmhSetBenchmarks {
 		}
 	}
 
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeContainsKeyNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testSet.contains(cachedNumbersNotContained[i]));
+		}
+	}	
+	
 	@Benchmark
 	public void timeIteration(Blackhole bh) {
 		for (Iterator<IValue> iterator = testSet.iterator(); iterator.hasNext();) {
@@ -264,6 +273,15 @@ public class JmhSetBenchmarks {
 
 		}
 	}
+
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeInsertContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testSet.insert(cachedNumbers[i]));
+
+		}
+	}	
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -274,10 +292,23 @@ public class JmhSetBenchmarks {
 	}	
 
 	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeRemoveKeyNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testSet.delete(cachedNumbersNotContained[i]));
+		}
+	}	
+	
+	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {	
 		bh.consume(testSet.equals(testSetRealDuplicate));
 	}
 
+	@Benchmark
+	public void timeEqualsRealDuplicateModified(Blackhole bh) {	
+		bh.consume(testSet.equals(testSetRealDuplicateSameSizeButDifferent));
+	}
+	
 	@Benchmark
 	public void timeEqualsDeltaDuplicate(Blackhole bh) {
 		bh.consume(testSet.equals(testSetDeltaDuplicate));

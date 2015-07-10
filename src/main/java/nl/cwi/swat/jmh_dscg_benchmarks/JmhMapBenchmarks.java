@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory;
-import nl.cwi.swat.jmh_dscg_benchmarks.profiler.CountingIntegerProfiler;
 
 import org.eclipse.imp.pdb.facts.IMap;
 import org.eclipse.imp.pdb.facts.IMapWriter;
@@ -26,9 +25,7 @@ import org.eclipse.imp.pdb.facts.IValue;
 import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.CompilerControl;
 import org.openjdk.jmh.annotations.Level;
-import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OperationsPerInvocation;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -36,16 +33,14 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-import org.openjdk.jmh.runner.options.WarmupMode;
 
-@BenchmarkMode(Mode.SingleShotTime)
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class JmhMapBenchmarks {
@@ -71,7 +66,7 @@ public class JmhMapBenchmarks {
 	@Param({ "0" }) // "1", "2", "3", "4", "5", "6", "7", "8", "9"
 	protected int run;
 	
-	@Param // ({ "SLEEPING_INTEGER" })
+	@Param
 	public ElementProducer producer;
 
 	public IValueFactory valueFactory;
@@ -189,21 +184,6 @@ public class JmhMapBenchmarks {
 		// OverseerUtils.setup(JmhMapBenchmarks.class, this);
 	}
 
-	protected int[] generateTestData(int size, int run) {
-		int[] data = new int[size];
-
-		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
-		Random rand = new Random(seedForThisTrial);
-
-		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
-
-		for (int i = size - 1; i >= 0; i--) {
-			data[i] = rand.nextInt();
-		}
-
-		return data;
-	}
-
 	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
 
 		valueFactory = valueFactoryFactory.getInstance();
@@ -211,14 +191,11 @@ public class JmhMapBenchmarks {
 		IMapWriter writer1 = valueFactory.mapWriter();
 		IMapWriter writer2 = valueFactory.mapWriter();
 
-		/*
-		 * randomly choose one element amongst the elements
-		 */
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial + 13);
 		int existingValueIndex = rand.nextInt(size);
 
-		int[] data = generateTestData(size, run);
+		int[] data = BenchmarkUtils.generateTestData(size, run);
 
 		for (int i = size - 1; i >= 0; i--) {
 //			final IValue current = producer.createFromInt(data[i]);
@@ -247,8 +224,7 @@ public class JmhMapBenchmarks {
 		}
 
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
-				VALUE_EXISTING);
-		
+				VALUE_EXISTING);		
 		
 		testMapRealDuplicateSameSizeButDifferent = testMapRealDuplicate.removeKey(VALUE_EXISTING)
 				.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
@@ -323,7 +299,6 @@ public class JmhMapBenchmarks {
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-//	@CompilerControl(org.openjdk.jmh.annotations.CompilerControl.Mode.DONT_INLINE)
 	public void timeInsert(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
@@ -369,18 +344,18 @@ public class JmhMapBenchmarks {
 		bh.consume(testMap.equals(testMapDeltaDuplicate));
 	}
 
-	@Benchmark
-	@BenchmarkMode(Mode.SingleShotTime)
-//	@Warmup(iterations = 0)
-//	@Measurement(iterations = 1)
-	public void timeHashCode(Blackhole bh) {
-		bh.consume(testMap.hashCode());
-	}
+//	@Benchmark
+//	@BenchmarkMode(Mode.SingleShotTime)
+////	@Warmup(iterations = 0)
+////	@Measurement(iterations = 1)
+//	public void timeHashCode(Blackhole bh) {
+//		bh.consume(testMap.hashCode());
+//	}
 
-	@Benchmark
-	public void timeJoin(Blackhole bh) {
-		bh.consume(testMap.join(singletonMapWithNotExistingValue));
-	}
+//	@Benchmark
+//	public void timeJoin(Blackhole bh) {
+//		bh.consume(testMap.join(singletonMapWithNotExistingValue));
+//	}
 
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());
