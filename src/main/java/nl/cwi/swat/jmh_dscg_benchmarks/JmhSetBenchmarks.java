@@ -98,7 +98,7 @@ public class JmhSetBenchmarks {
 			Random randForOperations = new Random(2147483647L);
 
 			for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-				cachedNumbers[i] = valueFactory.integer(randForOperations.nextInt());
+				cachedNumbers[i] = producer.createFromInt(randForOperations.nextInt());
 			}
 		}
 
@@ -114,7 +114,7 @@ public class JmhSetBenchmarks {
 				if (i >= size) {
 					cachedNumbers[i] = cachedNumbers[i % size];
 				} else {
-					cachedNumbers[i] = valueFactory.integer(rand.nextInt());
+					cachedNumbers[i] = producer.createFromInt(rand.nextInt());
 				}
 			}
 
@@ -129,7 +129,7 @@ public class JmhSetBenchmarks {
 				 */
 				boolean found = false;
 				while (!found) {
-					final IValue candidate = valueFactory.integer(anotherRand.nextInt());
+					final IValue candidate = producer.createFromInt(anotherRand.nextInt());
 
 					if (testSet.contains(candidate)) {
 						continue;
