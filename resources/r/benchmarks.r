@@ -3,24 +3,25 @@
 # http://stackoverflow.com/questions/14167178/passing-command-line-arguments-to-r-cmd-batch
 args <- commandArgs(TRUE)
 
-setwd(args[1])
-dataDirectory <- args[2]
-timestamp <- args[3]
+# setwd(args[1])
+# dataDirectory <- args[2]
+# timestamp <- args[3]
 
-# setwd("~/Development/oopsla15-benchmarks/resources/r")
-# timestamp <- "20141218_0337"
+setwd("~/Development/jmh-dscg-benchmarks/resources/r")
+dataDirectory <- "~/Development/jmh-dscg-benchmarks"
+timestamp <- "20150711_0218"
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
 cran_rstudio_repo="http://cran.rstudio.com/"
 
-install.packages("vioplot", repos = cran_rstudio_repo)
-install.packages("beanplot", repos = cran_rstudio_repo)
-install.packages("ggplot2", repos = cran_rstudio_repo)
-install.packages("reshape2", repos = cran_rstudio_repo)
-install.packages("functional", repos = cran_rstudio_repo)
-install.packages("plyr", repos = cran_rstudio_repo)
-install.packages("extrafont", repos = cran_rstudio_repo)
-install.packages("scales", repos = cran_rstudio_repo)
+# install.packages("vioplot", repos = cran_rstudio_repo)
+# install.packages("beanplot", repos = cran_rstudio_repo)
+# install.packages("ggplot2", repos = cran_rstudio_repo)
+# install.packages("reshape2", repos = cran_rstudio_repo)
+# install.packages("functional", repos = cran_rstudio_repo)
+# install.packages("plyr", repos = cran_rstudio_repo)
+# install.packages("extrafont", repos = cran_rstudio_repo)
+# install.packages("scales", repos = cran_rstudio_repo)
 library(vioplot)
 library(beanplot)
 library(ggplot2)
@@ -233,19 +234,28 @@ latexMathPercent <- Vectorize(latexMathPercent__)
 
 
 getBenchmarkMethodName__ <- function(arg) {
-  strsplit(as.character(arg), split = "[.]time")[[1]][2]
+  argWithoutAnnotation <- strsplit(as.character(arg), split = ":")[[1]][1]
+  strsplit(argWithoutAnnotation, split = "[.]time")[[1]][2]
 }
 
 getBenchmarkMethodName <- Vectorize(getBenchmarkMethodName__)
 
 
+getBenchmarkAnnotationName__ <- function(arg) {
+  strsplit(as.character(arg), split = ":")[[1]][2]
+}
+
+getBenchmarkAnnotationName <- Vectorize(getBenchmarkAnnotationName__)
+
+
 benchmarksFileName <- paste(paste(dataDirectory, paste("results.all", timestamp, sep="-"), sep="/"), "log", sep=".")
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
-colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
+colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
+benchmarks$Annotation <- getBenchmarkAnnotationName(benchmarks$Benchmark)
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
-benchmarksCleaned <- benchmarks[benchmarks$Param_sampleDataSelection == "MATCH" & !grepl("@", benchmarks$Benchmark),c(-2,-3,-4,-7,-10)]
+benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & is.na(benchmarks$Annotation), select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
 
 ###
 # If there are more measurements for one size, calculate the median.
