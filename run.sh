@@ -8,7 +8,7 @@ export VALUE_FACTORY_FACTORY="VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE,VF_P
 
 export PERF_EVENTS="L1-DCACHE-LOADS,L1-DCACHE-LOAD-MISSES,L2_RQSTS:0x03,L2_RQSTS:0x01,LLC_REFERENCES,LLC_MISSES,MEM_LOAD_RETIRED:0x10"
 export COMMON_JVM_SETTINGS="-Xms4g -Xmx4g -Doverseer.utils.events=$PERF_EVENTS"
-export COMMON_SETTINGS="-wi 15 -i 15 -f 1 -t 1 -r 1 -p run=0,1,2,3,4 -p sampleDataSelection=MATCH producer=PDB_INTEGER -gc true -rf csv -v EXTRA -foe true -bm avgt"
+export COMMON_SETTINGS="-wi 15 -i 15 -f 1 -t 1 -r 1 -p run=0,1,2,3,4 -p sampleDataSelection=MATCH -p producer=PDB_INTEGER -gc true -rf csv -v EXTRA -foe true -bm avgt"
 
 # Settings for cache measurements:
 # export COMMON_SETTINGS="-wi 0 -i 200 -r 10 -f 1 -t 1 -p run=0 -p sampleDataSelection=MATCH -gc true -rf csv -v EXTRA -foe true -bm ss"
