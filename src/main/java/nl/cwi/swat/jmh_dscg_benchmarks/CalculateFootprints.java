@@ -667,7 +667,7 @@ public final class CalculateFootprints {
 				timeTrieSet(testSet, count, currentRun,
 								Optional.of(VF_PDB_PERSISTENT_CURRENT.toString()),
 								TrieSet_5Bits.class, TrieMap_5Bits.class);
-								
+
 				timeTrieSet(testSet, count, currentRun,
 								Optional.of(VF_PDB_PERSISTENT_LAZY.toString()),
 								TrieSet_5Bits_LazyHashCode.class, TrieMap_5Bits_LazyHashCode.class);
@@ -675,16 +675,16 @@ public final class CalculateFootprints {
 				timeTrieSet(testSet, count, currentRun,
 								Optional.of(VF_PDB_PERSISTENT_MEMOIZED.toString()),
 								TrieSet_5Bits_Memoized.class, TrieMap_5Bits_Memoized.class);
-				
+
 				timeTrieSet(testSet, count, currentRun,
 								Optional.of(VF_PDB_PERSISTENT_MEMOIZED_LAZY.toString()),
-								TrieSet_5Bits_Memoized_LazyHashCode.class, TrieMap_5Bits_Memoized_LazyHashCode.class);				
-				
+								TrieSet_5Bits_Memoized_LazyHashCode.class,
+								TrieMap_5Bits_Memoized_LazyHashCode.class);
+
 				timeClojurePersistent(testSet, count, currentRun,
 								Optional.of(VF_CLOJURE.toString()));
 
-				timeScalaPersistent(testSet, count, currentRun, 
-								Optional.of(VF_SCALA.toString()));				
+				timeScalaPersistent(testSet, count, currentRun, Optional.of(VF_SCALA.toString()));
 				
 //				timeTrieSet0To4(testSet, count, currentRun);
 //				timeTrieSet0To8(testSet, count, currentRun);
