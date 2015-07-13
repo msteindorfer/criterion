@@ -11,8 +11,8 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import gnu.trove.map.hash.TIntIntHashMap;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -21,18 +21,18 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-import nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints.MemoryFootprintPreset;
+import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.*;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
-import org.eclipse.imp.pdb.facts.IInteger;
 import org.eclipse.imp.pdb.facts.ISet;
 import org.eclipse.imp.pdb.facts.ISetWriter;
 import org.eclipse.imp.pdb.facts.IValue;
@@ -43,14 +43,17 @@ import org.eclipse.imp.pdb.facts.util.ImmutableSet;
 import org.eclipse.imp.pdb.facts.util.TransientMap;
 import org.eclipse.imp.pdb.facts.util.TransientSet;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits;
-import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Spec0To8;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_LazyHashCode;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Memoized;
+import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Memoized_LazyHashCode;
 import org.eclipse.imp.pdb.facts.util.TrieMap_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge;
-import org.eclipse.imp.pdb.facts.util.TrieMap_Heterogeneous;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits;
+import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_LazyHashCode;
+import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_Memoized;
+import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_Memoized_LazyHashCode;
 import org.eclipse.imp.pdb.facts.util.TrieSet_5Bits_Untyped_Spec0To8;
 import org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge;
-import org.openjdk.jol.info.GraphLayout;
 
 import scala.Tuple2;
 import clojure.lang.IPersistentMap;
@@ -114,7 +117,7 @@ public final class CalculateFootprints {
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial);
 
-		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
+		// System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
 		for (int i = size; i > 0; i--) {
 			final int j = rand.nextInt();
@@ -134,7 +137,7 @@ public final class CalculateFootprints {
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial);
 
-		System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
+		// System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
 		for (int i = size; i > 0; i--) {
 			final int j = rand.nextInt();
@@ -164,31 +167,50 @@ public final class CalculateFootprints {
 		return Collections.unmodifiableSet(setWriter);
 	}	
 	
-	public static void timeTrieSet(final ISet testSet, int elementCount, int run) {		
-//		TransientSet<IValue> transientSet = TrieSet_5Bits.<IValue>transientOf(); 
-//		TransientMap<IValue, IValue> transientMap = TrieMap_5Bits.<IValue, IValue>transientOf();		
-//		
-//		for (IValue v : testSet) {
-//			if (reportSet) transientSet.__insert(v);
-//			if (reportMap) transientMap.__put(v, v);
-//		}
-//		
-//		ImmutableSet<IValue> xs = transientSet.freeze();
-//		ImmutableMap<IValue, IValue> ys = transientMap.freeze();
+	public static Object invokeFactoryMethodAndYieldEmptyInstance(final Class<?> target) {
+		final Method factoryMethodOfEmpty;
 		
-		ImmutableSet<IValue> xs = TrieSet_5Bits.<IValue>of();
-		ImmutableMap<Integer, Integer> ys = TrieMap_5Bits.of();
+		try {
+			factoryMethodOfEmpty = target.getMethod("of");
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new RuntimeException(e);
+		}
+		
+		try {
+			return factoryMethodOfEmpty.invoke(null);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static void timeTrieSet(final ISet testSet, int elementCount, int run,
+					Optional<String> shortName, final Class<?> setClass, final Class<?> mapClass) {
+
+		@SuppressWarnings("unchecked")
+		ImmutableSet<IValue> xs = (ImmutableSet<IValue>) invokeFactoryMethodAndYieldEmptyInstance(setClass);
+		
+		@SuppressWarnings("unchecked")
+		ImmutableMap<IValue, IValue> ys = (ImmutableMap<IValue, IValue>) invokeFactoryMethodAndYieldEmptyInstance(mapClass);
 				
 		for (IValue v : testSet) {
 			if (reportSet) xs = xs.__insert(v);
-			if (reportMap) ys = ys.__put(((IInteger) v).intValue(), ((IInteger) v).intValue());
+			if (reportMap) ys = ys.__put(v, v);
 		}
-		
-//		// statistics should exactly match, thus only printing them once
-//		((TrieSet_5Bits) xs).printStatistics();
-		
-		if (reportSet) measureAndReport(xs, "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits", DataType.SET, Archetype.PERSISTENT, false, elementCount, run);
-		if (reportMap) measureAndReport(ys, "org.eclipse.imp.pdb.facts.util.TrieMap_5Bits", DataType.MAP, Archetype.PERSISTENT, false, elementCount, run);
+				
+		if (reportSet) {
+			measureAndReport(
+							xs,
+							shortName.isPresent() ? shortName.get() : Objects.toString(setClass
+											.getCanonicalName()), DataType.SET,
+							Archetype.PERSISTENT, false, elementCount, run);
+		}
+		if (reportMap) {
+			measureAndReport(
+							ys,
+							shortName.isPresent() ? shortName.get() : Objects.toString(mapClass
+											.getCanonicalName()), DataType.MAP,
+							Archetype.PERSISTENT, false, elementCount, run);
+		}
 	}
 	
 //	public static void timeTrieMultimap(final ISet testSet, int elementCount, int run) {		
@@ -444,30 +466,65 @@ public final class CalculateFootprints {
 		if (reportMap) measureAndReport(ys, "clojure.lang.TransientHashMap", DataType.MAP, Archetype.PERSISTENT, true, elementCount, run);
 	}
 
-	public static void timeClojurePersistent(final ISet testSet, int elementCount, int run) {
+	public static void timeClojurePersistent(final ISet testSet, int elementCount, int run, Optional<String> shortName) {
+		final Class<?> setClass = clojure.lang.PersistentHashSet.class;
+		final Class<?> mapClass = clojure.lang.PersistentHashMap.class;
+		
 		IPersistentSet xs = (IPersistentSet) PersistentHashSet.EMPTY;
 		IPersistentMap ys = (IPersistentMap) PersistentHashMap.EMPTY;
 		
 		for (IValue v : testSet) {
-			if (reportSet) xs = (IPersistentSet) xs.cons(v);
-			if (reportMap) ys = (IPersistentMap) ys.assoc(v, v);
+			if (reportSet)
+				xs = (IPersistentSet) xs.cons(v);
+			if (reportMap)
+				ys = (IPersistentMap) ys.assoc(v, v);
 		}
 		
-		if (reportSet) measureAndReport(xs, "clojure.lang.PersistentHashSet", DataType.SET, Archetype.PERSISTENT, true, elementCount, run);
-		if (reportMap) measureAndReport(ys, "clojure.lang.PersistentHashMap", DataType.MAP, Archetype.PERSISTENT, true, elementCount, run);
+		if (reportSet) {
+			measureAndReport(
+							xs,
+							shortName.isPresent() ? shortName.get() : Objects.toString(setClass
+											.getCanonicalName()), DataType.SET,
+							Archetype.PERSISTENT, true, elementCount, run);
+		}
+		if (reportMap) {
+			measureAndReport(
+							ys,
+							shortName.isPresent() ? shortName.get() : Objects.toString(mapClass
+											.getCanonicalName()), DataType.MAP,
+							Archetype.PERSISTENT, true, elementCount, run);
+		}
 	}
 	
-	public static void timeScalaPersistent(final ISet testSet, int elementCount, int run) {
+	public static void timeScalaPersistent(final ISet testSet, int elementCount, int run,
+					Optional<String> shortName) {
+		final Class<?> setClass = scala.collection.immutable.HashSet.class;
+		final Class<?> mapClass = scala.collection.immutable.HashMap.class;
+
 		scala.collection.immutable.HashSet<IValue> xs = new scala.collection.immutable.HashSet<>();
 		scala.collection.immutable.HashMap<IValue, IValue> ys = new scala.collection.immutable.HashMap<>();
-		
+
 		for (IValue v : testSet) {
-			if (reportSet) xs = xs.$plus(v);
-			if (reportMap) ys = ys.$plus(new Tuple2<>(v, v));
+			if (reportSet)
+				xs = xs.$plus(v);
+			if (reportMap)
+				ys = ys.$plus(new Tuple2<>(v, v));
 		}
 
-		if (reportSet) measureAndReport(xs, "scala.collection.immutable.HashSet", DataType.SET, Archetype.PERSISTENT, false, elementCount, run);
-		if (reportMap) measureAndReport(ys, "scala.collection.immutable.HashMap", DataType.MAP, Archetype.PERSISTENT, false, elementCount, run);
+		if (reportSet) {
+			measureAndReport(
+							xs,
+							shortName.isPresent() ? shortName.get() : Objects.toString(setClass
+											.getCanonicalName()), DataType.SET,
+							Archetype.PERSISTENT, false, elementCount, run);
+		}
+		if (reportMap) {
+			measureAndReport(
+							ys,
+							shortName.isPresent() ? shortName.get() : Objects.toString(mapClass
+											.getCanonicalName()), DataType.MAP,
+							Archetype.PERSISTENT, false, elementCount, run);
+		}
 	}
 
 	public void timeScalaMutable(final ISet testSet, int elementCount, int run) {
@@ -542,7 +599,7 @@ public final class CalculateFootprints {
 		Footprint memoryFootprint = objectexplorer.ObjectGraphMeasurer.measure(objectToMeasure,
 						predicate);
 
-		final String statString = String.format("%d\t %60s\t\t %s", memoryInBytes, className,
+		final String statString = String.format("%d\t %60s\t[%s]\t %s", memoryInBytes, className, dataType,
 						memoryFootprint);
 		System.out.println(statString);
 
@@ -583,6 +640,11 @@ public final class CalculateFootprints {
 	
 	public static void footprintMap__Random_Persistent() {	
 		
+//		for (int exp = 13; exp <= 13; exp += 1) {
+//			final int count = (int) Math.pow(2, exp);
+//			
+//			for (int run = 0; run < 1; run++) {
+		
 		for (int exp = 0; exp <= 23; exp += 1) {
 			final int count = (int) Math.pow(2, exp);
 			
@@ -602,16 +664,34 @@ public final class CalculateFootprints {
 				final java.util.Set<java.lang.Integer> testSetInt = tmpSetInt;
 				final int currentRun = run;
 				
-				timeTrieSet(testSet, count, currentRun);
+				timeTrieSet(testSet, count, currentRun,
+								Optional.of(VF_PDB_PERSISTENT_CURRENT.toString()),
+								TrieSet_5Bits.class, TrieMap_5Bits.class);
+								
+				timeTrieSet(testSet, count, currentRun,
+								Optional.of(VF_PDB_PERSISTENT_LAZY.toString()),
+								TrieSet_5Bits_LazyHashCode.class, TrieMap_5Bits_LazyHashCode.class);
+
+				timeTrieSet(testSet, count, currentRun,
+								Optional.of(VF_PDB_PERSISTENT_MEMOIZED.toString()),
+								TrieSet_5Bits_Memoized.class, TrieMap_5Bits_Memoized.class);
+				
+				timeTrieSet(testSet, count, currentRun,
+								Optional.of(VF_PDB_PERSISTENT_MEMOIZED_LAZY.toString()),
+								TrieSet_5Bits_Memoized_LazyHashCode.class, TrieMap_5Bits_Memoized_LazyHashCode.class);				
+				
+				timeClojurePersistent(testSet, count, currentRun,
+								Optional.of(VF_CLOJURE.toString()));
+
+				timeScalaPersistent(testSet, count, currentRun, 
+								Optional.of(VF_SCALA.toString()));				
+				
 //				timeTrieSet0To4(testSet, count, currentRun);
 //				timeTrieSet0To8(testSet, count, currentRun);
 //				timeTrieSet0To12(testSet, count, currentRun);	
 //				timeTrieSetSpecializationWithUntypedVariables(testSet, count, currentRun);
 //				timeTrieSetSpecializationInt(testSetInt, count, currentRun);
 //				timeTrieSet_BleedingEdge(testSet, count, currentRun);
-				timeClojurePersistent(testSet, count, currentRun);
-				timeScalaPersistent(testSet, count, currentRun);
-
 				
 				// timeJavaMutable(testSet, count, currentRun);
 				// timeGSMutableUnifiedSet(testSet, count, currentRun);
