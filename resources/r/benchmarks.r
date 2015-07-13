@@ -41,7 +41,7 @@ sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
 }
 
 
-calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOrigin) {
+loadMemoryFootprintData <- function() {
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
@@ -54,7 +54,23 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
   dss_stats <- rbind(dss32_stats, dss64_stats)
+  colnames(dss_stats) <- c("Param_size", "Param_run", "Param_valueFactoryFactory", "Param_dataType", "archetype", "supportsStagedMutability", "footprintInBytes", "footprintInObjects", "footprintInReferences", "arch")
+  #
+  dss_stats
+}
+
+simplifyMemoryFootprintData <- function(dss_stats) {
+  ###
+  # If there are more measurements for one size, calculate the median.
+  # Currently we only have one measurment.
+  ##
+  dss_stats_meltByElementCount <- melt(dss_stats, id.vars=c('Param_size', 'Param_valueFactoryFactory', 'Param_dataType', 'arch'), measure.vars=c('footprintInBytes'))
+  dss_stats_castByMedian <- dcast(dss_stats_meltByElementCount, Param_size + Param_valueFactoryFactory + Param_dataType ~ paste("footprintInBytes", arch, "median", sep = "_"), median, fill=0)  
+}
+
+calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOrigin) {
   
+  dss_stats <- loadMemoryFootprintData()
   
   classNameTheOther <- switch(dataStructureOrigin, 
                               Scala = paste("scala.collection.immutable.Hash", capwords(tolower(requestedDataType)), sep = ""),
@@ -255,19 +271,28 @@ colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "S
 benchmarks$Annotation <- getBenchmarkAnnotationName(benchmarks$Benchmark)
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
-benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & is.na(benchmarks$Annotation), select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
-# benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & benchmarks$Annotation == "hashCode", select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
-
 ###
 # If there are more measurements for one size, calculate the median.
 # Currently we only have one measurment.
+#
+# Optionally use subset selection: .(Benchmark, Param_dataType, Param_size, Param_valueFactoryFactory)
 ##
-benchmarksCleaned = ddply(benchmarksCleaned, c("Benchmark", "Param_dataType", "Param_size", "Param_valueFactoryFactory"), function(x) c(Score = median(x$Score), ScoreError = median(x$ScoreError)))
+benchmarksCleaned <- ddply(benchmarks, colnames(benchmarks), function(x) c(Score = median(x$Score), ScoreError = median(x$ScoreError)))
+
+###
+# Load memory footprints and join with other benchmarks.
+##
+benchmarksCleaned <- join(benchmarksCleaned, simplifyMemoryFootprintData(loadMemoryFootprintData()))
+
+benchmarksCleaned <- subset(benchmarksCleaned, 
+                            Param_sampleDataSelection == "MATCH" & is.na(benchmarks$Annotation), 
+                            select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory, footprintInBytes_32_median, footprintInBytes_64_median))
+# benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & benchmarks$Annotation == "hashCode", select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
 
 benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory'))
 
-benchmarksByNameOutput <- data.frame(benchmarksByName)
-benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksByName$Param_size), "}", sep = ""))
+
+
 
 
 selectComparisionColumns <- function(inputData, measureVars, orderingByName) {
@@ -329,6 +354,7 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
 createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataFormatter, includeMemory = F) {
   lowerBoundExclusive <- 1
   
+  # DEBUG: nlevels(factor(input$Param_dataType))
   benchmarksCast <- dcast(input[input$Param_dataType == dataType & input$Param_size > lowerBoundExclusive,], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
     
   benchmarksCast$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast$Param_size), "}", sep = ""))
@@ -424,6 +450,13 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataF
   embed_fonts(outFileName)
 }
 
+
+
+
+
+benchmarksByNameOutput <- data.frame(benchmarksByName)
+benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksByName$Param_size), "}", sep = ""))
+
 ###
 # Results as saving percentags
 ##
@@ -431,10 +464,10 @@ measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
 measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
 dataFormatter <- latexMathPercent
 
-createTable(benchmarksByNameOutput, "SET", "Scala", measureVars_Scala, dataFormatter)
-createTable(benchmarksByNameOutput, "SET", "Clojure", measureVars_Clojure, dataFormatter)
-createTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, dataFormatter)
-createTable(benchmarksByNameOutput, "MAP", "Clojure", measureVars_Clojure, dataFormatter)
+createTable(benchmarksByNameOutput, "SET", "VF_SCALA", measureVars_Scala, dataFormatter)
+createTable(benchmarksByNameOutput, "SET", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
+createTable(benchmarksByNameOutput, "MAP", "VF_SCALA", measureVars_Scala, dataFormatter)
+createTable(benchmarksByNameOutput, "MAP", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
 
 # ###
 # # Results as speedup factors
