@@ -256,6 +256,7 @@ benchmarks$Annotation <- getBenchmarkAnnotationName(benchmarks$Benchmark)
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
 benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & is.na(benchmarks$Annotation), select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
+# benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & benchmarks$Annotation == "hashCode", select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
 
 ###
 # If there are more measurements for one size, calculate the median.
@@ -325,7 +326,7 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
   }
 }
 
-createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataFormatter) {
+createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataFormatter, includeMemory = F) {
   lowerBoundExclusive <- 1
   
   benchmarksCast <- dcast(input[input$Param_dataType == dataType & input$Param_size > lowerBoundExclusive,], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
@@ -354,24 +355,30 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataF
   # selectComparisionColumns <- Vectorize(function(castedData, benchmarkName) {
   #   data.frame(castedData[castedData$Benchmark == benchmarkName,])[,c(13,14,15)]
   # })
-    
-  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, measureVars, orderingByName)
   
-  memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureOrigin) 
-  memFootprint <- memFootprint[memFootprint$elementCount > lowerBoundExclusive,]
-  memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- dataFormatter(memFootprint[,c(col_idx)])}))
-  colnames(memFootprint_fmt) <- colnames(memFootprint)
-    
   tableAll <- selectComparisionColumns(benchmarksCast, measureVars, orderingByName)
   tableAll <- tableAll[tableAll$Param_size > lowerBoundExclusive,]
-  tableAll <- data.frame(tableAll, memFootprint[,c(2,3)])      
+
+  if (includeMemory == T) {
+    memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureOrigin) 
+    memFootprint <- memFootprint[memFootprint$elementCount > lowerBoundExclusive,]
+    memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- dataFormatter(memFootprint[,c(col_idx)])}))
+    colnames(memFootprint_fmt) <- colnames(memFootprint)
+    
+    tableAll <- data.frame(tableAll, memFootprint[,c(2,3)]) 
+  }
   
   tableAll_fmt <- data.frame(
     latexMath(paste("2^{", log2(tableAll$Param_size), "}", sep = "")),
     sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- dataFormatter(tableAll[,c(col_idx)])}))
   colnames(tableAll_fmt) <- colnames(tableAll)
   
-  tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
+  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, measureVars, orderingByName)
+  
+  if (includeMemory == T) {
+    tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
+  }
+  
   tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- dataFormatter(tableAll_summary[,c(col_idx)])}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
 
