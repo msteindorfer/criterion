@@ -7,9 +7,9 @@ args <- commandArgs(TRUE)
 # dataDirectory <- args[2]
 # timestamp <- args[3]
 
-setwd("~/Development/jmh-dscg-benchmarks/resources/r")
-dataDirectory <- "~/Development/jmh-dscg-benchmarks"
-timestamp <- "20150711_0218"
+setwd("~/Development/rascal-devel/jmh-dscg-benchmarks/resources/r")
+dataDirectory <- "~/Development/rascal-devel/jmh-dscg-benchmarks"
+timestamp <- "20150714_0455"
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
 cran_rstudio_repo="http://cran.rstudio.com/"
@@ -68,29 +68,33 @@ simplifyMemoryFootprintData <- function(dss_stats) {
   dss_stats_castByMedian <- dcast(dss_stats_meltByElementCount, Param_size + Param_valueFactoryFactory + Param_dataType ~ paste("footprintInBytes", arch, "median", sep = "_"), median, fill=0)  
 }
 
-calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOrigin) {
-  
-  dss_stats <- loadMemoryFootprintData()
-  
-  classNameTheOther <- switch(dataStructureOrigin, 
-                              Scala = paste("scala.collection.immutable.Hash", capwords(tolower(requestedDataType)), sep = ""),
-                              Clojure = paste("clojure.lang.PersistentHash", capwords(tolower(requestedDataType)), sep = ""))  
-
-  classNameOurs <-  paste("org.eclipse.imp.pdb.facts.util.Trie", capwords(tolower(requestedDataType)), "_5Bits", sep = "")
-  
+memoryFootprintDataAsBenchmark <- function(dss_stats) {
   ###
   # If there are more measurements for one size, calculate the median.
   # Currently we only have one measurment.
   ##
-  dss_stats_meltByElementCount <- melt(dss_stats, id.vars=c('elementCount', 'className', 'dataType', 'arch'), measure.vars=c('footprintInBytes')) # measure.vars=c('footprintInBytes')
-  dss_stats_castByMedian <- dcast(dss_stats_meltByElementCount, elementCount + className + dataType + arch ~ "footprintInBytes_median", median, fill=0)
+  dss_stats_meltByElementCount <- melt(dss_stats, id.vars=c('Param_size', 'Param_valueFactoryFactory', 'Param_dataType', 'arch'), measure.vars=c('footprintInBytes'), value.name = "Score")
+  dss_stats_meltByElementCount$Benchmark <- paste("Footprint", dss_stats_meltByElementCount$arch, sep = "")
+  
+  dss_stats_meltByElementCount <- subset(dss_stats_meltByElementCount, select = -c(arch, variable))
+  
+  aggregate(. ~ Param_dataType + Param_valueFactoryFactory + Param_size + Benchmark, dss_stats_meltByElementCount, median)
+}
+
+calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOrigin) {
+  
+  dss_stats <- loadMemoryFootprintData()
+  dss_stats_castByMedian <- simplifyMemoryFootprintData(dss_stats)
+  
+  classNameTheOther <- dataStructureOrigin
+  classNameOurs <- "VF_PDB_PERSISTENT_CURRENT"
   
   ###
   # Calculate different baselines for comparison.
   ##
-  dss_stats_castByBaselinePDBDynamic <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == classNameOurs,], min)
-  names(dss_stats_castByBaselinePDBDynamic) <- c('elementCount', 'dataType', 'arch', 'footprintInBytes_baselinePDBDynamic')
-
+  dss_stats_castByBaselinePDBDynamic <- aggregate(footprintInBytes_median ~ Param_size + Param_dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$Param_valueFactoryFactory == classNameOurs & dss_stats_castByMedian$dataType == requestedDataType,], min)
+  names(dss_stats_castByBaselinePDBDynamic) <- c('Param_size', 'Param_dataType', 'arch', 'footprintInBytes_baselinePDBDynamic')
+  
   ###
   # Merges baselines.
   ##
@@ -289,12 +293,13 @@ benchmarksCleaned <- subset(benchmarks,
 # Optionally use subset selection: .(Benchmark, Param_dataType, Param_size, Param_valueFactoryFactory)
 # Optionally select all: colnames(benchmarks)
 ##
-benchmarksCleaned <- ddply(benchmarks, .(Benchmark, Param_dataType, Param_size, Param_valueFactoryFactory), function(x) c(Score = median(x$Score), ScoreError = median(x$ScoreError)))
+benchmarksCleaned <- ddply(benchmarks, .(Benchmark, Param_dataType, Param_size, Param_valueFactoryFactory), function(x) c(Score = median(x$Score))) # ScoreError = median(x$ScoreError)
 
 ###
 # Load memory footprints and join with other benchmarks.
 ##
-benchmarksCleaned <- join(benchmarksCleaned, simplifyMemoryFootprintData(loadMemoryFootprintData()))
+# benchmarksCleaned <- join(benchmarksCleaned, simplifyMemoryFootprintData(loadMemoryFootprintData()))
+benchmarksCleaned <- rbind(benchmarksCleaned, memoryFootprintDataAsBenchmark(loadMemoryFootprintData()))
 
 benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory'))
 
@@ -303,7 +308,7 @@ benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size',
 
 
 selectComparisionColumns <- function(inputData, measureVars, orderingByName) {
-  tmp.m <- melt(data=join(inputData, orderingByName), id.vars=c('BenchmarkSortingID', 'Benchmark', 'Param_size'), measure.vars=measureVars)
+  tmp.m <- melt(data=join(inputData, orderingByName, type = "inner"), id.vars=c('BenchmarkSortingID', 'Benchmark', 'Param_size'), measure.vars=measureVars)
 
   #tmp.m$value <- formatNsmall2(tmp.m$value, rounding=T)
 
@@ -339,7 +344,7 @@ calculateMemoryFootprintSummary <- function(inputData) {
 }
 
 orderedBenchmarkNames <- function(dataType) {
-  candidates <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate")
+  candidates <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "Footprint32", "Footprint64")
   
   if (dataType == "MAP") {
     candidates
@@ -472,10 +477,10 @@ measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
 measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
 dataFormatter <- latexMathPercent
 
-createTable(benchmarksByNameOutput, "SET", "VF_SCALA", measureVars_Scala, dataFormatter)
-createTable(benchmarksByNameOutput, "SET", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
 createTable(benchmarksByNameOutput, "MAP", "VF_SCALA", measureVars_Scala, dataFormatter)
 createTable(benchmarksByNameOutput, "MAP", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
+createTable(benchmarksByNameOutput, "SET", "VF_SCALA", measureVars_Scala, dataFormatter)
+createTable(benchmarksByNameOutput, "SET", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
 
 # ###
 # # Results as speedup factors
