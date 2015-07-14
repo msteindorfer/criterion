@@ -648,7 +648,7 @@ public final class CalculateFootprints {
 		for (int exp = 0; exp <= 23; exp += 1) {
 			final int count = (int) Math.pow(2, exp);
 			
-			for (int run = 0; run < 4; run++) {
+			for (int run = 0; run < 5; run++) {
 			
 				ISet tmpSet = null;
 				java.util.Set<java.lang.Integer> tmpSetInt = null;

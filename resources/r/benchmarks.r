@@ -344,7 +344,7 @@ calculateMemoryFootprintSummary <- function(inputData) {
 }
 
 orderedBenchmarkNames <- function(dataType) {
-  candidates <- c("ContainsKey", "Insert", "RemoveKey", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "Footprint32", "Footprint64")
+  candidates <- c("ContainsKey", "ContainsKeyNotContained", "Insert", "InsertContained", "RemoveKey", "RemoveKeyNotContained", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "EqualsRealDuplicateModified", "Footprint32", "Footprint64")
   
   if (dataType == "MAP") {
     candidates
@@ -354,7 +354,7 @@ orderedBenchmarkNames <- function(dataType) {
 }
 
 orderedBenchmarkNamesForBoxplot <- function(dataType) {
-  candidates <- c("Lookup\n", "Insert\n", "Delete\n", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
+  candidates <- c("Lookup\n", "Lookup\n(Fail)", "Insert\n", "Insert\n(Fail)", "Delete\n", "Delete\n(Fail)", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Equality\n(Different)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
   
   if (dataType == "MAP") {
     candidates
@@ -437,7 +437,7 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
   fontScalingFactor <- 1.2
-  pdf(outFileName, family = "Times", width = 10, height = 3)
+  pdf(outFileName, family = "Times", width = 15, height = 3)
   
   selection <- tableAll[2:NCOL(tableAll)]
   names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
