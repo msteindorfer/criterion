@@ -83,7 +83,7 @@ public final class CalculateFootprints {
 
 	private static final IValueFactory valueFactory = ValueFactory.getInstance();
 
-	private static boolean reportSet = false;
+	private static boolean reportSet = true;
 	private static boolean reportMap = true;
 
 	private static int multimapValueCount = 6;
