@@ -437,7 +437,7 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
   fontScalingFactor <- 1.2
-  pdf(outFileName, family = "Times", width = 15, height = 3)
+  pdf(outFileName, family = "Times", width = 15, height = 4)
   
   selection <- tableAll[2:NCOL(tableAll)]
   names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
@@ -445,11 +445,11 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   par(mar = c(3.5,4.75,0,0) + 0.1)
   par(mgp=c(3.5, 1.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   
-  boxplot(selection, ylim=range(-0.1, 1.0), yaxt="n", las=0, ylab="savings (in %)", 
+  boxplot(selection, ylim=range(-0.5, 1.0), yaxt="n", las=0, ylab="savings (in %)", 
           cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
   
-  z  <- c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
-  zz <- c("0%", "20%", "40%", "60%", "80%", "100%")
+  z  <- c(-0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+  zz <- c("-40%", "-20%", "0%", "20%", "40%", "60%", "80%", "100%")
   par(mgp=c(0, 0.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   axis(2, at=z, labels=zz, las=2,
        cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
