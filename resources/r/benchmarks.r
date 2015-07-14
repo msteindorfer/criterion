@@ -271,23 +271,30 @@ colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "S
 benchmarks$Annotation <- getBenchmarkAnnotationName(benchmarks$Benchmark)
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
+
+# ###
+# # Filter before grouping.
+# ##
+benchmarksCleaned <- subset(benchmarks, 
+                            Param_sampleDataSelection == "MATCH" & benchmarks$Annotation == "hashCode") # is.na(benchmarks$Annotation)
+# benchmarksCleaned <- subset(benchmarks, 
+#                             Param_sampleDataSelection == "MATCH" & is.na(benchmarks$Annotation), 
+#                             select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory, footprintInBytes_32_median, footprintInBytes_64_median))
+# # benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & benchmarks$Annotation == "hashCode", select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
+
 ###
 # If there are more measurements for one size, calculate the median.
 # Currently we only have one measurment.
 #
 # Optionally use subset selection: .(Benchmark, Param_dataType, Param_size, Param_valueFactoryFactory)
+# Optionally select all: colnames(benchmarks)
 ##
-benchmarksCleaned <- ddply(benchmarks, colnames(benchmarks), function(x) c(Score = median(x$Score), ScoreError = median(x$ScoreError)))
+benchmarksCleaned <- ddply(benchmarks, .(Benchmark, Param_dataType, Param_size, Param_valueFactoryFactory), function(x) c(Score = median(x$Score), ScoreError = median(x$ScoreError)))
 
 ###
 # Load memory footprints and join with other benchmarks.
 ##
 benchmarksCleaned <- join(benchmarksCleaned, simplifyMemoryFootprintData(loadMemoryFootprintData()))
-
-benchmarksCleaned <- subset(benchmarksCleaned, 
-                            Param_sampleDataSelection == "MATCH" & is.na(benchmarks$Annotation), 
-                            select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory, footprintInBytes_32_median, footprintInBytes_64_median))
-# benchmarksCleaned <- subset(benchmarks, Param_sampleDataSelection == "MATCH" & benchmarks$Annotation == "hashCode", select = c(Benchmark, Score, Param_dataType, Param_run, Param_size, Param_valueFactoryFactory))
 
 benchmarksByName <- melt(benchmarksCleaned, id.vars=c('Benchmark', 'Param_size', 'Param_dataType', 'Param_valueFactoryFactory'))
 
@@ -353,9 +360,10 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
 
 createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataFormatter, includeMemory = F) {
   lowerBoundExclusive <- 1
+  filteredInput <- input[input$Param_dataType == dataType & input$variable == "Score" & input$Param_size > lowerBoundExclusive,]
   
   # DEBUG: nlevels(factor(input$Param_dataType))
-  benchmarksCast <- dcast(input[input$Param_dataType == dataType & input$Param_size > lowerBoundExclusive,], Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
+  benchmarksCast <- dcast(filteredInput, Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
     
   benchmarksCast$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast$Param_size), "}", sep = ""))
   benchmarksCast$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast$VF_CLOJURE_Score, "\\pm", benchmarksCast$VF_CLOJURE_ScoreError))
@@ -458,7 +466,7 @@ benchmarksByNameOutput <- data.frame(benchmarksByName)
 benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksByName$Param_size), "}", sep = ""))
 
 ###
-# Results as saving percentags
+# Results as saving percentages
 ##
 measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
 measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
