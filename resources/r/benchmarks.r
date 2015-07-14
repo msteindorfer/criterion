@@ -428,7 +428,10 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
   write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 
+  createBoxplot(tableAll, dataType, baselineAndOtherPairName);
+}
 
+createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   ###
   # Create boxplots as well
   ##
