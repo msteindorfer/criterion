@@ -81,12 +81,12 @@ memoryFootprintDataAsBenchmark <- function(dss_stats) {
   aggregate(. ~ Param_dataType + Param_valueFactoryFactory + Param_size + Benchmark, dss_stats_meltByElementCount, median)
 }
 
-calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOrigin) {
+calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureBaseline) {
   
   dss_stats <- loadMemoryFootprintData()
   dss_stats_castByMedian <- simplifyMemoryFootprintData(dss_stats)
   
-  classNameTheOther <- dataStructureOrigin
+  classNameTheOther <- dataStructureBaseline
   classNameOurs <- "VF_PDB_PERSISTENT_CURRENT"
   
   ###
@@ -363,27 +363,30 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
   }
 }
 
-createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataFormatter, includeMemory = F) {
+createTable <- function(input, dataType, dataStructureCandidate, dataStructureBaseline, measureVars, dataFormatter, compare, includeMemory = F) {
   lowerBoundExclusive <- 1
   filteredInput <- input[input$Param_dataType == dataType & input$variable == "Score" & input$Param_size > lowerBoundExclusive,]
-  
-  # DEBUG: nlevels(factor(input$Param_dataType))
-  benchmarksCast <- dcast(filteredInput, Benchmark + Param_size ~ Param_valueFactoryFactory + variable)
-    
-  benchmarksCast$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast$Param_size), "}", sep = ""))
-  benchmarksCast$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast$VF_CLOJURE_Score, "\\pm", benchmarksCast$VF_CLOJURE_ScoreError))
-  benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Interval <- latexMath(paste(benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score, "\\pm", benchmarksCast$VF_PDB_PERSISTENT_CURRENT_ScoreError))
-  benchmarksCast$VF_SCALA_Interval <- latexMath(paste(benchmarksCast$VF_SCALA_Score, "\\pm", benchmarksCast$VF_SCALA_ScoreError))
-  ###
-  benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score)
-  benchmarksCast$VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast$VF_SCALA_Score / benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score)
-  benchmarksCast$VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast$VF_CLOJURE_Score / benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score)
-  ###
-  benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score <- (benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast$VF_SCALA_Score)
-  benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score <- (benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast$VF_CLOJURE_Score)
-  ###
-  benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score)
-  benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score)
+
+  # assumes: nlevels(factor(input$variable)) == 1
+  benchmarksCast <- dcast(filteredInput, Benchmark + Param_size ~ Param_valueFactoryFactory)
+
+  baselineAndOtherPairName <- paste(dataStructureCandidate, "BY", dataStructureBaseline, sep = "_")
+  benchmarksCast[baselineAndOtherPairName] <- compare(benchmarksCast[dataStructureCandidate], benchmarksCast[dataStructureBaseline])
+      
+#   benchmarksCast$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksCast$Param_size), "}", sep = ""))
+#   benchmarksCast$VF_CLOJURE_Interval <- latexMath(paste(benchmarksCast$VF_CLOJURE_Score, "\\pm", benchmarksCast$VF_CLOJURE_ScoreError))
+#   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Interval <- latexMath(paste(benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score, "\\pm", benchmarksCast$VF_PDB_PERSISTENT_CURRENT_ScoreError))
+#   benchmarksCast$VF_SCALA_Interval <- latexMath(paste(benchmarksCast$VF_SCALA_Score, "\\pm", benchmarksCast$VF_SCALA_ScoreError))
+#   ###
+#   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score)
+#   benchmarksCast$VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast$VF_SCALA_Score / benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score)
+#   benchmarksCast$VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score <- (benchmarksCast$VF_CLOJURE_Score / benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score)
+#   ###
+#   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score <- (benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast$VF_SCALA_Score)
+#   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score <- (benchmarksCast$VF_PDB_PERSISTENT_CURRENT_Score / benchmarksCast$VF_CLOJURE_Score)
+#   ###
+#   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_Score)
+#   benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings <- (1 - benchmarksCast$VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_Score)
   
   orderedBenchmarkNames <- orderedBenchmarkNames(dataType)
   orderedBenchmarkIDs <- seq(1:length(orderedBenchmarkNames))
@@ -391,15 +394,11 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataF
   orderingByName <- data.frame(orderedBenchmarkIDs, orderedBenchmarkNames)
   colnames(orderingByName) <- c("BenchmarkSortingID", "Benchmark")
   
-  # selectComparisionColumns <- Vectorize(function(castedData, benchmarkName) {
-  #   data.frame(castedData[castedData$Benchmark == benchmarkName,])[,c(13,14,15)]
-  # })
-  
-  tableAll <- selectComparisionColumns(benchmarksCast, measureVars, orderingByName)
+  tableAll <- selectComparisionColumns(benchmarksCast, baselineAndOtherPairName, orderingByName)
   tableAll <- tableAll[tableAll$Param_size > lowerBoundExclusive,]
 
   if (includeMemory == T) {
-    memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureOrigin) 
+    memFootprint <- calculateMemoryFootprintOverhead(dataType, dataStructureBaseline) 
     memFootprint <- memFootprint[memFootprint$elementCount > lowerBoundExclusive,]
     memFootprint_fmt <- data.frame(sapply(1:NCOL(memFootprint), function(col_idx) { memFootprint[,c(col_idx)] <- dataFormatter(memFootprint[,c(col_idx)])}))
     colnames(memFootprint_fmt) <- colnames(memFootprint)
@@ -412,7 +411,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataF
     sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- dataFormatter(tableAll[,c(col_idx)])}))
   colnames(tableAll_fmt) <- colnames(tableAll)
   
-  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, measureVars, orderingByName)
+  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, baselineAndOtherPairName, orderingByName)
   
   if (includeMemory == T) {
     tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
@@ -421,11 +420,11 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataF
   tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- dataFormatter(tableAll_summary[,c(col_idx)])}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
 
-  fileNameSummary <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "summary", sep="-"), "tex", sep=".")
+  fileNameSummary <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "summary", sep="-"), "tex", sep=".")
   write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_summary_fmt), file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
-  fileName <- paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), sep="-"), "tex", sep=".")
+  fileName <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), sep="-"), "tex", sep=".")
   write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 
@@ -433,7 +432,7 @@ createTable <- function(input, dataType, dataStructureOrigin, measureVars, dataF
   ###
   # Create boxplots as well
   ##
-  outFileName <-paste(paste("all", "benchmarks", tolower(dataStructureOrigin), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
+  outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
   fontScalingFactor <- 1.2
   pdf(outFileName, family = "Times", width = 10, height = 3)
   
@@ -471,16 +470,35 @@ benchmarksByNameOutput <- data.frame(benchmarksByName)
 benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchmarksByName$Param_size), "}", sep = ""))
 
 ###
+# Comparising functions
+##
+compareSpeedup <- Vectorize(function(candidate, baseline) {
+  (baseline / candidate)
+})
+
+compareSaving <- Vectorize(function(candidate, baseline) {
+  1 - (candidate / baseline)
+})
+
+###
 # Results as saving percentages
 ##
 measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
 measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
 dataFormatter <- latexMathPercent
+compareFunction = compareSaving
 
-createTable(benchmarksByNameOutput, "MAP", "VF_SCALA", measureVars_Scala, dataFormatter)
-createTable(benchmarksByNameOutput, "MAP", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
-createTable(benchmarksByNameOutput, "SET", "VF_SCALA", measureVars_Scala, dataFormatter)
-createTable(benchmarksByNameOutput, "SET", "VF_CLOJURE", measureVars_Clojure, dataFormatter)
+createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
+createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", measureVars_Scala, dataFormatter, compareFunction)
+createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
+createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", measureVars_Scala, dataFormatter, compareFunction)
+
+# createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_PDB_PERSISTENT_CURRENT", measureVars_Scala, dataFormatter, compareFunction)
+
+createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
+createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", measureVars_Clojure, dataFormatter, compareFunction)
+createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
+createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", measureVars_Clojure, dataFormatter, compareFunction)
 
 # ###
 # # Results as speedup factors
