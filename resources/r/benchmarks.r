@@ -9,7 +9,7 @@ args <- commandArgs(TRUE)
 
 setwd("~/Development/rascal-devel/jmh-dscg-benchmarks/resources/r")
 dataDirectory <- "~/Development/rascal-devel/jmh-dscg-benchmarks"
-timestamp <- "20150716_1648"
+timestamp <- "20150716_1817"
 timestampMemoryMeasurement <- "latest"
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
