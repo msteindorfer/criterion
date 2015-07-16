@@ -9,7 +9,8 @@ args <- commandArgs(TRUE)
 
 setwd("~/Development/rascal-devel/jmh-dscg-benchmarks/resources/r")
 dataDirectory <- "~/Development/rascal-devel/jmh-dscg-benchmarks"
-timestamp <- "20150714_0455"
+timestamp <- "20150716_1648"
+timestampMemoryMeasurement <- "latest"
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
 cran_rstudio_repo="http://cran.rstudio.com/"
@@ -45,11 +46,11 @@ loadMemoryFootprintData <- function() {
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
-  dss32_fileName <- paste(paste(dataDirectory, paste("map-sizes-and-statistics", "32bit", timestamp, sep="-"), sep="/"), "csv", sep=".")
+  dss32_fileName <- paste(paste(dataDirectory, paste("map-sizes-and-statistics", "32bit", timestampMemoryMeasurement, sep="-"), sep="/"), "csv", sep=".")
   dss32_stats <- read.csv(dss32_fileName, sep=",", header=TRUE)
   dss32_stats <- within(dss32_stats, arch <- factor(32))
   #
-  dss64_fileName <- paste(paste(dataDirectory, paste("map-sizes-and-statistics", "64bit", timestamp, sep="-"), sep="/"), "csv", sep=".")
+  dss64_fileName <- paste(paste(dataDirectory, paste("map-sizes-and-statistics", "64bit", timestampMemoryMeasurement, sep="-"), sep="/"), "csv", sep=".")
   dss64_stats <- read.csv(dss64_fileName, sep=",", header=TRUE)
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
@@ -437,7 +438,7 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
   fontScalingFactor <- 1.2
-  pdf(outFileName, family = "Times", width = 15, height = 4)
+  pdf(outFileName, family = "Times", width = 15, height = 3.5)
   
   selection <- tableAll[2:NCOL(tableAll)]
   names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
