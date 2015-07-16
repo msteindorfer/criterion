@@ -549,8 +549,8 @@ LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "nl.cwi.swat.jmh_dscg_ben
 
 TIMESTAMP=`date +"%Y%m%d_%H%M"`
 
-INPUT_FILES=target/results/results.Jmh*.log
-RESULTS_FILE=target/results/results.all-$TIMESTAMP.log
+INPUT_FILES=`pwd`/target/results/results.Jmh*.log
+RESULTS_FILE=`pwd`/target/results/results.all-$TIMESTAMP.log
 
 RESULT_HEADER=`echo $INPUT_FILES | xargs -n 1 head -n 1 | head -n 1`
 {
@@ -560,10 +560,10 @@ RESULT_HEADER=`echo $INPUT_FILES | xargs -n 1 head -n 1 | head -n 1`
 	done
 } | cat <(echo $RESULT_HEADER) - > $RESULTS_FILE
 
-STD_CONSOLE_LOG_FILES=target/result-logs/results.std-console.*.log
-PERF_STAT_LOG_FILES=target/result-logs/results.perf-stat.*.log
+STD_CONSOLE_LOG_FILES=`pwd`/target/result-logs/results.std-console.*.log
+PERF_STAT_LOG_FILES=`pwd`/target/result-logs/results.perf-stat.*.log
 
-RESULTS_FILE_PERF_STAT=target/results/results.all-$TIMESTAMP.perf-stat.log
+RESULTS_FILE_PERF_STAT=`pwd`/target/results/results.all-$TIMESTAMP.perf-stat.log
 
 PERF_HEADER=`echo $PERF_STAT_LOG_FILES | xargs -n 1 head -n 1 | head -n 1 | sed -e 's/^/benchmark,/'`
 {
@@ -578,9 +578,9 @@ java -Xmx12G -XX:+UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(b
 java -Xmx12G -XX:-UseCompressedOops -javaagent:`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar -cp target/benchmarks.jar nl.cwi.swat.jmh_dscg_benchmarks.CalculateFootprints && mv map-sizes-and-statistics.csv target/map-sizes-and-statistics-64bit-$TIMESTAMP.csv
 
 ARCHIVE_PATH=`pwd`
-ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-$TIMESTAMP.tar.xz
+ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-$TIMESTAMP.tgz
 
-RESULTS_FILES=target/results/results.all-$TIMESTAMP*
+RESULTS_FILES=`pwd`/target/results/results.all-$TIMESTAMP*
 
 cp $RESULTS_FILES $ARCHIVE_PATH
-cd target && tar -cfJ $ARCHIVE_NAME results result-logs *.csv
+(cd target && tar -cvzf $ARCHIVE_NAME results result-logs *.csv $RESULTS_FILES)
