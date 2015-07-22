@@ -7,9 +7,9 @@ args <- commandArgs(TRUE)
 # dataDirectory <- args[2]
 # timestamp <- args[3]
 
-setwd("~/Development/rascal-devel/jmh-dscg-benchmarks/resources/r")
-dataDirectory <- "~/Development/rascal-devel/jmh-dscg-benchmarks"
-timestamp <- "20150716_1817"
+setwd("~/Development/jmh-dscg-benchmarks/resources/r")
+dataDirectory <- "~/Development/jmh-dscg-benchmarks"
+timestamp <- "20150719_0830"
 timestampMemoryMeasurement <- "latest"
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
@@ -273,6 +273,8 @@ benchmarksFileName <- paste(paste(dataDirectory, paste("results.all", timestamp,
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
+# benchmarks$Score <- as.numeric(benchmarks$Score)
+
 benchmarks$Annotation <- getBenchmarkAnnotationName(benchmarks$Benchmark)
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
 
@@ -333,6 +335,17 @@ selectComparisionColumnsSummary <- function(inputData, measureVars, orderingByNa
   res
 }
 
+summarizeTableData <- function(inputData) {
+  mins.c <- apply(inputData, c(2), min) # as.numeric(formatNsmall2(apply(tmp.c, c(2), min), rounding=T))
+  maxs.c <- apply(inputData, c(2), max) # as.numeric(formatNsmall2(apply(tmp.c, c(2), max), rounding=T))
+  #mean.c <- apply(inputData, c(2), mean)
+  medians.c <- apply(inputData, c(2), median) # as.numeric(formatNsmall2(apply(tmp.c, c(2), median), rounding=T))
+  
+  res <- data.frame(rbind(mins.c, medians.c, maxs.c))[-1]
+  rownames(res) <- c('minimum', 'median', 'maximum')
+  res
+}
+
 calculateMemoryFootprintSummary <- function(inputData) {
   mins.c <- apply(inputData, c(2), min) # as.numeric(formatNsmall2(apply(inputData, c(2), min), rounding=T))
   maxs.c <- apply(inputData, c(2), max) # as.numeric(formatNsmall2(apply(inputData, c(2), max), rounding=T))
@@ -345,7 +358,7 @@ calculateMemoryFootprintSummary <- function(inputData) {
 }
 
 orderedBenchmarkNames <- function(dataType) {
-  candidates <- c("ContainsKey", "ContainsKeyNotContained", "Insert", "InsertContained", "RemoveKey", "RemoveKeyNotContained", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "EqualsRealDuplicateModified", "Footprint32", "Footprint64")
+  candidates <- c("ContainsKey", "ContainsKeyNotContained", "Insert", "InsertContained", "RemoveKey", "RemoveKeyNotContained", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "Footprint32", "Footprint64")
   
   if (dataType == "MAP") {
     candidates
@@ -355,7 +368,7 @@ orderedBenchmarkNames <- function(dataType) {
 }
 
 orderedBenchmarkNamesForBoxplot <- function(dataType) {
-  candidates <- c("Lookup\n", "Lookup\n(Fail)", "Insert\n", "Insert\n(Fail)", "Delete\n", "Delete\n(Fail)", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Equality\n(Different)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
+  candidates <- c("Lookup\n", "Lookup\n(Fail)", "Insert\n", "Insert\n(Fail)", "Delete\n", "Delete\n(Fail)", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
   
   if (dataType == "MAP") {
     candidates
@@ -364,7 +377,7 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
   }
 }
 
-createTable <- function(input, dataType, dataStructureCandidate, dataStructureBaseline, measureVars, dataFormatter, compare, includeMemory = F) {
+createTable <- function(input, dataType, dataStructureCandidate, dataStructureBaseline, dataFormatter, compare, nameAppendix, includeMemory = F) {
   lowerBoundExclusive <- 1
   filteredInput <- input[input$Param_dataType == dataType & input$variable == "Score" & input$Param_size > lowerBoundExclusive,]
 
@@ -410,9 +423,11 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
   tableAll_fmt <- data.frame(
     latexMath(paste("2^{", log2(tableAll$Param_size), "}", sep = "")),
     sapply(2:NCOL(tableAll), function(col_idx) { tableAll[,c(col_idx)] <- dataFormatter(tableAll[,c(col_idx)])}))
-  colnames(tableAll_fmt) <- colnames(tableAll)
+  colnames(tableAll_fmt)[ 1] <- "Size"
+  colnames(tableAll_fmt)[-1] <- orderedBenchmarkNamesForBoxplot(dataType)
   
-  tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, baselineAndOtherPairName, orderingByName)
+  # tableAll_summary <- selectComparisionColumnsSummary(benchmarksCast, baselineAndOtherPairName, orderingByName)
+  tableAll_summary <- summarizeTableData(tableAll)
   
   if (includeMemory == T) {
     tableAll_summary <- data.frame(tableAll_summary, calculateMemoryFootprintSummary(memFootprint))
@@ -421,12 +436,12 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
   tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- dataFormatter(tableAll_summary[,c(col_idx)])}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
 
-  fileNameSummary <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "summary", sep="-"), "tex", sep=".")
+  fileNameSummary <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, "summary", sep="-"), "tex", sep=".")
   write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_summary_fmt), file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
-  fileName <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), sep="-"), "tex", sep=".")
-  write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  fileName <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, sep="-"), "tex", sep=".")
+  write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 
   createBoxplot(tableAll, dataType, baselineAndOtherPairName);
@@ -446,11 +461,11 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   par(mar = c(3.5,4.75,0,0) + 0.1)
   par(mgp=c(3.5, 1.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   
-  boxplot(selection, ylim=range(-0.5, 1.0), yaxt="n", las=0, ylab="savings (in %)", 
+  boxplot(selection, ylim=range(-0.8, 1.0), yaxt="n", las=0, ylab="savings (in %)", 
           cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
   
-  z  <- c(-0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
-  zz <- c("-40%", "-20%", "0%", "20%", "40%", "60%", "80%", "100%")
+  z  <- c(-0.8, -0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+  zz <- c("-80%", "-60%", "-40%", "-20%", "0%", "20%", "40%", "60%", "80%", "100%")
   par(mgp=c(0, 0.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   axis(2, at=z, labels=zz, las=2,
        cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
@@ -484,34 +499,34 @@ compareSaving <- Vectorize(function(candidate, baseline) {
   1 - (candidate / baseline)
 })
 
+createAllTables <- function(dataFormatter, compareFunction, nameAppendix) {
+  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+
+  # createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_PDB_PERSISTENT_CURRENT", dataFormatter, compareFunction, nameAppendix)
+
+  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+}
+
 ###
 # Results as saving percentages
 ##
-measureVars_Scala <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_SCALA_ScoreSavings')
-measureVars_Clojure <- c('VF_PDB_PERSISTENT_CURRENT_BY_VF_CLOJURE_ScoreSavings')
 dataFormatter <- latexMathPercent
-compareFunction = compareSaving
+compareFunction <- compareSaving
+nameAppendix <- "savings"
 
-createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
-createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", measureVars_Scala, dataFormatter, compareFunction)
-createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
-createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", measureVars_Scala, dataFormatter, compareFunction)
-
-# createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_PDB_PERSISTENT_CURRENT", measureVars_Scala, dataFormatter, compareFunction)
-
-createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
-createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", measureVars_Clojure, dataFormatter, compareFunction)
-createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", measureVars_Scala, dataFormatter, compareFunction)
-createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", measureVars_Clojure, dataFormatter, compareFunction)
+createAllTables(dataFormatter, compareFunction, nameAppendix)
 
 # ###
 # # Results as speedup factors
 # ##
-# measureVars_Scala <- c('VF_SCALA_BY_VF_PDB_PERSISTENT_CURRENT_Score')
-# measureVars_Clojure <- c('VF_CLOJURE_BY_VF_PDB_PERSISTENT_CURRENT_Score')
-# dataFormatter <- latexMathFactor
-# 
-# createTable(benchmarksByNameOutput, "SET", "Scala", measureVars_Scala, dataFormatter)
-# createTable(benchmarksByNameOutput, "SET", "Clojure", measureVars_Clojure, dataFormatter)
-# createTable(benchmarksByNameOutput, "MAP", "Scala", measureVars_Scala, dataFormatter)
-# createTable(benchmarksByNameOutput, "MAP", "Clojure", measureVars_Clojure, dataFormatter)
+dataFormatter <- latexMathFactor
+compareFunction <- compareSpeedup
+nameAppendix <- "speedup"
+
+createAllTables(dataFormatter, compareFunction, nameAppendix)
