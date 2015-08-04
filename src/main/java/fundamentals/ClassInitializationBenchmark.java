@@ -30,6 +30,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.util.VMSupport;
 
 @SuppressWarnings("restriction")
 @BenchmarkMode(Mode.AverageTime)
@@ -60,7 +61,10 @@ public class ClassInitializationBenchmark {
 	long nodeMapOffsetOffset = 0;
 	long dataMapOffsetOffset = 0;
 	long arrayOffsetsOffset = 0;
-		
+
+	long firstFieldOffset = 0;
+	long addressSize = 0;
+	
 	@Setup
 	public void initialize() {
 		final Random rand = new Random();
@@ -74,6 +78,9 @@ public class ClassInitializationBenchmark {
 
 		final Class<Map2To0Node> dstClass = Map2To0Node.class;
 		
+		new Map2To0Node(nodeMap, dataMap, key1, val1, key2, val2);
+		// ClassLayout.parseClass(Map2To0Node.class);
+
 		try {
 			nodeMapOffsetOffset = 
 					unsafe.staticFieldOffset(dstClass.getDeclaredField("nodeMapOffset"));
@@ -83,18 +90,58 @@ public class ClassInitializationBenchmark {
 
 			arrayOffsetsOffset = 
 					unsafe.staticFieldOffset(dstClass.getDeclaredField("arrayOffsets"));
+			
+			/**************************************************************************/
+			
+			firstFieldOffset = unsafe.getLong(dstClass, nodeMapOffsetOffset);
+
+			final long[] dstArrayOffsets = (long[]) unsafe.getObject(dstClass, arrayOffsetsOffset);
+			
+			// assuems that both are of type Object and next to each other in memory
+			addressSize = dstArrayOffsets[1] - dstArrayOffsets[0];
+			
+			/**************************************************************************/
+			
+			// System.out.println(ClassLayout.parseClass(Map2To0Node.class).toPrintable());
+
 		} catch (NoSuchFieldException | SecurityException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	boolean ensure(Object o) {
+		Map2To0Node that = (Map2To0Node) o;
+		
+		if (that.nodeMap != this.nodeMap)
+			return false;
+		if (that.dataMap != this.dataMap)
+			return false;
+		
+		if (!that.key1.equals(this.key1))
+			return false;
+		if (!that.val1.equals(this.val1))
+			return false;
+		if (!that.key2.equals(this.key2))
+			return false;
+		if (!that.val2.equals(this.val2))
+			return false;
+		
+		return true;
+	}
+	
 	@Benchmark
 	public Object timeClassInstanziation_Constructor() {
-		return new Map2To0Node(nodeMap, dataMap, key1, val1, key2, val2);
+		Object result = new Map2To0Node(nodeMap, dataMap, key1, val1, key2, val2);
+		assert ensure(result);
+		return result;
 	}
 
+//	@formatter:off
+	/*
+	 * Crashes with -XX:-UseCompressedOops.
+	 */
 	@Benchmark
-	public Object timeClassInstanziation_Unsafe_ConstantOffsets() {
+	public Object timeClassInstanziation_Unsafe_ConstantOffsets_32bit() {
 		try {
 			final Class<Map2To0Node> dstClass = Map2To0Node.class;
 
@@ -107,11 +154,39 @@ public class ClassInitializationBenchmark {
 			unsafe.putObject(dst, 28L, key2);
 			unsafe.putObject(dst, 32L, val2);
 
+			assert ensure(dst);
 			return dst;
 		} catch (InstantiationException | SecurityException e) {
 			throw new RuntimeException(e);
 		}
 	}
+//	@formatter:on
+	
+//	@formatter:off
+	/*
+	 * Crashes with -XX:+UseCompressedOops.
+	 */
+	@Benchmark
+	public Object timeClassInstanziation_Unsafe_ConstantOffsets_64bit() {
+		try {
+			final Class<Map2To0Node> dstClass = Map2To0Node.class;
+
+			final Map2To0Node dst = (Map2To0Node) (unsafe.allocateInstance(dstClass));
+
+			unsafe.putInt(dst, 16L, nodeMap);
+			unsafe.putInt(dst, 20L, dataMap);
+			unsafe.putObject(dst, 24L, key1);
+			unsafe.putObject(dst, 32L, val1);
+			unsafe.putObject(dst, 40L, key2);
+			unsafe.putObject(dst, 48L, val2);
+
+			assert ensure(dst);
+			return dst;
+		} catch (InstantiationException | SecurityException e) {
+			throw new RuntimeException(e);
+		}
+	}
+//	@formatter:on	
 
 	@Benchmark
 	public Object timeClassInstanziation_Unsafe_RunningOffsets() {
@@ -120,15 +195,17 @@ public class ClassInitializationBenchmark {
 
 			final Map2To0Node dst = (Map2To0Node) (unsafe.allocateInstance(dstClass));
 
-			long offset = 12L;
+			long offset = this.firstFieldOffset;
+			long addressSize = this.addressSize;
 
-			unsafe.putInt(dst, offset += 0, nodeMap);
-			unsafe.putInt(dst, offset += 4, dataMap);
-			unsafe.putObject(dst, offset += 4, key1);
-			unsafe.putObject(dst, offset += 4, val1);
-			unsafe.putObject(dst, offset += 4, key2);
-			unsafe.putObject(dst, offset += 4, val2);
+			unsafe.putInt(dst, offset, nodeMap); offset += 4;
+			unsafe.putInt(dst, offset, dataMap); offset += 4;
+			unsafe.putObject(dst, offset, key1); offset += addressSize;
+			unsafe.putObject(dst, offset, val1); offset += addressSize;
+			unsafe.putObject(dst, offset, key2); offset += addressSize;
+			unsafe.putObject(dst, offset, val2); offset += addressSize;
 
+			assert ensure(dst);
 			return dst;
 		} catch (InstantiationException | SecurityException e) {
 			throw new RuntimeException(e);
@@ -158,6 +235,7 @@ public class ClassInitializationBenchmark {
 			unsafe.putObject(dst, dstArrayOffsets[2], key2);
 			unsafe.putObject(dst, dstArrayOffsets[3], val2);
 
+			assert ensure(dst);
 			return dst;
 		} catch (InstantiationException | NoSuchFieldException | SecurityException e) {
 			throw new RuntimeException(e);
@@ -184,6 +262,7 @@ public class ClassInitializationBenchmark {
 			unsafe.putObject(dst, dstArrayOffsets[2], key2);
 			unsafe.putObject(dst, dstArrayOffsets[3], val2);
 
+			assert ensure(dst);
 			return dst;
 		} catch (InstantiationException | SecurityException e) {
 			throw new RuntimeException(e);
@@ -191,7 +270,6 @@ public class ClassInitializationBenchmark {
 	}
 	
 	
-	@SuppressWarnings("unused")
 	static class Base {
 
 		Base(final int nodeMap, final int dataMap) {
@@ -199,13 +277,12 @@ public class ClassInitializationBenchmark {
 			this.dataMap = dataMap;
 		}
 
-		private int nodeMap = 0;
-		private int dataMap = 0;
+		protected int nodeMap = 0;
+		protected int dataMap = 0;
 
 		// private int testReorderInt = 0;
 	}
 
-	@SuppressWarnings("unused")
 	static class Map2To0Node extends Base {
 
 		Map2To0Node(final int nodeMap, final int dataMap, final Object key1, final Object val1,
@@ -235,10 +312,13 @@ public class ClassInitializationBenchmark {
 		// private int testReorderInt = 0;
 		// private long testReorderLong1 = 0;
 
+		@SuppressWarnings("unused")
 		private static final long nodeMapOffset = bitmapOffset(Map2To0Node.class, "nodeMap");
 
+		@SuppressWarnings("unused")
 		private static final long dataMapOffset = bitmapOffset(Map2To0Node.class, "dataMap");
 
+		@SuppressWarnings("unused")
 		private static final long[] arrayOffsets = arrayOffsets(Map2To0Node.class, new String[] {
 				"key1", "val1", "key2", "val2" });
 
@@ -288,13 +368,14 @@ public class ClassInitializationBenchmark {
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(ClassInitializationBenchmark.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-				.include(".*" + ClassInitializationBenchmark.class.getSimpleName() + ".*")
+				.include(".*" + ClassInitializationBenchmark.class.getSimpleName() + ".*") // timeClassInstanziation_Unsafe_RunningOffsets
 				.timeUnit(TimeUnit.NANOSECONDS).forks(1).mode(Mode.AverageTime).warmupIterations(5)
 				.measurementIterations(5).build();
-
-		new Runner(opt).run();
-
+		
+		System.out.println(VMSupport.vmDetails());
 		System.out.println(ClassLayout.parseClass(Map2To0Node.class).toPrintable());
+		
+		new Runner(opt).run();
 	}
 
 }
