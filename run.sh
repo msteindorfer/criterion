@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# mvn clean install
-# mkdir -p target/results
-# mkdir -p target/result-logs
+mvn clean install
+mkdir -p target/results
+mkdir -p target/result-logs
 
 export VALUE_FACTORY_FACTORY="VF_PDB_PERSISTENT_CURRENT,VF_SCALA,VF_CLOJURE,VF_PDB_PERSISTENT_MEMOIZED_LAZY" # VF_PDB_PERSISTENT_LAZY,VF_PDB_PERSISTENT_MEMOIZED
 
