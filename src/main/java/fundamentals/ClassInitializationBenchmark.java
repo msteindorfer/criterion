@@ -275,10 +275,11 @@ public class ClassInitializationBenchmark {
 			unsafe.putInt(dst, dstNodeMapOffset, nodeMap);
 			unsafe.putInt(dst, dstDataMapOffset, dataMap);
 			// works in presence of padding
-			unsafe.putObject(dst, dstArrayOffsets[0], key1);
-			unsafe.putObject(dst, dstArrayOffsets[1], val1);
-			unsafe.putObject(dst, dstArrayOffsets[2], key2);
-			unsafe.putObject(dst, dstArrayOffsets[3], val2);
+			int slot = 0;
+			unsafe.putObject(dst, dstArrayOffsets[slot], key1); slot++;
+			unsafe.putObject(dst, dstArrayOffsets[slot], val1); slot++;
+			unsafe.putObject(dst, dstArrayOffsets[slot], key2); slot++;
+			unsafe.putObject(dst, dstArrayOffsets[slot], val2); slot++;
 
 			assert ensure(dst);
 			return dst;
@@ -302,10 +303,12 @@ public class ClassInitializationBenchmark {
 
 			unsafe.putInt(dst, dstNodeMapOffset, nodeMap);
 			unsafe.putInt(dst, dstDataMapOffset, dataMap);
-			unsafe.putObject(dst, dstArrayOffsets[0], key1);
-			unsafe.putObject(dst, dstArrayOffsets[1], val1);
-			unsafe.putObject(dst, dstArrayOffsets[2], key2);
-			unsafe.putObject(dst, dstArrayOffsets[3], val2);
+			// works in presence of padding
+			int slot = 0;
+			unsafe.putObject(dst, dstArrayOffsets[slot], key1); slot++;
+			unsafe.putObject(dst, dstArrayOffsets[slot], val1); slot++;
+			unsafe.putObject(dst, dstArrayOffsets[slot], key2); slot++;
+			unsafe.putObject(dst, dstArrayOffsets[slot], val2); slot++;
 
 			assert ensure(dst);
 			return dst;
@@ -453,7 +456,7 @@ public class ClassInitializationBenchmark {
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(ClassInitializationBenchmark.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-				.include(".*" + ClassInitializationBenchmark.class.getSimpleName() + ".timeClassInstanziation_Unsafe_RunningOffsetsVarargs*")
+				.include(".*" + ClassInitializationBenchmark.class.getSimpleName() + ".*")
 				.timeUnit(TimeUnit.NANOSECONDS).forks(1).mode(Mode.AverageTime).warmupIterations(5)
 				.measurementIterations(5).build();
 		

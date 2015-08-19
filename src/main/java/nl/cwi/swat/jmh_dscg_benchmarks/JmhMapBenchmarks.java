@@ -34,6 +34,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -364,12 +365,12 @@ public class JmhMapBenchmarks {
 						".*" + JmhMapBenchmarks.class.getSimpleName()
 								+ ".(timeInsert)")
 				.timeUnit(TimeUnit.NANOSECONDS)
-				.forks(1)
+				.forks(0)
 				//.warmupMode(WarmupMode.INDI)
-				.warmupIterations(30)
-				.warmupTime(TimeValue.seconds(3))
+				.warmupIterations(0)
+				.warmupTime(TimeValue.seconds(1))
 				.mode(Mode.AverageTime)
-				.measurementIterations(45)
+				.measurementIterations(5)
 				.param("dataType", "MAP")
 				.param("run", "0")
 //				.param("run", "1")
@@ -381,8 +382,10 @@ public class JmhMapBenchmarks {
 				.param("sampleDataSelection", "MATCH").param("size", "1024") // 1048576
 				//.param("valueFactoryFactory", "VF_PDB_PERSISTENT_SPECIALIZED")
 				.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT")
-				.param("valueFactoryFactory", "VF_SCALA")
+				//.param("valueFactoryFactory", "VF_SCALA")
 				//.param("valueFactoryFactory", "VF_CLOJURE")
+				.resultFormat(ResultFormatType.CSV)
+				.result("latest-results-main.csv")
 				.build();
 
 		new Runner(opt).run();

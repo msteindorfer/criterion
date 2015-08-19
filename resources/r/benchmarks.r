@@ -9,7 +9,7 @@ args <- commandArgs(TRUE)
 
 setwd("~/Development/jmh-dscg-benchmarks/resources/r")
 dataDirectory <- "~/Development/jmh-dscg-benchmarks"
-timestamp <- "20150719_0830"
+timestamp <- "20150817_0732"
 timestampMemoryMeasurement <- "latest"
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
@@ -23,6 +23,7 @@ cran_rstudio_repo="http://cran.rstudio.com/"
 # install.packages("plyr", repos = cran_rstudio_repo)
 # install.packages("extrafont", repos = cran_rstudio_repo)
 # install.packages("scales", repos = cran_rstudio_repo)
+# install.packages("tikzDevice", repos = cran_rstudio_repo)
 library(vioplot)
 library(beanplot)
 library(ggplot2)
@@ -31,6 +32,7 @@ library(functional)
 library(plyr) # needed to access . function
 library(extrafont)
 library(scales)
+# require(tikzDevice)
 loadfonts()
 
 
@@ -271,9 +273,12 @@ getBenchmarkAnnotationName <- Vectorize(getBenchmarkAnnotationName__)
 
 benchmarksFileName <- paste(paste(dataDirectory, paste("results.all", timestamp, sep="-"), sep="/"), "log", sep=".")
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
-colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
+# colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
+colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError_90_0", "RelativeScoreError_90_0", "ScoreError_95_0", "RelativeScoreError_95_0", "ScoreError_99_9", "RelativeScoreError_99_9", "MedianScore", "MedianAbsoluteDeviation", "RelativeMedianAbsoluteDeviation", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
 
-# benchmarks$Score <- as.numeric(benchmarks$Score)
+# View(benchmarks$Score - benchmarks$MedianScore)
+
+benchmarks$Score <- benchmarks$MedianScore
 
 benchmarks$Annotation <- getBenchmarkAnnotationName(benchmarks$Benchmark)
 benchmarks$Benchmark <- getBenchmarkMethodName(benchmarks$Benchmark)
@@ -436,11 +441,13 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
   tableAll_summary_fmt <- data.frame(sapply(1:NCOL(tableAll_summary), function(col_idx) { tableAll_summary[,c(col_idx)] <- dataFormatter(tableAll_summary[,c(col_idx)])}))
   rownames(tableAll_summary_fmt) <- rownames(tableAll_summary)
 
-  fileNameSummary <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, "summary", sep="-"), "tex", sep=".")
+  outputFolder <- "./tables-latex/tables"
+  
+  fileNameSummary <- paste(outputFolder, paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, "summary", sep="-"), "tex", sep="."), sep="/")
   write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_summary_fmt), file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
-  fileName <- paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, sep="-"), "tex", sep=".")
+  fileName <- paste(outputFolder, paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, sep="-"), "tex", sep="."), sep="/")
   write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 
@@ -448,27 +455,55 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
 }
 
 createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
+
+#   options( tikzLatexPackages = c(
+#     "\\usepackage{tikz}",
+#     "\\usepackage[active,tightpage]{preview}",
+#     "\\PreviewEnvironment{pgfpicture}",
+#     "\\setlength\\PreviewBorder{0pt}", 
+#     "\\usepackage{siunitx}",
+#     "\\usepackage{xspace}",
+#     "\\newcommand{\\Contained}{Contained\\xspace}",
+#     "\\newcommand{\\NotContained}{$\\neg$Contained\\xspace}"),
+#     
+#     tikzXelatexPackages = c(
+#       "\\usepackage{tikz}\n", 
+#       "\\usepackage[active,tightpage,xetex]{preview}\n", 
+#       "\\usepackage{fontspec,xunicode}\n", 
+#       "\\PreviewEnvironment{pgfpicture}\n", 
+#       "\\setlength\\PreviewBorder{0pt}\n",
+#       "\\usepackage{siunitx}",
+#       "\\usepackage{xspace}",
+#       "\\newcommand{\\Contained}{Contained\\xspace}",
+#       "\\newcommand{\\NotContained}{$\\neg$Contained\\xspace}")
+#   )
+  
   ###
   # Create boxplots as well
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
-  fontScalingFactor <- 1.2
-  pdf(outFileName, family = "Times", width = 15, height = 3.5)
+  fontScalingFactor <- 0.6
+
+  pdf(outFileName, family = "Times", width = 7, height = 1.65)
+  #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
   
   selection <- tableAll[2:NCOL(tableAll)]
   names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
   
-  par(mar = c(3.5,4.75,0,0) + 0.1)
-  par(mgp=c(3.5, 1.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  par(mar = c(1.6,2.3,0,0) + 0.15) # c(bottom, left, top, right)
+  par(mgp=c(1.8, 0.425, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   
-  boxplot(selection, ylim=range(-0.8, 1.0), yaxt="n", las=0, ylab="savings (in %)", 
+  par(tck = -0.025)
+  boxplot(selection, ylim=range(-0.4, 1.0), yaxt="n", las=0, ylab="savings (in %)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
           cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
   
   z  <- c(-0.8, -0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
   zz <- c("-80%", "-60%", "-40%", "-20%", "0%", "20%", "40%", "60%", "80%", "100%")
-  par(mgp=c(0, 0.75, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
-  axis(2, at=z, labels=zz, las=2,
+  #zz <- c("\\SI{-80}{\\percent}", "\\SI{-60}{\\percent}", "\\SI{-40}{\\percent}", "\\SI{-20}{\\percent}", "\\SI{0}{\\percent}", "\\SI{20}{\\percent}", "\\SI{40}{\\percent}", "\\SI{60}{\\percent}", "\\SI{80}{\\percent}", "\\SI{100}{\\percent}")
+  par(mgp=c(0, 0.25, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  axis(2, at=z, labels=zz, las=2, tck = -0.0225,  
        cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+#  axis(1, labels = NA, tck = -0.025)
   
 #   abline(v =  5.5)
   
@@ -513,6 +548,19 @@ createAllTables <- function(dataFormatter, compareFunction, nameAppendix) {
   createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
 }
 
+
+
+###
+# Results as speedup factors
+##
+dataFormatter <- latexMathFactor
+compareFunction <- compareSpeedup
+nameAppendix <- "speedup"
+
+createAllTables(dataFormatter, compareFunction, nameAppendix)
+
+
+
 ###
 # Results as saving percentages
 ##
@@ -522,11 +570,53 @@ nameAppendix <- "savings"
 
 createAllTables(dataFormatter, compareFunction, nameAppendix)
 
-# ###
-# # Results as speedup factors
-# ##
-dataFormatter <- latexMathFactor
-compareFunction <- compareSpeedup
-nameAppendix <- "speedup"
 
-createAllTables(dataFormatter, compareFunction, nameAppendix)
+
+###
+# Report on accuracy of measurements.
+##
+
+statScoreError <- function(scoreError) {
+  print(c(min(scoreError), median(scoreError), max(scoreError)))
+  print(quantile(sort(scoreError), c(.50, .90, .95, .99)))
+}
+
+statScoreError(scoreError = benchmarks$RelativeScoreError_90_0)
+statScoreError(scoreError = benchmarks$RelativeScoreError_95_0)
+statScoreError(scoreError = benchmarks$RelativeScoreError_99_9)
+
+# sub <- benchmarks # benchmarks[benchmarks$Param_size > 1,]
+# sub$ScoreErrorRelative <- (sub$ScoreError * 100) / sub$Score
+# 
+# median(sub$ScoreErrorRelative)
+# c(min(sub$ScoreErrorRelative), median(sub$ScoreErrorRelative), max(sub$ScoreErrorRelative))
+# # mad((sub$ScoreError * 100) / sub$Score)
+# 
+# # median(sub$ScoreError)
+# # c(min(sub$ScoreError), median(sub$ScoreError), max(sub$ScoreError))
+# # # mad(sub$ScoreError)
+# 
+# # View(sub[order(-sub$ScoreErrorRelative),])
+# # View(sub[order(-sub$ScoreErrorRelative) & sub$ScoreErrorRelative > 10,])
+# View(sub[order(-sub$ScoreErrorRelative) & sub$ScoreErrorRelative > 10, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory')])
+# 
+# quantile(sub[order(sub$ScoreErrorRelative),]$ScoreErrorRelative, c(.50, .90, .95, .99))
+
+
+###
+# Report on accuracy with new JMH data points.
+##
+sub <- benchmarks
+
+c(min(sub$RelativeScoreError_90_0), median(sub$RelativeScoreError_90_0), max(sub$RelativeScoreError_90_0))
+c(min(sub$RelativeScoreError_95_0), median(sub$RelativeScoreError_95_0), max(sub$RelativeScoreError_95_0))
+c(min(sub$RelativeScoreError_99_9), median(sub$RelativeScoreError_99_9), max(sub$RelativeScoreError_99_9))
+
+View(sub[order(-sub$RelativeScoreError_99_9) & sub$RelativeScoreError_99_9 > 0.10, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory','RelativeScoreError_99_9')])
+
+# c(min(sub$MedianAbsoluteDeviation), median(sub$MedianAbsoluteDeviation), max(sub$MedianAbsoluteDeviation))
+c(min(sub$RelativeMedianAbsoluteDeviation), median(sub$RelativeMedianAbsoluteDeviation), max(sub$RelativeMedianAbsoluteDeviation))
+
+quantile(sub[order(sub$RelativeMedianAbsoluteDeviation),]$RelativeMedianAbsoluteDeviation, c(.50, .90, .95, .99))
+
+View(sub[order(-sub$RelativeMedianAbsoluteDeviation) & sub$RelativeMedianAbsoluteDeviation > 0.05, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory')])
