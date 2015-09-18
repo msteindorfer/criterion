@@ -359,33 +359,32 @@ public class JmhMapBenchmarks {
 //	}
 
 	public static void main(String[] args) throws RunnerException {
+		/*
+		 * /Users/Michael/Development/jku/mx2/graal/jvmci/jdk1.8.0_60/product/bin/java -jvmci -jar ./target/benchmarks.jar "JmhMapBenchmarks.timeContainsKey$" -p valueFactoryFactory=VF_PDB_PERSISTENT_CURRENT,VF_PDB_PERSISTENT_BLEEDING_EDGE -p producer=PDB_INTEGER -p size=4194304 -jvm /Users/Michael/Development/jku/mx2/graal/jvmci/jdk1.8.0_60/product/bin/java -jvmArgs "-jvmci" -wi 7 -i 10 -f 0
+		 */
+		
+		
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 				.include(
 						".*" + JmhMapBenchmarks.class.getSimpleName()
-								+ ".(timeInsert)")
+								+ ".(timeContainsKey$)")
 				.timeUnit(TimeUnit.NANOSECONDS)
-				.forks(0)
-				//.warmupMode(WarmupMode.INDI)
-				.warmupIterations(0)
-				.warmupTime(TimeValue.seconds(1))
 				.mode(Mode.AverageTime)
-				.measurementIterations(5)
+				.warmupIterations(7)
+				.warmupTime(TimeValue.seconds(1))
+				.measurementIterations(10)
+				.forks(0)
 				.param("dataType", "MAP")
 				.param("run", "0")
-//				.param("run", "1")
-//				.param("run", "2")
-//				.param("run", "3")
-				//.addProfiler(CountingIntegerProfiler.class)
-				//.param("producer", "SLEEPING_INTEGER")
-				.param("producer", "COUNTING_INTEGER")
-				.param("sampleDataSelection", "MATCH").param("size", "1024") // 1048576
-				//.param("valueFactoryFactory", "VF_PDB_PERSISTENT_SPECIALIZED")
+				.param("producer", "PDB_INTEGER")
+				.param("sampleDataSelection", "MATCH").param("size", "1048576") // 1048576 4194304
 				.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT")
+				.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE")
 				//.param("valueFactoryFactory", "VF_SCALA")
 				//.param("valueFactoryFactory", "VF_CLOJURE")
-				.resultFormat(ResultFormatType.CSV)
-				.result("latest-results-main.csv")
+				//.resultFormat(ResultFormatType.CSV)
+				//.result("latest-results-main.csv")
 				.build();
 
 		new Runner(opt).run();
