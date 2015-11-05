@@ -18,11 +18,11 @@ import java.util.concurrent.TimeUnit;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhSet;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhSetWriter;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValueFactory;
 
-import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ISetWriter;
-import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -68,20 +68,20 @@ public class JmhSetBenchmarks {
 	@Param
 	public ElementProducer producer;	
 	
-	public IValueFactory valueFactory;
+	public JmhValueFactory valueFactory;
 	
-	public ISet testSet;
-	private ISet testSetRealDuplicate;
-	private ISet testSetDeltaDuplicate;
+	public JmhSet testSet;
+	private JmhSet testSetRealDuplicate;
+	private JmhSet testSetDeltaDuplicate;
 	
-	private ISet testSetRealDuplicateSameSizeButDifferent;
+	private JmhSet testSetRealDuplicateSameSizeButDifferent;
 
-	public IValue VALUE_EXISTING;
-	public IValue VALUE_NOT_EXISTING;
+	public JmhValue VALUE_EXISTING;
+	public JmhValue VALUE_NOT_EXISTING;
 
 	public static final int CACHED_NUMBERS_SIZE = 8;
-	public IValue[] cachedNumbers = new IValue[CACHED_NUMBERS_SIZE];
-	public IValue[] cachedNumbersNotContained = new IValue[CACHED_NUMBERS_SIZE];
+	public JmhValue[] cachedNumbers = new JmhValue[CACHED_NUMBERS_SIZE];
+	public JmhValue[] cachedNumbersNotContained = new JmhValue[CACHED_NUMBERS_SIZE];
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
@@ -129,7 +129,7 @@ public class JmhSetBenchmarks {
 				 */
 				boolean found = false;
 				while (!found) {
-					final IValue candidate = producer.createFromInt(anotherRand.nextInt());
+					final JmhValue candidate = producer.createFromInt(anotherRand.nextInt());
 
 					if (testSet.contains(candidate)) {
 						continue;
@@ -141,14 +141,14 @@ public class JmhSetBenchmarks {
 			}
 
 			// assert (contained)
-			for (IValue sample : cachedNumbers) {
+			for (JmhValue sample : cachedNumbers) {
 				if (!testSet.contains(sample)) {
 					throw new IllegalStateException();
 				}
 			}
 
 			// assert (not contained)
-			for (IValue sample : cachedNumbersNotContained) {
+			for (JmhValue sample : cachedNumbersNotContained) {
 				if (testSet.contains(sample)) {
 					throw new IllegalStateException();
 				}
@@ -167,8 +167,8 @@ public class JmhSetBenchmarks {
 	protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
 		valueFactory = valueFactoryFactory.getInstance();
 
-		ISetWriter writer1 = valueFactory.setWriter();
-		ISetWriter writer2 = valueFactory.setWriter();
+		JmhSetWriter writer1 = valueFactory.setWriter();
+		JmhSetWriter writer2 = valueFactory.setWriter();
 
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial + 13);
@@ -195,7 +195,7 @@ public class JmhSetBenchmarks {
 		 * found
 		 */
 		while (VALUE_NOT_EXISTING == null) {
-			final IValue candidate = producer.createFromInt(rand.nextInt());
+			final JmhValue candidate = producer.createFromInt(rand.nextInt());
 
 			if (!testSet.contains(candidate)) {
 				VALUE_NOT_EXISTING = candidate;
@@ -252,7 +252,7 @@ public class JmhSetBenchmarks {
 	
 	@Benchmark
 	public void timeIteration(Blackhole bh) {
-		for (Iterator<IValue> iterator = testSet.iterator(); iterator.hasNext();) {
+		for (Iterator<JmhValue> iterator = testSet.iterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
 		}
 	}
@@ -320,8 +320,10 @@ public class JmhSetBenchmarks {
 						.include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".(timeIteration)")
 						.forks(0).warmupIterations(5).measurementIterations(5)
 						.mode(Mode.AverageTime).param("dataType", "SET")
+						.param("producer", "PDB_INTEGER")
 						.param("sampleDataSelection", "MATCH").param("size", "1048576").param("run", "0")
-						.param("valueFactoryFactory", "VF_PDB_PERSISTENT_BLEEDING_EDGE").build();
+						//.param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT")
+						.build();
 
 		new Runner(opt).run();
 	}

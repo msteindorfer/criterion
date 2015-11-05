@@ -4,10 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.eclipse.imp.pdb.facts.IMap;
-import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
+import org.rascalmpl.value.IMap;
+import org.rascalmpl.value.ISet;
+import org.rascalmpl.value.IValueFactory;
+import org.rascalmpl.value.io.BinaryValueReader;
 
 public class AllDominatorsRunner {
 
@@ -24,7 +24,7 @@ public class AllDominatorsRunner {
 	public static final IMap CURRENT_DATA_SET;
 
 	static {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 		
 		try {
 			CURRENT_DATA_SET = (IMap) new BinaryValueReader().read(vf, new FileInputStream(
@@ -42,8 +42,8 @@ public class AllDominatorsRunner {
 		IMap resultsBareMetalOne = DominatorsWithoutPDB_Default.testOne();
 		IMap resultsClojureOne = DominatorsClojure.testOne();
 		IMap resultsScalaOne = DominatorsScalaV1.testOne();
-//		IMap resultsPdbPersistentOne = DominatorsPDB.testOne(org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance());
-// 		IMap resultsPdbFastOne = DominatorsPDB.testOne(org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance());		
+//		IMap resultsPdbPersistentOne = DominatorsPDB.testOne(org.rascalmpl.value.impl.persistent.ValueFactory.getInstance());
+// 		IMap resultsPdbFastOne = DominatorsPDB.testOne(org.rascalmpl.value.impl.fast.ValueFactory.getInstance());		
 //		
 //		if (!resultsPdbPersistentOne.equals(resultsBareMetalOne)) {
 //			throw new Error("Dominator calculations do differ [PDB Persistent vs CHART]!");
@@ -66,8 +66,8 @@ public class AllDominatorsRunner {
 		ISet resultsBareMetal = DominatorsWithoutPDB_Default.testAll(CURRENT_DATA_SET);
 		ISet resultsClojure = DominatorsClojure.testAll(CURRENT_DATA_SET);
 		ISet resultsScala = DominatorsScalaV1.testAll(CURRENT_DATA_SET);
-//		ISet resultsPdbPersistent = DominatorsPDB.testAll(org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance());
-// 		ISet resultsPdbFast = DominatorsPDB.testAll(org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance());		
+//		ISet resultsPdbPersistent = DominatorsPDB.testAll(org.rascalmpl.value.impl.persistent.ValueFactory.getInstance());
+// 		ISet resultsPdbFast = DominatorsPDB.testAll(org.rascalmpl.value.impl.fast.ValueFactory.getInstance());		
 //		
 //		if (!resultsPdbPersistent.equals(resultsBareMetal)) {
 //			throw new Error("Dominator calculations do differ [PDB Persistent vs CHART]!");

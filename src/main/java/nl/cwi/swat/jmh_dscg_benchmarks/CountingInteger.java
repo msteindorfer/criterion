@@ -1,11 +1,12 @@
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import org.eclipse.imp.pdb.facts.impl.AbstractValue;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
+
 import org.openjdk.jmh.annotations.CompilerControl;
 import org.openjdk.jmh.annotations.CompilerControl.Mode;
 
 @CompilerControl(Mode.DONT_INLINE)
-public class CountingInteger extends AbstractValue {
+public class CountingInteger implements JmhValue {
 
 	private static long HASHCODE_COUNTER = 0;
 	private static long EQUALS_COUNTER = 0;

@@ -2,7 +2,7 @@ package dom;
 
 import java.util.ArrayList;
 
-import org.eclipse.imp.pdb.facts.ISet;
+import org.rascalmpl.value.ISet;
 import org.openjdk.jmh.infra.Blackhole;
 
 public interface DominatorBenchmark {

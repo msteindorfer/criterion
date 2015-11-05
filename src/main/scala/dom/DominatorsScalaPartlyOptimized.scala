@@ -11,14 +11,14 @@ import scala.collection.immutable.HashMap
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.Builder
 
-import org.eclipse.imp.pdb.facts.IConstructor
-import org.eclipse.imp.pdb.facts.IMap
-import org.eclipse.imp.pdb.facts.ISet
-import org.eclipse.imp.pdb.facts.ITuple
-import org.eclipse.imp.pdb.facts.IValue
-import org.eclipse.imp.pdb.facts.io.BinaryValueReader
-import org.eclipse.imp.pdb.facts.io.BinaryValueWriter
-import org.eclipse.imp.pdb.facts.io.StandardTextWriter
+import org.rascalmpl.value.IConstructor
+import org.rascalmpl.value.IMap
+import org.rascalmpl.value.ISet
+import org.rascalmpl.value.ITuple
+import org.rascalmpl.value.IValue
+import org.rascalmpl.value.io.BinaryValueReader
+import org.rascalmpl.value.io.BinaryValueWriter
+import org.rascalmpl.value.io.StandardTextWriter
 import org.openjdk.jmh.infra.Blackhole
 import org.rascalmpl.interpreter.utils.Timing
 
@@ -176,7 +176,7 @@ object DominatorsScalaPartlyOptimized {
 	}
 
 	def testOne: IMap = {
-		val vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance
+		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
 
 		val data = new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME)).asInstanceOf[ISet]
 
@@ -252,7 +252,7 @@ object DominatorsScalaPartlyOptimized {
 
 	def immutableSetOfMapsToSetOfMapValues(result: HashSet[HashMap[IConstructor, HashSet[IConstructor]]]): ISet = {
 		// convert back to PDB for serialization
-		val vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance
+		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
 
 		val resultBuilder = vf.setWriter
 
@@ -278,7 +278,7 @@ object DominatorsScalaPartlyOptimized {
 	}
 
 	def immutableSetToPdbSet[K <: IValue](set: HashSet[K]): ISet = {
-		val vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance
+		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
 
 		val builder = vf.setWriter
 
@@ -292,7 +292,7 @@ object DominatorsScalaPartlyOptimized {
 	def immutableMapToPdbMap(
 		result: HashMap[IConstructor, HashSet[IConstructor]]): IMap = {
 		// convert back to PDB for serialization
-		val vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance
+		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
 
 		val builder = vf.mapWriter
 

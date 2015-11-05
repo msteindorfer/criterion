@@ -12,3 +12,7 @@ map-sizes-and-statistics.csv
 
 data/wordpress-cfgs-as-graphs.bin
 data/wordpress-cfgs-as-graphs-sampled.bin
+
+resources/r/.RData
+resources/r/.Rhistory
+resources/r/all-benchmarks-*

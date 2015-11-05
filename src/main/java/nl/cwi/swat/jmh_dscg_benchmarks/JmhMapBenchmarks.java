@@ -18,11 +18,11 @@ import java.util.concurrent.TimeUnit;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.SampleDataSelection;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhMap;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhMapWriter;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValueFactory;
 
-import org.eclipse.imp.pdb.facts.IMap;
-import org.eclipse.imp.pdb.facts.IMapWriter;
-import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.IValueFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -70,23 +70,23 @@ public class JmhMapBenchmarks {
 	@Param
 	public ElementProducer producer;
 
-	public IValueFactory valueFactory;
+	public JmhValueFactory valueFactory;
 
-	public IMap testMap;
-	private IMap testMapRealDuplicate;
-	private IMap testMapDeltaDuplicate;
+	public JmhMap testMap;
+	private JmhMap testMapRealDuplicate;
+	private JmhMap testMapDeltaDuplicate;
 
-	private IMap testMapRealDuplicateSameSizeButDifferent;
+	private JmhMap testMapRealDuplicateSameSizeButDifferent;
 	
-	public IValue VALUE_EXISTING;
-	public IValue VALUE_NOT_EXISTING;
+	public JmhValue VALUE_EXISTING;
+	public JmhValue VALUE_NOT_EXISTING;
 
 	public static final int CACHED_NUMBERS_SIZE = 8;
-	public IValue[] cachedNumbers = new IValue[CACHED_NUMBERS_SIZE];
-	public IValue[] cachedNumbersNotContained = new IValue[CACHED_NUMBERS_SIZE];
+	public JmhValue[] cachedNumbers = new JmhValue[CACHED_NUMBERS_SIZE];
+	public JmhValue[] cachedNumbersNotContained = new JmhValue[CACHED_NUMBERS_SIZE];
 
-	private IMap singletonMapWithExistingValue;
-	private IMap singletonMapWithNotExistingValue;
+	private JmhMap singletonMapWithExistingValue;
+	private JmhMap singletonMapWithNotExistingValue;
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
@@ -138,7 +138,7 @@ public class JmhMapBenchmarks {
 				 */
 				boolean found = false;
 				while (!found) {
-					final IValue candidate = producer.createFromInt(anotherRand.nextInt());
+					final JmhValue candidate = producer.createFromInt(anotherRand.nextInt());
 
 					if (testMap.containsKey(candidate)) {
 						continue;
@@ -150,14 +150,14 @@ public class JmhMapBenchmarks {
 			}
 
 			// assert (contained)
-			for (IValue sample : cachedNumbers) {
+			for (JmhValue sample : cachedNumbers) {
 				if (!testMap.containsKey(sample)) {
 					throw new IllegalStateException();
 				}
 			}
 
 			// assert (not contained)
-			for (IValue sample : cachedNumbersNotContained) {
+			for (JmhValue sample : cachedNumbersNotContained) {
 				if (testMap.containsKey(sample)) {
 					throw new IllegalStateException();
 				}
@@ -165,11 +165,11 @@ public class JmhMapBenchmarks {
 		}
 		}
 
-		final IMapWriter mapWriter1 = valueFactory.mapWriter();
+		final JmhMapWriter mapWriter1 = valueFactory.mapWriter();
 		mapWriter1.put(VALUE_EXISTING, VALUE_EXISTING);
 		singletonMapWithExistingValue = mapWriter1.done();
 
-		final IMapWriter mapWriter2 = valueFactory.mapWriter();
+		final JmhMapWriter mapWriter2 = valueFactory.mapWriter();
 		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 		singletonMapWithNotExistingValue = mapWriter2.done();
 
@@ -189,8 +189,8 @@ public class JmhMapBenchmarks {
 
 		valueFactory = valueFactoryFactory.getInstance();
 
-		IMapWriter writer1 = valueFactory.mapWriter();
-		IMapWriter writer2 = valueFactory.mapWriter();
+		JmhMapWriter writer1 = valueFactory.mapWriter();
+		JmhMapWriter writer2 = valueFactory.mapWriter();
 
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial + 13);
@@ -217,7 +217,7 @@ public class JmhMapBenchmarks {
 		 * found
 		 */
 		while (VALUE_NOT_EXISTING == null) {
-			final IValue candidate = producer.createFromInt(rand.nextInt());
+			final JmhValue candidate = producer.createFromInt(rand.nextInt());
 
 			if (!testMap.containsKey(candidate)) {
 				VALUE_NOT_EXISTING = candidate;
@@ -280,14 +280,14 @@ public class JmhMapBenchmarks {
 
 	@Benchmark
 	public void timeIteration(Blackhole bh) {
-		for (Iterator<IValue> iterator = testMap.iterator(); iterator.hasNext();) {
+		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
 		}
 	}
 
 	@Benchmark
 	public void timeEntryIteration(Blackhole bh) {
-		for (Iterator<java.util.Map.Entry<IValue, IValue>> iterator = testMap.entryIterator(); iterator
+		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap.entryIterator(); iterator
 				.hasNext();) {
 			bh.consume(iterator.next());
 		}

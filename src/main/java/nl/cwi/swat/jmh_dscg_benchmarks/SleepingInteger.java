@@ -1,15 +1,16 @@
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import org.eclipse.imp.pdb.facts.impl.AbstractValue;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
+
 import org.openjdk.jmh.annotations.CompilerControl;
 import org.openjdk.jmh.annotations.CompilerControl.Mode;
 
 @CompilerControl(Mode.DONT_INLINE)
-public class SleepingInteger extends AbstractValue {
+public class SleepingInteger implements JmhValue {
 
 	public static boolean IS_SLEEP_ENABLED_IN_HASHCODE = true;
 	public static boolean IS_SLEEP_ENABLED_IN_EQUALS = true;
-	
+
 	private static final int MAX_SLEEP_IN_MILLISECONDS = 0;
 	private static final int MAX_SLEEP_IN_NANOSECONDS = 100;
 
@@ -36,7 +37,8 @@ public class SleepingInteger extends AbstractValue {
 	}
 
 	// TODO: have configurable WEIGHTS for hashCode() and equals() penalties.
-	// TODO: add caching to option to CHART (either keys, or keys + vals; in extra int[] array)
+	// TODO: add caching to option to CHART (either keys, or keys + vals; in
+	// extra int[] array)
 	@Override
 	public int hashCode() {
 		if (IS_SLEEP_ENABLED_IN_HASHCODE) {

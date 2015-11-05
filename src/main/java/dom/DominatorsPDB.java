@@ -13,23 +13,23 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.imp.pdb.facts.IConstructor;
-import org.eclipse.imp.pdb.facts.IMap;
-import org.eclipse.imp.pdb.facts.IMapWriter;
-import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ISetWriter;
-import org.eclipse.imp.pdb.facts.ITuple;
-import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
-import org.eclipse.imp.pdb.facts.io.BinaryValueWriter;
-import org.eclipse.imp.pdb.facts.io.StandardTextWriter;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieMap;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieSet;
-import org.eclipse.imp.pdb.facts.util.ImmutableMap;
-import org.eclipse.imp.pdb.facts.util.ImmutableSet;
-import org.eclipse.imp.pdb.facts.util.TransientMap;
-import org.eclipse.imp.pdb.facts.util.TransientSet;
+import org.rascalmpl.value.IConstructor;
+import org.rascalmpl.value.IMap;
+import org.rascalmpl.value.IMapWriter;
+import org.rascalmpl.value.ISet;
+import org.rascalmpl.value.ISetWriter;
+import org.rascalmpl.value.ITuple;
+import org.rascalmpl.value.IValue;
+import org.rascalmpl.value.IValueFactory;
+import org.rascalmpl.value.io.BinaryValueReader;
+import org.rascalmpl.value.io.BinaryValueWriter;
+import org.rascalmpl.value.io.StandardTextWriter;
+import io.usethesource.capsule.DefaultTrieMap;
+import io.usethesource.capsule.DefaultTrieSet;
+import io.usethesource.capsule.ImmutableMap;
+import io.usethesource.capsule.ImmutableSet;
+import io.usethesource.capsule.TransientMap;
+import io.usethesource.capsule.TransientSet;
 import org.rascalmpl.interpreter.utils.Timing;
 
 
@@ -143,8 +143,8 @@ public class DominatorsPDB {
     }
     
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		testAll(org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance());
-		testAll(org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance());
+		testAll(org.rascalmpl.value.impl.persistent.ValueFactory.getInstance());
+		testAll(org.rascalmpl.value.impl.fast.ValueFactory.getInstance());
 	}
 
 	public static IMap testOne(IValueFactory vf) throws IOException, FileNotFoundException {

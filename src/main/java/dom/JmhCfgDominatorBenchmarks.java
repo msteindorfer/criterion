@@ -23,14 +23,14 @@ import java.util.concurrent.TimeUnit;
 
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils;
 
-import org.eclipse.imp.pdb.facts.IConstructor;
-import org.eclipse.imp.pdb.facts.IMap;
-import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ISetWriter;
-import org.eclipse.imp.pdb.facts.ITuple;
-import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
+import org.rascalmpl.value.IConstructor;
+import org.rascalmpl.value.IMap;
+import org.rascalmpl.value.ISet;
+import org.rascalmpl.value.ISetWriter;
+import org.rascalmpl.value.ITuple;
+import org.rascalmpl.value.IValue;
+import org.rascalmpl.value.IValueFactory;
+import org.rascalmpl.value.io.BinaryValueReader;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -87,7 +87,7 @@ public class JmhCfgDominatorBenchmarks {
 	}
 
 	protected void deseriaizeFullDataSet() {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
 		try {
 			int bufferSize = 512 * 1024 * 1024;
@@ -130,7 +130,7 @@ public class JmhCfgDominatorBenchmarks {
 				ISet mapValue = (ISet) DATA_SET_FULL.get(mapKey);
 
 //				/**** REMOVE ANNOTATIONS ***/
-//				IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+//				IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 //				
 //				ISetWriter bldr = vf.setWriter();
 //				for (IValue untypedTuple : mapValue) {

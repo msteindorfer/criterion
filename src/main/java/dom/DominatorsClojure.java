@@ -21,20 +21,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
-import org.eclipse.imp.pdb.facts.IConstructor;
-import org.eclipse.imp.pdb.facts.IMap;
-import org.eclipse.imp.pdb.facts.IMapWriter;
-import org.eclipse.imp.pdb.facts.ISet;
-import org.eclipse.imp.pdb.facts.ISetWriter;
-import org.eclipse.imp.pdb.facts.ITuple;
-import org.eclipse.imp.pdb.facts.IValue;
-import org.eclipse.imp.pdb.facts.IValueFactory;
-import org.eclipse.imp.pdb.facts.io.BinaryValueReader;
-import org.eclipse.imp.pdb.facts.io.BinaryValueWriter;
-import org.eclipse.imp.pdb.facts.io.StandardTextWriter;
-import org.eclipse.imp.pdb.facts.util.DefaultTrieSet;
-import org.eclipse.imp.pdb.facts.util.ImmutableSet;
-import org.eclipse.imp.pdb.facts.util.TransientSet;
+import org.rascalmpl.value.IConstructor;
+import org.rascalmpl.value.IMap;
+import org.rascalmpl.value.IMapWriter;
+import org.rascalmpl.value.ISet;
+import org.rascalmpl.value.ISetWriter;
+import org.rascalmpl.value.ITuple;
+import org.rascalmpl.value.IValue;
+import org.rascalmpl.value.IValueFactory;
+import org.rascalmpl.value.io.BinaryValueReader;
+import org.rascalmpl.value.io.BinaryValueWriter;
+import org.rascalmpl.value.io.StandardTextWriter;
+import io.usethesource.capsule.DefaultTrieSet;
+import io.usethesource.capsule.ImmutableSet;
+import io.usethesource.capsule.TransientSet;
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
 
@@ -153,7 +153,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 	}
 
 	public static IMap testOne() throws IOException, FileNotFoundException {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
 		ISet data = (ISet) new BinaryValueReader().read(vf, new FileInputStream(
 						DATA_SET_SINGLE_FILE_NAME));
@@ -230,7 +230,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 	@SuppressWarnings("unchecked")
 	private static ISet persistentHashSetOfMapsToSetOfMapValues(PersistentHashSet result) {
 		// convert back to PDB for serialization
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
 		ISetWriter resultBuilder = vf.setWriter();
 
@@ -250,7 +250,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 
 	private static IMap persistentHashMapToPdbMap(PersistentHashMap result) {
 		// convert back to PDB for serialization
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
 		IMapWriter builder = vf.mapWriter();
 
@@ -263,7 +263,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 	}
 
 	private static <K extends IValue> ISet persistentHashSetToPdbSet(PersistentHashSet set) {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
 		ISetWriter builder = vf.setWriter();
 
@@ -278,7 +278,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 	// PersistentHashMapToPdbMap(
 	// PersistentHashMap<K, V> map) {
 	// IValueFactory vf =
-	// org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+	// org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 	//
 	// IMapWriter builder = vf.mapWriter();
 	//
@@ -300,7 +300,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 	}
 
 	public static void assertDominatorsEqual() throws FileNotFoundException, IOException {
-		IValueFactory vf = org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
 		ISet dominatorsRascal = (ISet) new BinaryValueReader().read(vf, new FileInputStream(
 						"data/dominators-rascal.bin"));

@@ -1,34 +1,34 @@
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import org.eclipse.imp.pdb.facts.IValue;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
 
 public enum ElementProducer {
 
 	PDB_INTEGER {
 		@Override
-		public IValue createFromInt(int value) {
-			return org.eclipse.imp.pdb.facts.impl.primitive.IntegerValue.newInteger(value);
+		public JmhValue createFromInt(int value) {
+			return new PureIntegerWithCustomHashCode(value);
 		}
 	},
 	PURE_INTEGER {
 		@Override
-		public IValue createFromInt(int value) {
+		public JmhValue createFromInt(int value) {
 			return new PureInteger(value);
 		}
 	},
 	SLEEPING_INTEGER {
 		@Override
-		public IValue createFromInt(int value) {
+		public JmhValue createFromInt(int value) {
 			return new SleepingInteger(value);
 		}
 	},
 	COUNTING_INTEGER {
 		@Override
-		public IValue createFromInt(int value) {
+		public JmhValue createFromInt(int value) {
 			return new CountingInteger(value);
 		}
 	};
 
-	public abstract IValue createFromInt(int value);
+	public abstract JmhValue createFromInt(int value);
 
 }

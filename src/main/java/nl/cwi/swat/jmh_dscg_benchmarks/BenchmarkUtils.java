@@ -14,121 +14,121 @@ package nl.cwi.swat.jmh_dscg_benchmarks;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.eclipse.imp.pdb.facts.IValueFactory;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValueFactory;
 
 public class BenchmarkUtils {
 	public static enum ValueFactoryFactory {
 		VF_CLOJURE {
-			@Override public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessValueFactory.getInstance();
+			@Override public JmhValueFactory getInstance() {
+				return new nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.clojure.ClojureValueFactory();
 			}
 		},
 //		VF_CLJ_DS {
 //			@Override public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
+//				return org.rascalmpl.value.impl.persistent.clojure.TypelessCljDsValueFactory.getInstance();
 //			}
 //		},		
 		VF_SCALA {
-			@Override public IValueFactory getInstance() {
-				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.TypelessValueFactory();
+			@Override public JmhValueFactory getInstance() {
+				return new nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.scala.ScalaValueFactory();
 			}
 		},
 //		VF_PDB_REFERENCE {
 //			@Override public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.reference.ValueFactory.getInstance();
+//				return org.rascalmpl.value.impl.reference.ValueFactory.getInstance();
 //			}
 //		},
-		VF_PDB_FAST {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
-			}
-		},
+//		VF_PDB_FAST {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.fast.ValueFactory.getInstance();
+//			}
+//		},
 //		VF_PDB_PERSISTENT {
 //			@Override
 //			public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.ValueFactory.getInstance();
+//				return org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 //			}
 //		},
 //		VF_CLOJURE {
 //			@Override public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.clojure.ValueFactory.getInstance();
+//				return org.rascalmpl.value.impl.persistent.clojure.ValueFactory.getInstance();
 //			}
 //		},
 //		VF_SCALA {
 //			@Override public IValueFactory getInstance() {
-//				return new org.eclipse.imp.pdb.facts.impl.persistent.scala.ValueFactory();
+//				return new org.rascalmpl.value.impl.persistent.scala.ValueFactory();
 //			}
 //		};
 //		
-		VF_PDB_GPCE_0To04 {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryGPCE0To4.getInstance();
-			}
-		},
+//		VF_PDB_GPCE_0To04 {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryGPCE0To4.getInstance();
+//			}
+//		},
 //		VF_PDB_GPCE_0To08 {
 //			@Override
 //			public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryGPCE0To8.getInstance();
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryGPCE0To8.getInstance();
 //			}
 //		},
 //		VF_PDB_GPCE_0To12 {
 //			@Override
 //			public IValueFactory getInstance() {
-//				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryGPCE0To12.getInstance();
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryGPCE0To12.getInstance();
 //			}
 //			},		
-		VF_PDB_GPCE_DYNAMIC {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryGPCEDynamic.getInstance();
-			}
-		},
-		VF_PDB_PERSISTENT_BLEEDING_EDGE {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryBleedingEdge.getInstance();
-			}
-		},
-		VF_PDB_PERSISTENT_SPECIALIZED {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactorySpecialization.getInstance();
-			}
-		},		
-		VF_PDB_PERSISTENT_UNTYPED {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactorySpecializationWithUntypedVariables.getInstance();
-			}
-		},		
+//		VF_PDB_GPCE_DYNAMIC {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryGPCEDynamic.getInstance();
+//			}
+//		},
+//		VF_PDB_PERSISTENT_BLEEDING_EDGE {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryBleedingEdge.getInstance();
+//			}
+//		},
+//		VF_PDB_PERSISTENT_SPECIALIZED {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactorySpecialization.getInstance();
+//			}
+//		},		
+//		VF_PDB_PERSISTENT_UNTYPED {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactorySpecializationWithUntypedVariables.getInstance();
+//			}
+//		},		
 		VF_PDB_PERSISTENT_CURRENT {
 			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryCurrent.getInstance();
+			public JmhValueFactory getInstance() {
+				return new nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.champ.ChampValueFactory_Current();
 			}
 		},
-		VF_PDB_PERSISTENT_LAZY {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryLazy.getInstance();
-			}
-		},
-		VF_PDB_PERSISTENT_MEMOIZED {
-			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryMemoized.getInstance();
-			}
-		},
+//		VF_PDB_PERSISTENT_LAZY {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryLazy.getInstance();
+//			}
+//		},
+//		VF_PDB_PERSISTENT_MEMOIZED {
+//			@Override
+//			public IValueFactory getInstance() {
+//				return org.rascalmpl.value.impl.persistent.TypelessValueFactoryMemoized.getInstance();
+//			}
+//		},
 		VF_PDB_PERSISTENT_MEMOIZED_LAZY {
 			@Override
-			public IValueFactory getInstance() {
-				return org.eclipse.imp.pdb.facts.impl.persistent.TypelessValueFactoryMemoizedLazy.getInstance();
+			public JmhValueFactory getInstance() {
+				return new nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.champ.ChampValueFactory_MemoizedLazy();
 			}
 		};
 
-		public abstract IValueFactory getInstance();
+		public abstract JmhValueFactory getInstance();
 	}
 	
 	public static enum DataType {

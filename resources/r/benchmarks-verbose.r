@@ -49,7 +49,7 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
                               Scala = paste("scala.collection.immutable.Hash", capwords(tolower(requestedDataType)), sep = ""),
                               Clojure = paste("clojure.lang.PersistentHash", capwords(tolower(requestedDataType)), sep = ""))  
 
-  classNameOurs <-  paste("org.eclipse.imp.pdb.facts.util.Trie", capwords(tolower(requestedDataType)), "_5Bits", sep = "")
+  classNameOurs <-  paste("io.usethesource.capsule.Trie", capwords(tolower(requestedDataType)), "_5Bits", sep = "")
   
   ###
   # If there are more measurements for one size, calculate the median.
@@ -58,11 +58,11 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   dss_stats_meltByElementCount <- melt(dss_stats, id.vars=c('elementCount', 'className', 'dataType', 'arch'), measure.vars=c('footprintInBytes')) # measure.vars=c('footprintInBytes')
   dss_stats_castByMedian <- dcast(dss_stats_meltByElementCount, elementCount + className + dataType + arch ~ "footprintInBytes_median", median, fill=0)
   
-  mapClassName <- "org.eclipse.imp.pdb.facts.util.TrieMap_5Bits"
-  setClassName <- "org.eclipse.imp.pdb.facts.util.TrieSet_5Bits"
+  mapClassName <- "io.usethesource.capsule.TrieMap_5Bits"
+  setClassName <- "io.usethesource.capsule.TrieSet_5Bits"
 
-#   mapClassName <- "org.eclipse.imp.pdb.facts.util.TrieMap_BleedingEdge"
-#   setClassName <- "org.eclipse.imp.pdb.facts.util.TrieSet_BleedingEdge"
+#   mapClassName <- "io.usethesource.capsule.TrieMap_BleedingEdge"
+#   setClassName <- "io.usethesource.capsule.TrieSet_BleedingEdge"
   
   ###
   # Calculate different baselines for comparison.
@@ -70,13 +70,13 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   dss_stats_castByBaselinePDBDynamic <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == mapClassName | dss_stats_castByMedian$className == setClassName,], min)
   names(dss_stats_castByBaselinePDBDynamic) <- c('elementCount', 'dataType', 'arch', 'footprintInBytes_baselinePDBDynamic')
   
-  # dss_stats_castByBaselinePDB0To4 <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieMap" | dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieSet",], min)
+  # dss_stats_castByBaselinePDB0To4 <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == "io.usethesource.capsule.TrieMap" | dss_stats_castByMedian$className == "io.usethesource.capsule.TrieSet",], min)
   # names(dss_stats_castByBaselinePDB0To4) <- c('elementCount', 'dataType', 'arch', 'footprintInBytes_baselinePDB0To4')
   # 
-  # dss_stats_castByBaselinePDB0To8 <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To8" | dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To8",], min)
+  # dss_stats_castByBaselinePDB0To8 <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == "io.usethesource.capsule.TrieMap0To8" | dss_stats_castByMedian$className == "io.usethesource.capsule.TrieSet0To8",], min)
   # names(dss_stats_castByBaselinePDB0To8) <- c('elementCount', 'dataType', 'arch', 'footprintInBytes_baselinePDB0To8')
   # 
-  # dss_stats_castByBaselinePDB0To12 <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To12" | dss_stats_castByMedian$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To12",], min)
+  # dss_stats_castByBaselinePDB0To12 <- aggregate(footprintInBytes_median ~ elementCount + dataType + arch, dss_stats_castByMedian[dss_stats_castByMedian$className == "io.usethesource.capsule.TrieMap0To12" | dss_stats_castByMedian$className == "io.usethesource.capsule.TrieSet0To12",], min)
   # names(dss_stats_castByBaselinePDB0To12) <- c('elementCount', 'dataType', 'arch', 'footprintInBytes_baselinePDB0To12')
   
   ###
@@ -97,39 +97,39 @@ calculateMemoryFootprintOverhead <- function(requestedDataType, dataStructureOri
   ###
   # How good score our specializations [map]?
   ##
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMapDynamic",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To8",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To12",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMapDynamic",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap0To8",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap0To12",]$memorySavingComparedToPDBDynamic)
   
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMapDynamic" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To8" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To12" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMapDynamic" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap0To8" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap0To12" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
   
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMapDynamic" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To8" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieMap0To12" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMapDynamic" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap0To8" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieMap0To12" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
   
   
   ###
   # How good score our specializations [set]?
   ##
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSetDynamic",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To8",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To12",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSetDynamic",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet0To8",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet0To12",]$memorySavingComparedToPDBDynamic)
   
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSetDynamic" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To8" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To12" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSetDynamic" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet0To8" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet0To12" & dss_stats_with_min$arch == "32",]$memorySavingComparedToPDBDynamic)
   
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSetDynamic" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To8" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
-  median(dss_stats_with_min[dss_stats_with_min$className == "org.eclipse.imp.pdb.facts.util.TrieSet0To12" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSetDynamic" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet0To8" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
+  median(dss_stats_with_min[dss_stats_with_min$className == "io.usethesource.capsule.TrieSet0To12" & dss_stats_with_min$arch == "64",]$memorySavingComparedToPDBDynamic)
   
   
   ###

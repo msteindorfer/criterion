@@ -1,11 +1,12 @@
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
-import org.eclipse.imp.pdb.facts.impl.AbstractValue;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
+
 import org.openjdk.jmh.annotations.CompilerControl;
 import org.openjdk.jmh.annotations.CompilerControl.Mode;
 
 @CompilerControl(Mode.DONT_INLINE)
-public class PureInteger extends AbstractValue {
+public class PureInteger implements JmhValue {
 	
 	private int value;
 
