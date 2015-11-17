@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>io.usethesource</groupId>
 			<artifactId>capsule</artifactId>
-			<version>0.2.0</version>
+			<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
 		</dependency>				
 		<dependency>
 			<groupId>org.scala-lang</groupId>
@@ -101,11 +101,11 @@
 <!-- 			<artifactId>overseer-java-api</artifactId> -->
 <!-- 			<version>1.0-SNAPSHOT</version> -->
 <!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sf.trove4j</groupId> -->
-<!-- 			<artifactId>trove4j</artifactId> -->
-<!-- 			<version>3.0.3</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+			<version>3.0.3</version>
+		</dependency>
 	</dependencies>
 
 	<properties>
