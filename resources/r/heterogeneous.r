@@ -6,6 +6,8 @@ library(reshape2)
 benchmark_fileName <- "map_sizes_heterogeneous_exponential"
 benchmark_data <- read.csv(paste0(benchmark_fileName, ".csv"), sep=",", header=TRUE)
 
+# benchmark_data <- subset(benchmark_data, className != "TrieMapIntInt")
+
 benchmark_data.m <- melt(benchmark_data, id.vars=c('elementCount', 'className'), measure.vars=c('footprintInBytes'))
 benchmark_data.c <- dcast(benchmark_data.m,  className ~ elementCount, median, fill=0)
 

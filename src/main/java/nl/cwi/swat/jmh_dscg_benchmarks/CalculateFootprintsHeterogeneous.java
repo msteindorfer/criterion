@@ -40,7 +40,7 @@ import objectexplorer.ObjectGraphMeasurer.Footprint;
 public final class CalculateFootprintsHeterogeneous {
 
 	public static void main(String[] args) {
-//		testOneConfiguration(2097152);
+		testOneConfiguration(2097152);
 
 		FootprintUtils.writeToFile(Paths.get("map_sizes_heterogeneous_exponential.csv"), false,
 				FootprintUtils.createExponentialRange(0, 24).stream()
