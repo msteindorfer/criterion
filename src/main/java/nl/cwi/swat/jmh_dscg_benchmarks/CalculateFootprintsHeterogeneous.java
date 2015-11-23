@@ -28,11 +28,9 @@ import com.google.common.base.Predicates;
 
 import gnu.trove.map.hash.TIntIntHashMap;
 import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.TrieMap_5Bits_Spec0To16;
-import io.usethesource.capsule.TrieMap_5Bits_Spec0To16_IntKey_IntValue;
+import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieMap_5Bits_Spec0To8;
 import io.usethesource.capsule.TrieMap_5Bits_Spec0To8_IntKey_IntValue;
-import io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.FootprintUtils.Archetype;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
@@ -132,12 +130,12 @@ public final class CalculateFootprintsHeterogeneous {
 
 		return presets.stream()
 				.flatMap(preset -> Arrays.stream(new String[] { 
-						createAndMeasureJavaUtilHashMap(data, size, 0, preset),
-						createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true),
-						createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false),
-						createAndMeasureTrove4jIntArrayList(data, size, 0, preset),
-						createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true) }))
-				.collect(Collectors.toList());
+						createAndMeasureJavaUtilHashMap(data, size, 0, preset)
+						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
+						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
+						, createAndMeasureTrove4jIntArrayList(data, size, 0, preset)
+						//, createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true)
+				})).collect(Collectors.toList());
 	}
 
 	public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount, int run,
@@ -188,22 +186,22 @@ public final class CalculateFootprintsHeterogeneous {
 
 	public static String createAndMeasureTrieMapHeterogeneous(final Object[] data, int elementCount, int run,
 			MemoryFootprintPreset preset, boolean storePrimivesBoxed) {
-		TrieMap_Heterogeneous_BleedingEdge ys = (TrieMap_Heterogeneous_BleedingEdge) TrieMap_Heterogeneous_BleedingEdge.of();
+		TrieMap_5Bits_Heterogeneous_BleedingEdge ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) TrieMap_5Bits_Heterogeneous_BleedingEdge.of();
 
 		for (Object v : data) {
 			if (v instanceof Integer && storePrimivesBoxed) {
 //				PureInteger boxedValue = new PureInteger(((Integer) v).intValue());
 				Integer boxedValue = (Integer) v;
 
-				ys = (TrieMap_Heterogeneous_BleedingEdge) ys.__put(boxedValue, boxedValue);
+				ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(boxedValue, boxedValue);
 				assert ys.containsKey(boxedValue);
 			} else if (v instanceof Integer && !storePrimivesBoxed) {
 				int unboxedValue = ((Integer) v).intValue();
 				
-				ys = (TrieMap_Heterogeneous_BleedingEdge) ys.__put(unboxedValue, unboxedValue);
+				ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(unboxedValue, unboxedValue);
 				assert ys.containsKey(unboxedValue);
 //			} else {
-//				ys = (TrieMap_Heterogeneous_BleedingEdge) ys.__put(v, v);
+//				ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(v, v);
 //				assert ys.containsKey(v);				
 			}
 		}
