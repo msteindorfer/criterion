@@ -11,20 +11,30 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.champ;
 
+import io.usethesource.capsule.MapFactory;
+import io.usethesource.capsule.SetFactory;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhMap;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhMapWriter;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhSet;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhSetWriter;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValueFactory;
 
-public class ChampValueFactory_Current implements JmhValueFactory {
+public class ChampValueFactory implements JmhValueFactory {
+
+	private final SetFactory setFactory;
+	private final MapFactory mapFactory;
+
+	public ChampValueFactory(final Class<?> targetSetClass, final Class<?> targetMapClass) {
+		setFactory = new SetFactory(targetSetClass);
+		mapFactory = new MapFactory(targetMapClass);
+	}
 
 	public JmhSet set() {
 		return setWriter().done();
 	}
-	
+
 	public JmhSetWriter setWriter() {
-		return new ChampSetWriter_Current();
+		return new ChampSetWriter(setFactory);
 	}
 
 	@Override
@@ -34,7 +44,7 @@ public class ChampValueFactory_Current implements JmhValueFactory {
 
 	@Override
 	public JmhMapWriter mapWriter() {
-		return new ChampMapWriter_Current();
+		return new ChampMapWriter(mapFactory);
 	}
 
 	@Override

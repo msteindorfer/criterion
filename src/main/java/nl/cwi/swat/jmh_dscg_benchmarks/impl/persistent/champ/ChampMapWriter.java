@@ -14,9 +14,8 @@ package nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.champ;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.TransientMap;
-import io.usethesource.capsule.TrieMap_5Bits_Memoized_LazyHashCode;
-
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhMap;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhMapWriter;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
@@ -26,15 +25,13 @@ import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
  * 		* without types
  * 		* with equals() instead of isEqual()
  */
-final class ChampMapWriter_MemoizedLazy implements JmhMapWriter {
+final class ChampMapWriter implements JmhMapWriter {
 
 	protected final TransientMap<JmhValue, JmhValue> mapContent;
 	protected JmhMap constructedMap;
 
-	ChampMapWriter_MemoizedLazy() {
-		super();
-
-		mapContent = TrieMap_5Bits_Memoized_LazyHashCode.transientOf();
+	ChampMapWriter(MapFactory mapFactory) {
+		mapContent = mapFactory.transientOf();
 		constructedMap = null;
 	}
 
@@ -83,4 +80,5 @@ final class ChampMapWriter_MemoizedLazy implements JmhMapWriter {
 
 		return constructedMap;
 	}
+
 }

@@ -12,8 +12,8 @@
 package nl.cwi.swat.jmh_dscg_benchmarks;
 
 import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
-import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_PDB_PERSISTENT_CURRENT;
-import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_PDB_PERSISTENT_MEMOIZED_LAZY;
+import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP;
+import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MEMOIZED;
 import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_SCALA;
 import static nl.cwi.swat.jmh_dscg_benchmarks.PureIntegerWithCustomHashCode.valueOf;
 
@@ -189,10 +189,10 @@ public final class CalculateFootprints {
 
 				if (reportSet) {
 					results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-							Optional.of(VF_PDB_PERSISTENT_CURRENT.toString()), TrieSet_5Bits.class));
+							Optional.of(VF_CHAMP.toString()), TrieSet_5Bits.class));
 
 					results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-							Optional.of(VF_PDB_PERSISTENT_MEMOIZED_LAZY.toString()),
+							Optional.of(VF_CHAMP_MEMOIZED.toString()),
 							TrieSet_5Bits_Memoized_LazyHashCode.class));
 
 					results.add(measureFootprintOfPersistentClojureSet(testSet, count, run,
@@ -204,10 +204,10 @@ public final class CalculateFootprints {
 
 				if (reportMap) {
 					results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-							Optional.of(VF_PDB_PERSISTENT_CURRENT.toString()), TrieMap_5Bits.class));
+							Optional.of(VF_CHAMP.toString()), TrieMap_5Bits.class));
 
 					results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-							Optional.of(VF_PDB_PERSISTENT_MEMOIZED_LAZY.toString()),
+							Optional.of(VF_CHAMP_MEMOIZED.toString()),
 							TrieMap_5Bits_Memoized_LazyHashCode.class));
 
 					results.add(measureFootprintOfPersistentClojureMap(testSet, count, run,

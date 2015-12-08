@@ -11,20 +11,19 @@
  *******************************************************************************/
 package nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.champ;
 
+import io.usethesource.capsule.SetFactory;
 import io.usethesource.capsule.TransientSet;
-import io.usethesource.capsule.TrieSet_5Bits;
-
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhSet;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhSetWriter;
 import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
 
-class ChampSetWriter_Current implements JmhSetWriter {
+class ChampSetWriter implements JmhSetWriter {
 
 	protected final TransientSet<JmhValue> setContent;
 	protected JmhSet constructedSet;
 
-	ChampSetWriter_Current() {
-		setContent = TrieSet_5Bits.transientOf();
+	ChampSetWriter(SetFactory setFactory) {
+		setContent = setFactory.transientOf();
 		constructedSet = null;
 	}
 
