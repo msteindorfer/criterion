@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>jmh-dscg-benchmarks</name>
-	<comment></comment>
+	<comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
 	<projects>
+		<project>rascal</project>
+		<project>capsule</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.scala-ide.sdt.core.scalabuilder</name>
+			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -17,8 +19,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.scala-ide.sdt.core.scalanature</nature>
-		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>
