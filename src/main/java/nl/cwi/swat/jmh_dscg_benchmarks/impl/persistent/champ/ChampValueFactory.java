@@ -44,7 +44,7 @@ public class ChampValueFactory implements JmhValueFactory {
 
 	@Override
 	public JmhMapWriter mapWriter() {
-		return new ChampMapWriter(mapFactory);
+		return new PersistentChampMapWriter(mapFactory);
 	}
 
 	@Override

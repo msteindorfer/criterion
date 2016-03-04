@@ -11,6 +11,8 @@
  *******************************************************************************/
 package fundamentals;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +33,8 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jol.info.ClassLayout;
 import org.openjdk.jol.util.VMSupport;
+
+import io.usethesource.capsule.RangecopyUtils;
 
 @SuppressWarnings("restriction")
 @BenchmarkMode(Mode.AverageTime)
@@ -58,6 +62,10 @@ public class ClassInitializationBenchmark {
 	private Object key2 = null;
 	private Object val2 = null;
 	
+	private Object[] src = null;
+	private Map2To0Node srcClassInstance;
+	private Map2To0NodeAlt srcClassAltInstance;
+	
 	long nodeMapOffsetOffset = 0;
 	long dataMapOffsetOffset = 0;
 	long arrayOffsetsOffset = 0;
@@ -76,11 +84,13 @@ public class ClassInitializationBenchmark {
 		this.key2 = rand.nextInt();
 		this.val2 = rand.nextInt();
 
+		this.src = new Object[] { key1, val1, key2, val2 };
+		
 		final Class<Map2To0Node> dstClass = Map2To0Node.class;		
-		new Map2To0Node(nodeMap, dataMap, key1, val1, key2, val2);
+		this.srcClassInstance = new Map2To0Node(nodeMap, dataMap, key1, val1, key2, val2);
 		
 		final Class<Map2To0NodeAlt> dstClassAlt = Map2To0NodeAlt.class;
-		new Map2To0NodeAlt(nodeMap, dataMap, key1, val1, key2, val2);
+		this.srcClassAltInstance = new Map2To0NodeAlt(nodeMap, dataMap, key1, val1, key2, val2);
 
 		try {			
 			
@@ -142,6 +152,59 @@ public class ClassInitializationBenchmark {
 			return false;
 		
 		return true;
+	}
+	
+    static MethodHandle MH_constructor;
+	
+    static {
+    	try {
+    		// NOTE: lookup code only considers public constructors
+			MH_constructor = MethodHandles.lookup().unreflectConstructor(Map2To0Node.class.getConstructors()[0]);
+		} catch (IllegalAccessException | SecurityException e) {}
+    }
+
+	@Benchmark 
+	public Object timeClassInstanziation_MethodHandle() {
+		try {
+			Map2To0Node newInstance = (Map2To0Node) MethodHandles.insertArguments(MH_constructor, 0, nodeMap, dataMap, key1, val1, key2, val2).invokeExact();			
+			assert ensure(newInstance);
+			return newInstance;
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+    
+	@Benchmark 
+	public Object timeClassInstanziation_MethodHandle_invokeWithArguments() {
+		try {
+			Object newInstance  = MH_constructor.invokeWithArguments(nodeMap, dataMap, key1, val1, key2, val2);
+			assert ensure(newInstance);
+			return newInstance;
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}    
+    
+	@Benchmark 
+	public Object timeClassInstanziation_MethodHandle_invoke() {
+		try {
+			Object newInstance  = MH_constructor.invoke(nodeMap, dataMap, key1, val1, key2, val2);
+			assert ensure(newInstance);
+			return newInstance;
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}    
+    
+	@Benchmark 
+	public Object timeClassInstanziation_MethodHandle_invokeExact() {
+		try {
+			Map2To0Node newInstance  = (Map2To0Node) MH_constructor.invokeExact(nodeMap, dataMap, key1, val1, key2, val2);
+			assert ensure(newInstance);
+			return newInstance;
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Benchmark
@@ -317,6 +380,60 @@ public class ClassInitializationBenchmark {
 		}
 	}
 	
+	public int RANGECOPY_SIZE = 4; // 0 <= RANGECOPY_SIZE <= 4
+	public int RANGECOPY_COUNT = 512;
+	
+	@Benchmark
+	public Object timeRangecopy_Array_SystemArraycopy() {
+		Object dst = new Object[RANGECOPY_SIZE];		
+		
+		for (int i = 0; i < RANGECOPY_COUNT; i++)
+			System.arraycopy(src, 0, dst, 0, RANGECOPY_SIZE);
+		
+		return dst;
+	}
+	
+//	@Benchmark
+//	public Object timeRangecopy_Array_UnsafeCopyMemory() {
+//		Object dst = new Object[RANGECOPY_SIZE];		
+//		
+//		for (int i = 0; i < RANGECOPY_COUNT; i++)
+//			unsafe.copyMemory(src, 16L, dst, 16L, RANGECOPY_SIZE * 4); // assume addressSize == 4
+//		
+//		return dst;
+//	}	
+	
+	@Benchmark
+	public Object timeRangecopy_ObjectRegionThrows_ConstantOffsets_32bit() throws InstantiationException {
+		Object src = srcClassInstance;
+		Object dst = unsafe.allocateInstance(src.getClass());		
+		
+		for (int i = 0; i < RANGECOPY_COUNT; i++)
+			RangecopyUtils.rangecopyObjectRegion(src, 20L, dst, 20L, RANGECOPY_SIZE);
+		
+		return dst;
+	}	
+	
+//	@Benchmark
+//	public Object timeRangecopy_ObjectRegionThrows_UnsafeCopyMemory_ConstantOffsets_32bit() throws InstantiationException {
+//		Object src = srcClassInstance;
+//		Object dst = unsafe.allocateInstance(src.getClass());		
+//		
+//		for (int i = 0; i < RANGECOPY_COUNT; i++)
+//			unsafe.copyMemory(src, 20L, dst, 20L, RANGECOPY_SIZE * 4); // assume addressSize == 4
+//		
+//		return dst;
+//	}		
+
+	// @Benchmark
+	public Object timeRangecopy_ObjectRegionCatches_ConstantOffsets_32bit() {
+		try {
+			return timeRangecopy_ObjectRegionThrows_ConstantOffsets_32bit();
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		}
+	}	
+
 	
 	static class Base {
 
@@ -375,7 +492,7 @@ public class ClassInitializationBenchmark {
 
 	static class Map2To0Node extends Base {
 
-		Map2To0Node(final int nodeMap, final int dataMap, final Object key1, final Object val1,
+		public Map2To0Node(final int nodeMap, final int dataMap, final Object key1, final Object val1,
 				final Object key2, final Object val2) {
 			super(nodeMap, dataMap);
 
@@ -417,7 +534,7 @@ public class ClassInitializationBenchmark {
 	@SuppressWarnings("unused")
 	static class Map2To0NodeAlt extends Base {
 
-		Map2To0NodeAlt(final int nodeMap, final int dataMap, final Object key1, final Object val1,
+		public Map2To0NodeAlt(final int nodeMap, final int dataMap, final Object key1, final Object val1,
 				final Object key2, final Object val2) {
 			super(nodeMap, dataMap);
 
@@ -456,7 +573,7 @@ public class ClassInitializationBenchmark {
 	public static void main(String[] args) throws RunnerException {
 		System.out.println(ClassInitializationBenchmark.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-				.include(".*" + ClassInitializationBenchmark.class.getSimpleName() + ".*")
+				.include(".*" + ClassInitializationBenchmark.class.getSimpleName() + ".*timeRangecopy_.*")
 				.timeUnit(TimeUnit.NANOSECONDS).forks(1).mode(Mode.AverageTime).warmupIterations(5)
 				.measurementIterations(5).build();
 		

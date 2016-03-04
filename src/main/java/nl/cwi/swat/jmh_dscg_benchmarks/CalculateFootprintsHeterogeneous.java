@@ -21,18 +21,16 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.rascalmpl.value.IValue;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import gnu.trove.map.hash.TIntIntHashMap;
 import io.usethesource.capsule.ImmutableMap;
+import io.usethesource.capsule.TrieMap_5Bits;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.TrieMap_5Bits_Spec0To8;
-import io.usethesource.capsule.TrieMap_5Bits_Spec0To8_IntKey_IntValue;
 import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.DataType;
 import nl.cwi.swat.jmh_dscg_benchmarks.FootprintUtils.Archetype;
+import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
 public final class CalculateFootprintsHeterogeneous {
@@ -139,15 +137,8 @@ public final class CalculateFootprintsHeterogeneous {
 	}
 
 	public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount, int run,
-			MemoryFootprintPreset preset, boolean isSpecialized) {
-		ImmutableMap<Integer, Integer> ys = null;
-
-		if (isSpecialized) {
-			ys = TrieMap_5Bits_Spec0To8_IntKey_IntValue.of();
-			// ys = TrieMap_BleedingEdge.of();
-		} else {
-			ys = TrieMap_5Bits_Spec0To8.of();
-		}
+			MemoryFootprintPreset preset) {
+		ImmutableMap<Integer, Integer> ys = TrieMap_5Bits.of();
 
 		// for (Object v : data) {
 		// ys = ys.__put(v, v);
@@ -176,7 +167,7 @@ public final class CalculateFootprintsHeterogeneous {
 			assert ys.containsKey(value);
 		}
 
-		String shortName = "TrieMapIntInt";
+		String shortName = "TrieMap [Boxed]";
 
 		// String longName = String.format(
 		// "io.usethesource.capsule.TrieMap_5Bits_Spec0To8", isSpecialized);
@@ -282,7 +273,7 @@ public final class CalculateFootprintsHeterogeneous {
 		case DATA_STRUCTURE_OVERHEAD:
 			predicate = Predicates
 					.not(Predicates.or(Predicates.instanceOf(Integer.class), Predicates.instanceOf(BigInteger.class),
-							Predicates.instanceOf(IValue.class), Predicates.instanceOf(PureInteger.class)));
+							Predicates.instanceOf(JmhValue.class), Predicates.instanceOf(PureInteger.class)));
 			break;
 		case RETAINED_SIZE:
 			predicate = Predicates.alwaysTrue();

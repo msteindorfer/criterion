@@ -12,6 +12,10 @@
 
 package nl.cwi.swat.jmh_dscg_benchmarks.api;
 
+import org.openjdk.jmh.annotations.CompilerControl;
+import org.openjdk.jmh.annotations.CompilerControl.Mode;
+
+@CompilerControl(Mode.DONT_INLINE)
 public interface JmhValue {
     
 }

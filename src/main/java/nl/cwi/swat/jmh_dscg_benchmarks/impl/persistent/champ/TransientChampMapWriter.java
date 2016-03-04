@@ -25,12 +25,12 @@ import nl.cwi.swat.jmh_dscg_benchmarks.api.JmhValue;
  * 		* without types
  * 		* with equals() instead of isEqual()
  */
-final class ChampMapWriter implements JmhMapWriter {
+final class TransientChampMapWriter implements JmhMapWriter {
 
 	protected final TransientMap<JmhValue, JmhValue> mapContent;
 	protected JmhMap constructedMap;
 
-	ChampMapWriter(MapFactory mapFactory) {
+	TransientChampMapWriter(MapFactory mapFactory) {
 		mapContent = mapFactory.transientOf();
 		constructedMap = null;
 	}
@@ -79,6 +79,14 @@ final class ChampMapWriter implements JmhMapWriter {
 		}
 
 		return constructedMap;
+	}
+
+	@Override
+	public void put(int key, int value) {
+		checkMutation();
+
+		@SuppressWarnings("unused")
+		final Object replaced = mapContent.__put(key, value);
 	}
 
 }

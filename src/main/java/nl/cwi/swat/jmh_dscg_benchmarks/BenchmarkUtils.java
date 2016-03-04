@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import io.usethesource.capsule.TrieMap_5Bits;
+import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieSet_5Bits;
@@ -53,7 +54,7 @@ public class BenchmarkUtils {
 			public JmhValueFactory getInstance() {
 				// TODO: replace set implementation with heterogeneous set implementation
 				return new nl.cwi.swat.jmh_dscg_benchmarks.impl.persistent.champ.ChampValueFactory(
-								TrieSet_5Bits.class, TrieMap_Heterogeneous_BleedingEdge.class);
+								TrieSet_5Bits.class, TrieMap_5Bits_Heterogeneous_BleedingEdge.class);
 			}
 		};
 
