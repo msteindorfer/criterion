@@ -18,12 +18,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.sample</groupId>
-	<artifactId>jmh-dscg-benchmarks</artifactId>
-	<version>1.0</version>
+	<groupId>io.usethesource</groupId>
+	<artifactId>criterion</artifactId>
 	<packaging>jar</packaging>
-
-	<name>Auto-generated JMH benchmark</name>
 
 	<prerequisites>
 		<maven>3.2</maven>
@@ -56,16 +53,16 @@
 			<artifactId>guava</artifactId>
 			<version>16.0.1</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.goldmansachs</groupId> -->
-<!-- 			<artifactId>gs-collections-api</artifactId> -->
-<!-- 			<version>${gs-collections.version}</version> -->
-<!-- 		</dependency>		 -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.goldmansachs</groupId> -->
-<!-- 			<artifactId>gs-collections</artifactId> -->
-<!-- 			<version>${gs-collections.version}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>com.goldmansachs</groupId>
+			<artifactId>gs-collections-api</artifactId>
+			<version>${gs-collections.version}</version>
+		</dependency>		
+		<dependency>
+			<groupId>com.goldmansachs</groupId>
+			<artifactId>gs-collections</artifactId>
+			<version>${gs-collections.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>io.usethesource</groupId>
 			<artifactId>capsule</artifactId>
@@ -294,4 +291,5 @@
 <!-- 		</pluginRepository> -->
 <!-- 	</pluginRepositories> -->
 
+	<version>0.0.1-SNAPSHOT</version>
 </project>
