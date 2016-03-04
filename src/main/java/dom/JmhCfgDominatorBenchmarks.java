@@ -21,8 +21,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils;
-
 import org.rascalmpl.value.IConstructor;
 import org.rascalmpl.value.IMap;
 import org.rascalmpl.value.ISet;
@@ -47,6 +45,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
+import io.usethesource.criterion.BenchmarkUtils;
 
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
