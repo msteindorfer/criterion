@@ -53,5 +53,23 @@ public interface JmhValueFactory {
 	 * @return a map builder
 	 */
 	public JmhMapBuilder mapBuilder();
+		
+	/**
+	 * Creates an empty unmodifiable set-multimap.
+	 * 
+	 * @return an empty set-multimap
+	 */
+	default JmhSetMultimap setMultimap() {
+		throw new RuntimeException("Not supported.");
+	}
+
+	/**
+	 * Create a map builder.
+	 * 
+	 * @return a map builder
+	 */
+	default JmhSetMultimapBuilder setMultimapBuilder() {
+		throw new RuntimeException("Not supported.");
+	}
 	
 }

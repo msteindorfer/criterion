@@ -182,7 +182,7 @@ public final class CalculateFootprintsHeterogeneous {
 		/* Note: direct creation of immutable that uses newWith(...) is tremendously slow. */		
 		com.gs.collections.api.multimap.set.ImmutableSetMultimap<Integer, Integer> ys = mutableYs.toImmutable();
 					
-		return measureAndReport(ys, "com.gs.collections.api.multimap.set.ImmutableSetMultimap", DataType.MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
+		return measureAndReport(ys, "com.gs.collections.api.multimap.set.ImmutableSetMultimap", DataType.SET_MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
 	}		
 
 	public static String createAndMeasureFastUtilInt2IntOpenHashMap(final Object[] data, int elementCount, int run,
@@ -238,7 +238,7 @@ public final class CalculateFootprintsHeterogeneous {
 		
 		com.google.common.collect.ImmutableMultimap<Integer, Integer> ys = ysBldr.build();
 		
-		return measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
+		return measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.SET_MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
 	}
 	
 	public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount, int run,

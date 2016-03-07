@@ -15,6 +15,8 @@ import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhSetBuilder;
+import io.usethesource.criterion.api.JmhSetMultimap;
+import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class ClojureValueFactory implements JmhValueFactory {
@@ -39,6 +41,16 @@ public class ClojureValueFactory implements JmhValueFactory {
 		return new ClojureSetWriter();
 	}
 	
+	@Override
+	public JmhSetMultimap setMultimap() {	
+		return setMultimapBuilder().done();
+	}
+
+	@Override
+	public JmhSetMultimapBuilder setMultimapBuilder() {
+		return new ClojureSetMultimapWriter();
+	}
+
 	@Override
 	public String toString() {
 		return "VF_CLOJURE";

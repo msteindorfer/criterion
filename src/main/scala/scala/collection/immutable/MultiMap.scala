@@ -10,17 +10,17 @@
 
 package scala
 package collection
-package mutable
+package immutable
 
 
-/** A trait for mutable maps with multiple values assigned to a key.
+/** A trait for immutable maps with multiple values assigned to a key.
  *
  *  This class is typically used as a mixin. It turns maps which map `A`
  *  to `Set[B]` objects into multimaps that map `A` to `B` objects.
  *
  *  @example {{{
- *  // first import all necessary types from package `collection.mutable`
- *  import collection.mutable.{ HashMap, MultiMap, Set }
+ *  // first import all necessary types from package `collection.immutable`
+ *  import collection.immutable.{ HashMap, MultiMap, Set }
  *
  *  // to create a `MultiMap` the easiest way is to mixin it into a normal
  *  // `Map` instance
@@ -54,7 +54,7 @@ package mutable
  *  @version 2.8
  *  @since   1
  */
-trait MultiMap[A, B] extends Map[A, Set[B]] {
+trait MultiMap[A, B] extends immutable.Map[A, immutable.Set[B]] {
   /** Creates a new set.
    *
    *  Classes that use this trait as a mixin can override this method
@@ -63,7 +63,7 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
    *
    *  @return An empty set of values of type `B`.
    */
-  protected def makeSet: Set[B] = new HashSet[B]
+  protected def makeSet: immutable.Set[B] = new immutable.HashSet[B]
 
   /** Assigns the specified `value` to a specified `key`.  If the key
    *  already has a binding to equal to `value`, nothing is changed;
@@ -73,18 +73,17 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
    *  @param value  The value to bind to the key.
    *  @return       A reference to this multimap.
    */
-  def addBinding(key: A, value: B): this.type = {
+  def addBinding(key: A, value: B): immutable.MultiMap[A, B] = { // this.type  
     get(key) match {
       case None =>
         val set = makeSet
-        set += value
-        this(key) = set
+        return this.updated(key, set + value) // :: immutable.MultiMap
       case Some(set) =>
-        set += value
+        return this.updated(key, set + value) // :: immutable.MultiMap
     }
     this
   }
-
+  
   /** Removes the binding of `value` to `key` if it exists, otherwise this
    *  operation doesn't have any effect.
    *
@@ -95,12 +94,15 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
    *  @param value   The value to remove.
    *  @return        A reference to this multimap.
    */
-  def removeBinding(key: A, value: B): this.type = {
+  def removeBinding(key: A, value: B): immutable.MultiMap[A, B] = { // this.type
     get(key) match {
       case None =>
-        case Some(set) =>
-          set -= value
-          if (set.isEmpty) this -= key
+      case Some(set) =>
+        val newSet = set - value
+        if (newSet.isEmpty)
+          return (this - key) // :: immutable.MultiMap
+        else
+          return (this + (key -> newSet)) // :: immutable.MultiMap
     }
     this
   }
@@ -115,4 +117,31 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
     case None => false
     case Some(set) => set exists p
   }
-}
+}                                                                                                  
+
+//////
+//// Solution for dynamically attaching a trait to an existing instance. 
+//// See: http://stackoverflow.com/questions/3893274/how-to-mix-in-a-trait-to-instance
+//// Note: Unfortunatley this solution does not work for traits with generic arguments,
+//// because the companion object cannot take generics.
+////////
+//
+//trait DynamicMixinCompanion[TT] {                                                                    
+//  implicit def baseObject[OT](o: Mixin[OT]): OT = o.obj                                              
+//
+//  def ::[OT](o: OT): Mixin[OT] with TT                                                               
+//  class Mixin[OT] (val obj: OT) // protected[DynamicMixinCompanion]                                       
+//}  
+//
+//
+////trait OtherTrait {                                                                                   
+////  def traitOperation = println("any trait")                                                          
+////}                                                                                                    
+////
+////object OtherTrait extends DynamicMixinCompanion[OtherTrait] {                                        
+////  def ::[T](o: T) = new Mixin(o) with OtherTrait                                                     
+////}
+//
+//object MultiMap extends DynamicMixinCompanion[immutable.MultiMap[Any, Any]] {
+//  def ::[A, B, T <: immutable.Map[A, immutable.Set[B]]](o: T) = new Mixin(o) with immutable.MultiMap[A, B]
+//}

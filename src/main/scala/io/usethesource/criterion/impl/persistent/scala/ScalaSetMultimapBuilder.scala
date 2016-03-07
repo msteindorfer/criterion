@@ -11,32 +11,26 @@
  ******************************************************************************/
 package io.usethesource.criterion.impl.persistent.scala
 
+import scala.collection.immutable.Map.empty
 import scala.collection.JavaConversions.mapAsScalaMap
-
+import scala.collection.JavaConversions.iterableAsScalaIterable
+import scala.collection.mutable.MapBuilder
 import io.usethesource.criterion.api.JmhValue
-import io.usethesource.criterion.api.JmhValueFactory
 import io.usethesource.criterion.api.JmhSetMultimap
+import io.usethesource.criterion.api.JmhSetMultimapBuilder
 
-class ScalaValueFactory extends JmhValueFactory {
-	
-	def set() = setBuilder.done
+sealed class ScalaSetMultimapBuilder extends JmhSetMultimapBuilder {
 
-	def set(xs: JmhValue*) = {
-		val writer = setBuilder
-		writer.insert(xs: _*)
-		writer.done
-	}
+  var xs: ScalaSetMultimap = ScalaSetMultimap(ScalaSetMultimap.empty)
 
-	def setBuilder = new ScalaSetBuilder
-	
-	def map() = mapBuilder.done
+  override def put(k: JmhValue, v: JmhValue) = { xs = xs.put(k, v) }
 
-	def mapBuilder = new ScalaMapBuilder
-	
-	def setMultimapBuilder = new ScalaSetMultimapBuilder
-	
-	def setMultimap = setMultimapBuilder.done
-	
-	override def toString = "VF_SCALA"
+//  override def putAll(other: JmhSetMultimap) = other match {
+//    case ScalaMap(ys) => xs ++= ys
+//  }
+//
+//  override def putAll(ys: java.util.Map[JmhValue, JmhValue]) = xs ++= ys
+
+  override def done = xs
 
 }

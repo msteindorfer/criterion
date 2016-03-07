@@ -77,7 +77,8 @@ public interface JmhMap extends Iterable<JmhValue>, JmhValue {
 	public Iterator<Entry<JmhValue, JmhValue>> entryIterator();
 		
 	default public boolean containsKey(int key) { 
-		throw new UnsupportedOperationException("Not implemented.");
+		// throw new UnsupportedOperationException("Not implemented.");
+		return false;
 	}
 	
 	default public JmhMap put(int key, int value) { 

@@ -37,19 +37,19 @@ import org.openjdk.jmh.runner.options.TimeValue;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
-import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
+import io.usethesource.criterion.api.JmhSetMultimap;
+import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class JmhMapBenchmarks {
+public class JmhSetMultimapBenchmarks {
 
 	private static boolean USE_PRIMITIVE_DATA = false;
 
-	@Param({ "MAP" })
+	@Param({ "SET_MULTIMAP" })
 	public DataType dataType;
 
 	@Param({ "MATCH" })
@@ -75,13 +75,13 @@ public class JmhMapBenchmarks {
 
 	public JmhValueFactory valueFactory;
 
-	public JmhMap testMap;
-	private JmhMap testMapRealDuplicate;
-	private JmhMap testMapDeltaDuplicate;
+	public JmhSetMultimap testMap;
+	private JmhSetMultimap testMapRealDuplicate;
+	private JmhSetMultimap testMapDeltaDuplicate;
 
-	public JmhMap testMapInt;
+	public JmhSetMultimap testMapInt;
 
-	private JmhMap testMapRealDuplicateSameSizeButDifferent;
+	private JmhSetMultimap testMapRealDuplicateSameSizeButDifferent;
 
 	public JmhValue VALUE_EXISTING;
 	public JmhValue VALUE_NOT_EXISTING;
@@ -96,8 +96,8 @@ public class JmhMapBenchmarks {
 	public int[] cachedNumbersInt = new int[CACHED_NUMBERS_SIZE];
 	public int[] cachedNumbersIntNotContained = new int[CACHED_NUMBERS_SIZE];
 
-	private JmhMap singletonMapWithExistingValue;
-	private JmhMap singletonMapWithNotExistingValue;
+	private JmhSetMultimap singletonMapWithExistingValue;
+	private JmhSetMultimap singletonMapWithNotExistingValue;
 
 	@Setup(Level.Trial)
 	public void setUp() throws Exception {
@@ -217,11 +217,11 @@ public class JmhMapBenchmarks {
 		}
 		}
 
-		final JmhMapBuilder mapWriter1 = valueFactory.mapBuilder();
+		final JmhSetMultimapBuilder mapWriter1 = valueFactory.setMultimapBuilder();
 		mapWriter1.put(VALUE_EXISTING, VALUE_EXISTING);
 		singletonMapWithExistingValue = mapWriter1.done();
 
-		final JmhMapBuilder mapWriter2 = valueFactory.mapBuilder();
+		final JmhSetMultimapBuilder mapWriter2 = valueFactory.setMultimapBuilder();
 		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 		singletonMapWithNotExistingValue = mapWriter2.done();
 
@@ -235,15 +235,15 @@ public class JmhMapBenchmarks {
 		SleepingInteger.IS_SLEEP_ENABLED_IN_HASHCODE = false;
 		SleepingInteger.IS_SLEEP_ENABLED_IN_EQUALS = false;
 
-		// OverseerUtils.setup(JmhMapBenchmarks.class, this);
+		// OverseerUtils.setup(JmhSetMultimapBenchmarks.class, this);
 	}
 
 	protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
 
 		valueFactory = valueFactoryFactory.getInstance();
 
-		JmhMapBuilder writer1 = valueFactory.mapBuilder();
-		JmhMapBuilder writer2 = valueFactory.mapBuilder();
+		JmhSetMultimapBuilder writer1 = valueFactory.setMultimapBuilder();
+		JmhSetMultimapBuilder writer2 = valueFactory.setMultimapBuilder();
 
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial + 13);
@@ -287,15 +287,15 @@ public class JmhMapBenchmarks {
 		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
 						VALUE_EXISTING);
 
-		testMapRealDuplicateSameSizeButDifferent = testMapRealDuplicate.removeKey(VALUE_EXISTING)
-						.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
+		testMapRealDuplicateSameSizeButDifferent = testMapRealDuplicate.remove(VALUE_EXISTING, VALUE_EXISTING)
+				.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 	}
 
-	protected static JmhMap generateMap(JmhValueFactory valueFactory, ElementProducer producer,
+	protected static JmhSetMultimap generateMap(JmhValueFactory valueFactory, ElementProducer producer,
 					boolean usePrimitiveData, int size, int run) throws Exception {
 
 		final int[] data = BenchmarkUtils.generateTestData(size, run);
-		final JmhMapBuilder writer = valueFactory.mapBuilder();
+		final JmhSetMultimapBuilder writer = valueFactory.setMultimapBuilder();
 
 		for (int i = size - 1; i >= 0; i--) {
 			if (usePrimitiveData) {
@@ -367,7 +367,7 @@ public class JmhMapBenchmarks {
 	//
 	// @Setup(Level.Invocation)
 	// public void setupInvocation() {
-	// OverseerUtils.setup(JmhMapBenchmarks.class, this);
+	// OverseerUtils.setup(JmhSetMultimapBenchmarks.class, this);
 	// OverseerUtils.doRecord(true);
 	// }
 	//
@@ -405,20 +405,21 @@ public class JmhMapBenchmarks {
 		}
 	}
 
-	@Benchmark
-	public void timeIteration(Blackhole bh) {
-		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
-			bh.consume(iterator.next());
-		}
-	}
-
-	@Benchmark
-	public void timeEntryIteration(Blackhole bh) {
-		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
-						.entryIterator(); iterator.hasNext();) {
-			bh.consume(iterator.next());
-		}
-	}
+	// @Benchmark
+	// public void timeIteration(Blackhole bh) {
+	// for (Iterator<JmhValue> iterator = testMap.iterator();
+	// iterator.hasNext();) {
+	// bh.consume(iterator.next());
+	// }
+	// }
+	//
+	// @Benchmark
+	// public void timeEntryIteration(Blackhole bh) {
+	// for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
+	// .entryIterator(); iterator.hasNext();) {
+	// bh.consume(iterator.next());
+	// }
+	// }
 
 	// @Benchmark
 	// public void timeInsertSingle(Blackhole bh) {
@@ -433,13 +434,13 @@ public class JmhMapBenchmarks {
 		}
 	}
 
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeInsertInt(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMapInt.put(cachedNumbersIntNotContained[i], VALUE_NOT_EXISTING_INT));
-		}
-	}
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeInsertInt(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMapInt.put(cachedNumbersIntNotContained[i], VALUE_NOT_EXISTING_INT));
+//		}
+//	}
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -449,21 +450,21 @@ public class JmhMapBenchmarks {
 		}
 	}
 
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeRemoveKeyNotContained(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.removeKey(cachedNumbersNotContained[i]));
-		}
-	}
-
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeRemoveKey(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.removeKey(cachedNumbers[i]));
-		}
-	}
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeRemoveKeyNotContained(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.removeKey(cachedNumbersNotContained[i]));
+//		}
+//	}
+//
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeRemoveKey(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.removeKey(cachedNumbers[i]));
+//		}
+//	}
 
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {
@@ -497,7 +498,7 @@ public class JmhMapBenchmarks {
 		/*
 		 * /Users/Michael/Development/jku/mx2/graal/jvmci/jdk1.8.0_60/product/
 		 * bin/java -jvmci -jar ./target/benchmarks.jar
-		 * "JmhMapBenchmarks.timeContainsKey$" -p
+		 * "JmhSetMultimapBenchmarks.timeContainsKey$" -p
 		 * valueFactoryFactory=VF_PDB_PERSISTENT_CURRENT,
 		 * VF_PDB_PERSISTENT_BLEEDING_EDGE -p producer=PDB_INTEGER -p
 		 * size=4194304 -jvm
@@ -505,13 +506,13 @@ public class JmhMapBenchmarks {
 		 * bin/java -jvmArgs "-jvmci" -wi 7 -i 10 -f 0
 		 */
 
-		System.out.println(JmhMapBenchmarks.class.getSimpleName());
+		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
-						.include(".*" + JmhMapBenchmarks.class.getSimpleName()
+						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
 										+ ".(timeInsert)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
-						.param("dataType", "MAP").param("run", "0")
+						.param("dataType", "SET_MULTIMAP").param("run", "0")
 //						.param("run", "1")
 //						.param("run", "2")
 //						.param("run", "3")
@@ -521,8 +522,9 @@ public class JmhMapBenchmarks {
 //						.param("size", "2048")
 						.param("size", "1048576")
 //						.param("valueFactoryFactory", "VF_CHAMP")
-						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
-//						.param("valueFactoryFactory", "VF_SCALA")
+//						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
+						.param("valueFactoryFactory", "VF_CLOJURE")
+						.param("valueFactoryFactory", "VF_SCALA")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();
