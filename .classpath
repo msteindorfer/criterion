@@ -25,44 +25,10 @@
 	<classpathentry kind="var" path="M2_REPO/org/openjdk/jol/jol-core/0.3.2/jol-core-0.3.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/memory-measurer/1.0-SNAPSHOT/memory-measurer-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/guava/guava/16.0.1/guava-16.0.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/rascalmpl/value/0.5.0/value-0.5.0.jar" sourcepath="M2_REPO/org/rascalmpl/value/0.5.0/value-0.5.0-sources.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.osgi/3.10.101.v20150820-1432/org.eclipse.osgi-3.10.101.v20150820-1432.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.commands/3.7.0.v20150422-0725/org.eclipse.core.commands-3.7.0.v20150422-0725.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.common/3.7.0.v20150402-1709/org.eclipse.equinox.common-3.7.0.v20150402-1709.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.contenttype/3.5.0.v20150421-2214/org.eclipse.core.contenttype-3.5.0.v20150421-2214.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.preferences/3.5.300.v20150408-1437/org.eclipse.equinox.preferences-3.5.300.v20150408-1437.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.registry/3.6.0.v20150318-1503/org.eclipse.equinox.registry-3.6.0.v20150318-1503.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/com.ibm.icu/54.1.1.v201501272100/com.ibm.icu-54.1.1.v201501272100.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.expressions/3.5.0.v20150421-2214/org.eclipse.core.expressions-3.5.0.v20150421-2214.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.runtime/3.11.1.v20150903-1804/org.eclipse.core.runtime-3.11.1.v20150903-1804.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.filesystem/1.5.0.v20150725-1910/org.eclipse.core.filesystem-1.5.0.v20150725-1910.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.jobs/3.7.0.v20150330-2103/org.eclipse.core.jobs-3.7.0.v20150330-2103.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.core.resources/3.10.1.v20150725-1910/org.eclipse.core.resources-3.10.1.v20150725-1910.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.app/1.3.300.v20150423-1356/org.eclipse.equinox.app-1.3.300.v20150423-1356.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.swt/3.104.1.v20150825-0743/org.eclipse.swt-3.104.1.v20150825-0743.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.text/3.5.400.v20150505-1044/org.eclipse.text-3.5.400.v20150505-1044.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.jdt.core/3.11.1.v20150902-1521/org.eclipse.jdt.core-3.11.1.v20150902-1521.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.eclipse.swt.cocoa.macosx.x86_64/3.104.1.v20150825-0743/org.eclipse.swt.cocoa.macosx.x86_64-3.104.1.v20150825-0743.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.hamcrest.core/1.3.0.v201303031735/org.hamcrest.core-1.3.0.v201303031735.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/.cache/tycho/org.junit-4.12.0.v201504281640.jar/junit.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.objectweb.asm.tree/5.0.1.v201404251740/org.objectweb.asm.tree-5.0.1.v201404251740.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.objectweb.asm/5.0.1.v201404251740/org.objectweb.asm-5.0.1.v201404251740.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/snakeyaml-1.11.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/gson-2.2.4.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/xz-1.5.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/commons-compress-1.9.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/jdom-2.0.6.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/fst-2.42-onejar.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/caffeine-1.2.0.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/jline-2.13.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/Development/rascal-devel/rascal-projects-latest/rascal/lib/value-0.5.0.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.apache.commons.math/2.1.0.v201105210652/org.apache.commons.math-2.1.0.v201105210652.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/org.apache.commons.lang/2.6.0.v201404270220/org.apache.commons.lang-2.6.0.v201404270220.jar"/>
-	<classpathentry kind="lib" path="/Users/Michael/.m2/repository/p2/osgi/bundle/com.google.gson/2.2.4.v201311231704/com.google.gson-2.2.4.v201311231704.jar"/>
 	<classpathentry kind="src" path="/capsule"/>
 	<classpathentry kind="var" path="M2_REPO/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/clojure/clojure/1.7.0/clojure-1.7.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/net/sf/trove4j/trove4j/3.0.3/trove4j-3.0.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/sf/trove4j/trove4j/3.0.3/trove4j-3.0.3.jar" sourcepath="/M2_REPO/net/sf/trove4j/trove4j/3.0.3/trove4j-3.0.3-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

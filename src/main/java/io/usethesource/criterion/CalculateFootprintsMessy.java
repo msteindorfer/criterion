@@ -1,4 +1,4 @@
-package io.usethesource.criterion;
+//package io.usethesource.criterion;
 ///*******************************************************************************
 // * Copyright (c) 2014 CWI
 // * All rights reserved. This program and the accompanying materials
@@ -10,12 +10,12 @@ package io.usethesource.criterion;
 // *
 // *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
 // *******************************************************************************/
-//package nl.cwi.swat.jmh_dscg_benchmarks;
+//package io.usethesource.criterion;
 //
-//import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
-//import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_PDB_PERSISTENT_CURRENT;
-//import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_PDB_PERSISTENT_MEMOIZED_LAZY;
-//import static nl.cwi.swat.jmh_dscg_benchmarks.BenchmarkUtils.ValueFactoryFactory.VF_SCALA;
+//import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
+//import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_PDB_PERSISTENT_CURRENT;
+//import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_PDB_PERSISTENT_MEMOIZED_LAZY;
+//import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_SCALA;
 //
 //import java.lang.reflect.InvocationTargetException;
 //import java.lang.reflect.Method;

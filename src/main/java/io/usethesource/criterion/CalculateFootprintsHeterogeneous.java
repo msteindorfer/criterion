@@ -21,8 +21,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.apache.mahout.math.map.OpenIntIntHashMap;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.gs.collections.impl.map.mutable.primitive.IntIntHashMap;
 
 import gnu.trove.map.hash.TIntIntHashMap;
 import io.usethesource.capsule.ImmutableMap;
@@ -31,32 +34,39 @@ import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.FootprintUtils.Archetype;
 import io.usethesource.criterion.api.JmhValue;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
 public final class CalculateFootprintsHeterogeneous {
 
+	private static int multimapValueCount = 1;
+	
 	public static void main(String[] args) {
 		testOneConfiguration(2097152);
-
-		FootprintUtils.writeToFile(Paths.get("map_sizes_heterogeneous_exponential.csv"), false,
+		
+		String userHome = System.getProperty("user.home");
+		String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
+		boolean appendToFile = true;
+		
+		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential.csv"), appendToFile,
 				FootprintUtils.createExponentialRange(0, 24).stream()
 						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 
-		FootprintUtils.writeToFile(Paths.get("map_sizes_heterogeneous_tiny.csv"), false,
-				FootprintUtils.createLinearRange(0, 101, 1).stream()
-						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
-		
-		FootprintUtils.writeToFile(Paths.get("map_sizes_heterogeneous_small.csv"), false,
-				FootprintUtils.createLinearRange(0, 10_100, 100).stream()
-						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
-
-		FootprintUtils.writeToFile(Paths.get("map_sizes_heterogeneous_medium.csv"), false,
-				FootprintUtils.createLinearRange(10_000, 101_000, 1_000).stream()
-						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
-
-		FootprintUtils.writeToFile(Paths.get("map_sizes_heterogeneous_large.csv"), false,
-				FootprintUtils.createLinearRange(100_000, 8_100_000, 100_000).stream()
-						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_tiny.csv"), appendToFile,
+//				FootprintUtils.createLinearRange(0, 101, 1).stream()
+//						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
+//		
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_small.csv"), appendToFile,
+//				FootprintUtils.createLinearRange(0, 10_100, 100).stream()
+//						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
+//
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_medium.csv"), appendToFile,
+//				FootprintUtils.createLinearRange(10_000, 101_000, 1_000).stream()
+//						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
+//
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_large.csv"), appendToFile,
+//				FootprintUtils.createLinearRange(100_000, 8_100_000, 100_000).stream()
+//						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 	}
 
 	// public static void testPrintStatsRandomSmallAndBigIntegers() {
@@ -128,14 +138,109 @@ public final class CalculateFootprintsHeterogeneous {
 
 		return presets.stream()
 				.flatMap(preset -> Arrays.stream(new String[] { 
-						createAndMeasureJavaUtilHashMap(data, size, 0, preset)
-						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
-						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
-						, createAndMeasureTrove4jIntArrayList(data, size, 0, preset)
-						//, createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true)
+						/* Map[int, int] */
+						createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset)
+//						, createAndMeasureMahoutMutableIntIntHashMap(data, size, 0, preset)
+//						, createAndMeasureGsImmutableIntIntMap(data, size, 0, preset)
+						
+						/* SetMultimap */
+//						, createAndMeasureGsImmutableSetMultimap(data, size, 0, preset)
+//						, createAndMeasureGuavaImmutableSetMultimap(data, size, 0, preset)
+						
+//						createAndMeasureJavaUtilHashMap(data, size, 0, preset)
+//						, createAndMeasureTrieMapHomogeneous(data, size, 0, preset)
+//						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
+//						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
+//						, createAndMeasureTrove4jTIntIntHashMap(data, size, 0, preset)
 				})).collect(Collectors.toList());
 	}
 
+//	public static String createAndMeasureMultiChamp(final Object[] data, int elementCount, int run,
+//			MemoryFootprintPreset preset) {
+//		ImmutableSetMultimap<Integer, Integer> ys = TrieSetMultimap_BleedingEdge.of();
+//
+//		for (Object o : data) {
+//			for (int i = 0; i < multimapValueCount; i++) {
+//				ys = ys.__put((Integer) o, (Integer) i);
+//			}
+//		}
+//
+//		return measureAndReport(ys, "io.usethesource.capsule.TrieSetMultimap_BleedingEdge", DataType.MULTIMAP,
+//				Archetype.PERSISTENT, false, elementCount, run, preset);
+//	}
+	
+	public static String createAndMeasureGsImmutableSetMultimap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		com.gs.collections.api.multimap.set.MutableSetMultimap<Integer, Integer> mutableYs = com.gs.collections.impl.factory.Multimaps.mutable.set.with();
+		
+		for (Object o : data) {
+			for(int i = 0; i < multimapValueCount; i++) {				
+				mutableYs.put((Integer) o, (Integer) i);
+			}			
+		}
+		
+		/* Note: direct creation of immutable that uses newWith(...) is tremendously slow. */		
+		com.gs.collections.api.multimap.set.ImmutableSetMultimap<Integer, Integer> ys = mutableYs.toImmutable();
+					
+		return measureAndReport(ys, "com.gs.collections.api.multimap.set.ImmutableSetMultimap", DataType.MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
+	}		
+
+	public static String createAndMeasureFastUtilInt2IntOpenHashMap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		it.unimi.dsi.fastutil.ints.AbstractInt2IntMap mutableYs = new Int2IntOpenHashMap();
+		
+		for (Object o : data) {
+			for(int i = 0; i < multimapValueCount; i++) {				
+				mutableYs.put((Integer) o, (Integer) i);
+			}			
+		}
+							
+		return measureAndReport(mutableYs, "it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap", DataType.MAP, Archetype.MUTABLE, false, elementCount, run, preset);
+	}
+	
+	public static String createAndMeasureMahoutMutableIntIntHashMap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		org.apache.mahout.math.map.AbstractIntIntMap mutableYs = new OpenIntIntHashMap();
+		
+		for (Object o : data) {
+			for(int i = 0; i < multimapValueCount; i++) {				
+				mutableYs.put((Integer) o, (Integer) i);
+			}			
+		}
+							
+		return measureAndReport(mutableYs, "org.apache.mahout.math.map.OpenIntIntHashMap", DataType.MAP, Archetype.MUTABLE, false, elementCount, run, preset);
+	}
+	
+	public static String createAndMeasureGsImmutableIntIntMap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		com.gs.collections.api.map.primitive.MutableIntIntMap mutableYs = new IntIntHashMap();
+		
+		for (Object o : data) {
+			for(int i = 0; i < multimapValueCount; i++) {				
+				mutableYs.put((Integer) o, (Integer) i);
+			}			
+		}
+		
+		com.gs.collections.api.map.primitive.ImmutableIntIntMap ys = mutableYs.toImmutable();
+					
+		return measureAndReport(ys, "com.gs.collections.api.map.primitive.ImmutableIntIntMap", DataType.MAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
+	}	
+	
+	public static String createAndMeasureGuavaImmutableSetMultimap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		com.google.common.collect.ImmutableSetMultimap.Builder<Integer, Integer> ysBldr = com.google.common.collect.ImmutableSetMultimap.builder();
+		
+		for (Object o : data) {
+			for (int i = 0; i < multimapValueCount; i++) { 
+				ysBldr.put((Integer) o, (Integer) i);
+			}
+		}
+		
+		com.google.common.collect.ImmutableMultimap<Integer, Integer> ys = ysBldr.build();
+		
+		return measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
+	}
+	
 	public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount, int run,
 			MemoryFootprintPreset preset) {
 		ImmutableMap<Integer, Integer> ys = TrieMap_5Bits.of();
@@ -227,7 +332,7 @@ public final class CalculateFootprintsHeterogeneous {
 		return measureAndReport(ys, shortName, DataType.MAP, Archetype.MUTABLE, false, elementCount, run, preset);
 	}
 
-	public static String createAndMeasureTrove4jIntArrayList(final Object[] data, int elementCount, int run,
+	public static String createAndMeasureTrove4jTIntIntHashMap(final Object[] data, int elementCount, int run,
 			MemoryFootprintPreset preset) {
 		TIntIntHashMap ys = new TIntIntHashMap(elementCount);
 
@@ -259,7 +364,7 @@ public final class CalculateFootprintsHeterogeneous {
 
 		return measureAndReport(ys, shortName, DataType.MAP, Archetype.MUTABLE, false, elementCount, run, preset);
 	}
-
+		
 	enum MemoryFootprintPreset {
 		RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD
 	}

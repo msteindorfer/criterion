@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-setwd("~/Development/jmh-dscg-benchmarks/")
+setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
 
 library(reshape2)
 

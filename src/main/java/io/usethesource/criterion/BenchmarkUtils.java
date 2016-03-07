@@ -63,6 +63,7 @@ public class BenchmarkUtils {
 	
 	public static enum DataType {
 		MAP,
+		MULTIMAP,
 		SET
 	}	
 	

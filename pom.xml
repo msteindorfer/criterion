@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
+			<version>19.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.goldmansachs</groupId>
@@ -63,6 +63,16 @@
 			<artifactId>gs-collections</artifactId>
 			<version>${gs-collections.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.mahout</groupId>
+		    <artifactId>mahout-math</artifactId>
+		    <version>0.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>7.0.10</version>
+		</dependency>		
 		<dependency>
 			<groupId>io.usethesource</groupId>
 			<artifactId>capsule</artifactId>
@@ -86,7 +96,7 @@
 		<dependency>
 			<groupId>org.clojure</groupId>
 			<artifactId>clojure</artifactId>
-			<version>1.7.0</version>
+			<version>1.8.0</version>
 		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>com.github.krukow</groupId> -->
@@ -108,7 +118,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jmh.version>1.11</jmh.version>
-		<gs-collections.version>5.0.0</gs-collections.version>
+		<gs-collections.version>7.0.1</gs-collections.version>
 	</properties>
 
 	<build>
