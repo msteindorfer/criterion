@@ -1,6 +1,6 @@
 package io.usethesource.criterion.api;
 
-public interface JmhWriter {
+public interface JmhBuilder {
 
 	public JmhValue done();
 

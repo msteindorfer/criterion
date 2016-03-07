@@ -38,7 +38,7 @@ import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapWriter;
+import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
 
@@ -217,11 +217,11 @@ public class JmhMapBenchmarks {
 		}
 		}
 
-		final JmhMapWriter mapWriter1 = valueFactory.mapWriter();
+		final JmhMapBuilder mapWriter1 = valueFactory.mapBuilder();
 		mapWriter1.put(VALUE_EXISTING, VALUE_EXISTING);
 		singletonMapWithExistingValue = mapWriter1.done();
 
-		final JmhMapWriter mapWriter2 = valueFactory.mapWriter();
+		final JmhMapBuilder mapWriter2 = valueFactory.mapBuilder();
 		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 		singletonMapWithNotExistingValue = mapWriter2.done();
 
@@ -242,8 +242,8 @@ public class JmhMapBenchmarks {
 
 		valueFactory = valueFactoryFactory.getInstance();
 
-		JmhMapWriter writer1 = valueFactory.mapWriter();
-		JmhMapWriter writer2 = valueFactory.mapWriter();
+		JmhMapBuilder writer1 = valueFactory.mapBuilder();
+		JmhMapBuilder writer2 = valueFactory.mapBuilder();
 
 		int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial + 13);
@@ -295,7 +295,7 @@ public class JmhMapBenchmarks {
 					boolean usePrimitiveData, int size, int run) throws Exception {
 
 		final int[] data = BenchmarkUtils.generateTestData(size, run);
-		final JmhMapWriter writer = valueFactory.mapWriter();
+		final JmhMapBuilder writer = valueFactory.mapBuilder();
 
 		for (int i = size - 1; i >= 0; i--) {
 			if (usePrimitiveData) {

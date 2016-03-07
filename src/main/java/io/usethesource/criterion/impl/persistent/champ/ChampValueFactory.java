@@ -14,9 +14,9 @@ package io.usethesource.criterion.impl.persistent.champ;
 import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.SetFactory;
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapWriter;
+import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhSetWriter;
+import io.usethesource.criterion.api.JmhSetBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class ChampValueFactory implements JmhValueFactory {
@@ -30,20 +30,20 @@ public class ChampValueFactory implements JmhValueFactory {
 	}
 
 	public JmhSet set() {
-		return setWriter().done();
+		return setBuilder().done();
 	}
 
-	public JmhSetWriter setWriter() {
+	public JmhSetBuilder setBuilder() {
 		return new ChampSetWriter(setFactory);
 	}
 
 	@Override
 	public JmhMap map() {
-		return mapWriter().done();
+		return mapBuilder().done();
 	}
 
 	@Override
-	public JmhMapWriter mapWriter() {
+	public JmhMapBuilder mapBuilder() {
 		return new PersistentChampMapWriter(mapFactory);
 	}
 

@@ -11,27 +11,27 @@
  ******************************************************************************/
 package io.usethesource.criterion.impl.persistent.scala
 
-import scala.collection.JavaConversions.mapAsScalaMap
+import scala.collection.JavaConversions.iterableAsScalaIterable
+import scala.collection.mutable.SetBuilder
 
+import io.usethesource.criterion.api.JmhSet
+import io.usethesource.criterion.api.JmhSetBuilder
 import io.usethesource.criterion.api.JmhValue
-import io.usethesource.criterion.api.JmhValueFactory
 
-class ScalaValueFactory extends JmhValueFactory {
-	
-	def set() = setBuilder.done
+sealed class ScalaSetBuilder extends JmhSetBuilder {
 
-	def set(xs: JmhValue*) = {
-		val writer = setBuilder
-		writer.insert(xs: _*)
-		writer.done
+	val xs: SetBuilder[JmhValue, ScalaSet.Coll] = new SetBuilder(ScalaSet.empty)
+
+	override def insert(ys: JmhValue*) {
+		xs ++= ys
 	}
 
-	def setBuilder = new ScalaSetBuilder
-	
-	def map() = mapBuilder.done
+	override def insertAll(ys: java.lang.Iterable[_ <: JmhValue]) {
+		xs ++= ys
+	}
 
-	def mapBuilder = new ScalaMapBuilder
-
-	override def toString = "VF_SCALA"
+	override def done: JmhSet = { 
+		ScalaSet(xs.result)
+	}
 
 }

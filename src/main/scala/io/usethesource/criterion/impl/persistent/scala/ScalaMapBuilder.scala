@@ -11,27 +11,26 @@
  ******************************************************************************/
 package io.usethesource.criterion.impl.persistent.scala
 
+import scala.collection.immutable.Map.empty
+import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.JavaConversions.iterableAsScalaIterable
-import scala.collection.mutable.SetBuilder
-
-import io.usethesource.criterion.api.JmhSet
-import io.usethesource.criterion.api.JmhSetWriter
+import scala.collection.mutable.MapBuilder
 import io.usethesource.criterion.api.JmhValue
+import io.usethesource.criterion.api.JmhMap
+import io.usethesource.criterion.api.JmhMapBuilder
 
-sealed class ScalaSetWriter extends JmhSetWriter {
+sealed class ScalaMapBuilder extends JmhMapBuilder {
 
-	val xs: SetBuilder[JmhValue, ScalaSet.Coll] = new SetBuilder(ScalaSet.empty)
+  val xs: MapBuilder[JmhValue, JmhValue, ScalaMap.Coll] = new MapBuilder(ScalaMap.empty)
 
-	override def insert(ys: JmhValue*) {
-		xs ++= ys
-	}
+  override def put(k: JmhValue, v: JmhValue) = xs += (k -> v)
 
-	override def insertAll(ys: java.lang.Iterable[_ <: JmhValue]) {
-		xs ++= ys
-	}
+  override def putAll(other: JmhMap) = other match {
+    case ScalaMap(ys) => xs ++= ys
+  }
 
-	override def done: JmhSet = { 
-		ScalaSet(xs.result)
-	}
+  override def putAll(ys: java.util.Map[JmhValue, JmhValue]) = xs ++= ys
+
+  override def done = ScalaMap(xs.result)
 
 }

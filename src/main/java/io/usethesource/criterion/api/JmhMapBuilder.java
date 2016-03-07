@@ -14,7 +14,7 @@ package io.usethesource.criterion.api;
 
 import java.util.Map;
 
-public interface JmhMapWriter extends JmhWriter {
+public interface JmhMapBuilder extends JmhBuilder {
 
 	default void put(int key, int value) {
 		throw new UnsupportedOperationException("Not implemented.");

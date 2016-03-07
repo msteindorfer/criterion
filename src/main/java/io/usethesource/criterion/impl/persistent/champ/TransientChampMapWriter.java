@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapWriter;
+import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
 /*
@@ -25,7 +25,7 @@ import io.usethesource.criterion.api.JmhValue;
  * 		* without types
  * 		* with equals() instead of isEqual()
  */
-final class TransientChampMapWriter implements JmhMapWriter {
+final class TransientChampMapWriter implements JmhMapBuilder {
 
 	protected final TransientMap<JmhValue, JmhValue> mapContent;
 	protected JmhMap constructedMap;

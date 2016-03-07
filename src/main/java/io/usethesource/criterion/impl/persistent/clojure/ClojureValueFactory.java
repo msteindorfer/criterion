@@ -12,30 +12,30 @@
 package io.usethesource.criterion.impl.persistent.clojure;
 
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapWriter;
+import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhSetWriter;
+import io.usethesource.criterion.api.JmhSetBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class ClojureValueFactory implements JmhValueFactory {
 
 	@Override
 	public JmhMap map() {
-		return mapWriter().done();
+		return mapBuilder().done();
 	}
 
 	@Override
-	public JmhMapWriter mapWriter() {
+	public JmhMapBuilder mapBuilder() {
 		return new ClojureMapWriter();
 	}
 
 	@Override
 	public JmhSet set() {
-		return setWriter().done();
+		return setBuilder().done();
 	}
 
 	@Override
-	public JmhSetWriter setWriter() {
+	public JmhSetBuilder setBuilder() {
 		return new ClojureSetWriter();
 	}
 	

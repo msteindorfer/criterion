@@ -38,7 +38,7 @@ public interface JmhValueFactory {
 	 * 
 	 * @return a set builder
 	 */
-	public JmhSetWriter setWriter();
+	public JmhSetBuilder setBuilder();
 
 	/**
 	 * Creates an empty unmodifiable map.
@@ -52,6 +52,6 @@ public interface JmhValueFactory {
 	 * 
 	 * @return a map builder
 	 */
-	public JmhMapWriter mapWriter();
+	public JmhMapBuilder mapBuilder();
 	
 }

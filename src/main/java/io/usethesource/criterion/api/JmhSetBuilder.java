@@ -12,7 +12,7 @@
 
 package io.usethesource.criterion.api;
 
-public interface JmhSetWriter extends JmhWriter {
+public interface JmhSetBuilder extends JmhBuilder {
 	
 	void insert(JmhValue... v);
 
