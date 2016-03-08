@@ -17,6 +17,8 @@ import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhSetBuilder;
+import io.usethesource.criterion.api.JmhSetMultimap;
+import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class ChampValueFactory implements JmhValueFactory {
@@ -46,6 +48,17 @@ public class ChampValueFactory implements JmhValueFactory {
 	public JmhMapBuilder mapBuilder() {
 		return new PersistentChampMapWriter(mapFactory);
 	}
+	
+	@Override
+	public JmhSetMultimap setMultimap() {
+		return setMultimapBuilder().done();
+	}
+
+	@Override
+	public JmhSetMultimapBuilder setMultimapBuilder() {
+		// TODO provide setMultimapFactory
+		return new PersistentChampSetMultimapWriter(mapFactory);
+	}	
 
 	@Override
 	public String toString() {
