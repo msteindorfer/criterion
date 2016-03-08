@@ -13,7 +13,7 @@ package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.ImmutableSetMultimap;
 import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.TrieSetMultimap_BleedingEdge;
+import io.usethesource.capsule.TrieSetMultimap_ChampBasedPrototype;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
@@ -25,7 +25,7 @@ final class PersistentChampSetMultimapWriter implements JmhSetMultimapBuilder {
 
 	PersistentChampSetMultimapWriter(MapFactory mapFactory) {
 		// mapContent = mapFactory.of();
-		mapContent = TrieSetMultimap_BleedingEdge.<JmhValue, JmhValue> of();
+		mapContent = TrieSetMultimap_ChampBasedPrototype.<JmhValue, JmhValue> of();
 		constructedMap = null;
 	}
 
