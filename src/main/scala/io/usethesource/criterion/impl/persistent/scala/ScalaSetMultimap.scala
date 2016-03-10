@@ -11,11 +11,16 @@
  ******************************************************************************/
 package io.usethesource.criterion.impl.persistent.scala
 
+import java.util.Collections
+import java.util.Map.Entry 
 import scala.collection.immutable
 import scala.collection.JavaConversions.asJavaIterator
 import scala.collection.JavaConversions.mapAsJavaMap
+import scala.collection.JavaConversions._
 import io.usethesource.criterion.api.JmhValue
 import io.usethesource.criterion.api.JmhSetMultimap
+
+import io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf
 
 case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
@@ -62,8 +67,9 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 //	override def valueIterator = xs.values iterator
 
 	override def entryIterator: java.util.Iterator[java.util.Map.Entry[JmhValue, JmhValue]] = {
-    val xsAsFlatTuples: scala.collection.immutable.HashMap[JmhValue, JmhValue] = xs.flatMap { case (k, vs) => vs.map((k, _)) }
-    mapAsJavaMap(xsAsFlatTuples).entrySet iterator
+//    val xsAsFlatTuples: scala.collection.immutable.HashMap[JmhValue, JmhValue] = xs.flatMap { case (k, vs) => vs.map((k, _)) }
+//    mapAsJavaMap(xsAsFlatTuples).entrySet iterator
+	  new FlatteningIterator(mapAsJavaMap(xs).entrySet.iterator)  
   }
 
 
@@ -87,7 +93,32 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 	
 }
 
+class FlatteningIterator(val entryIterator : java.util.Iterator[java.util.Map.Entry[JmhValue, immutable.HashSet[JmhValue]]]) extends java.util.Iterator[java.util.Map.Entry[JmhValue, JmhValue]] {
+
+	var lastKey : JmhValue = null
+	var lastIterator : java.util.Iterator[JmhValue] = java.util.Collections.emptyIterator[JmhValue]
+
+	override def hasNext : Boolean = if (lastIterator.hasNext) true else entryIterator.hasNext   
+
+	override def next : Entry[JmhValue, JmhValue] = {
+		if (lastIterator.hasNext) {
+			return entryOf(lastKey, lastIterator.next());
+		} else {
+			lastKey = null;
+			
+			val nextEntry = entryIterator.next
+							  					
+			lastKey = nextEntry.getKey
+			lastIterator = setAsJavaSet(nextEntry.getValue).iterator
+			
+			return entryOf(lastKey, lastIterator.next)
+		}
+	}
+
+}
+
 object ScalaSetMultimap {
   type Coll = scala.collection.immutable.HashMap[JmhValue, immutable.HashSet[JmhValue]]
 	val empty = scala.collection.immutable.HashMap.empty[JmhValue, immutable.HashSet[JmhValue]]
 }
+
