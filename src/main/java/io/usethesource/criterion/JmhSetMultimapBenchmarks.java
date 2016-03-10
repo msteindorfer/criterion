@@ -27,7 +27,6 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
-import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -389,7 +388,7 @@ public class JmhSetMultimapBenchmarks {
 		}
 	}
 
-	@Benchmark
+	// @Benchmark /* Type=Int */
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeContainsKeyInt(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
@@ -405,6 +404,23 @@ public class JmhSetMultimapBenchmarks {
 		}
 	}
 
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeContainsTuple(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.contains(cachedNumbers[i], cachedNumbers[i]));
+		}
+	}
+
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeContainsTupleNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.contains(cachedNumbersNotContained[i],
+							cachedNumbersNotContained[i]));
+		}
+	}
+	
 	// @Benchmark
 	// public void timeIteration(Blackhole bh) {
 	// for (Iterator<JmhValue> iterator = testMap.iterator();
@@ -412,14 +428,14 @@ public class JmhSetMultimapBenchmarks {
 	// bh.consume(iterator.next());
 	// }
 	// }
-	//
-	// @Benchmark
-	// public void timeEntryIteration(Blackhole bh) {
-	// for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
-	// .entryIterator(); iterator.hasNext();) {
-	// bh.consume(iterator.next());
-	// }
-	// }
+
+	@Benchmark
+	public void timeEntryIteration(Blackhole bh) {
+		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
+						.entryIterator(); iterator.hasNext();) {
+			bh.consume(iterator.next());
+		}
+	}
 
 	// @Benchmark
 	// public void timeInsertSingle(Blackhole bh) {
@@ -465,7 +481,23 @@ public class JmhSetMultimapBenchmarks {
 //			bh.consume(testMap.removeKey(cachedNumbers[i]));
 //		}
 //	}
-
+	
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeRemoveTuple(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.remove(cachedNumbers[i], cachedNumbers[i]));
+		}
+	}
+	
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeRemoveTupleNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.remove(cachedNumbersNotContained[i], cachedNumbersNotContained[i]));
+		}
+	}
+	
 	@Benchmark
 	public void timeEqualsRealDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapRealDuplicate));
@@ -509,7 +541,7 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeInsert)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeEntryIteration)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
 						.param("dataType", "SET_MULTIMAP").param("run", "0")

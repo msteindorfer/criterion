@@ -60,9 +60,11 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 //	override def iterator = xs.keys iterator
 //
 //	override def valueIterator = xs.values iterator
-//
-//	@deprecated
-//	override def entryIterator: java.util.Iterator[java.util.SetMultimap.Entry[JmhValue, JmhValue]] = mapAsJavaSetMultimap(xs).entrySet iterator
+
+	override def entryIterator: java.util.Iterator[java.util.Map.Entry[JmhValue, JmhValue]] = {
+    val xsAsFlatTuples: scala.collection.immutable.HashMap[JmhValue, JmhValue] = xs.flatMap { case (k, vs) => vs.map((k, _)) }
+    mapAsJavaMap(xsAsFlatTuples).entrySet iterator
+  }
 
 
 	override def equals(that: Any): Boolean = that match {

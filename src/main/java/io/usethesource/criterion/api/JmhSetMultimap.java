@@ -12,6 +12,9 @@
  *******************************************************************************/
 package io.usethesource.criterion.api;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue> 
 
 //	boolean isEmpty();
@@ -33,8 +36,8 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 //	Iterator<JmhValue> iterator();
 //
 //	Iterator<JmhValue> valueIterator();
-//
-//	Iterator<Entry<JmhValue, JmhValue>> entryIterator();
+
+	Iterator<Entry<JmhValue, JmhValue>> entryIterator();
 		
 	default boolean containsKey(int key) { 
 		// throw new UnsupportedOperationException("Not implemented.");

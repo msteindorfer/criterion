@@ -11,9 +11,25 @@
  *******************************************************************************/
 package io.usethesource.criterion.impl.persistent.clojure;
 
+import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.Map.Entry;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import clojure.lang.APersistentMap;
 import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.PersistentHashSet;
+import io.usethesource.capsule.AbstractSpecialisedImmutableMap;
+import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 
@@ -146,11 +162,89 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 //	public Iterator<JmhValue> valueIterator() {
 //		return ((APersistentMap) xs).values().iterator();
 //	}
+
+	@Override
+	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
+		return untypedEntryStream().flatMap(ClojureSetMultimap::dispatchOnTypeAndFlatten)
+						.iterator();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Stream<Entry<JmhValue, Object>> untypedEntryStream() {
+		int size = xs.count();
+		Iterator<Entry<JmhValue, Object>> it = ((APersistentMap) xs).entrySet().iterator();
+
+		Spliterator<Entry<JmhValue, Object>> split = Spliterators.spliterator(it, size,
+						Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED);
+
+		return StreamSupport.stream(split, false);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Stream<Entry<JmhValue, JmhValue>> dispatchOnTypeAndFlatten(
+					Entry<JmhValue, Object> tuple) {
+		Object singletonOrSet = tuple.getValue();
+
+		if (singletonOrSet instanceof IPersistentSet) {
+			IPersistentSet set = (IPersistentSet) singletonOrSet;
+
+			Iterator<Entry<JmhValue, JmhValue>> it = new MultimapEntryToMapEntriesIterator(
+							tuple.getKey(), ((Iterable<JmhValue>) set).iterator());
+
+			Spliterator<Entry<JmhValue, JmhValue>> split = Spliterators.spliterator(it, set.count(),
+							Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED);
+
+			return StreamSupport.stream(split, false);
+		} else {
+			return Stream.of((Map.Entry<JmhValue, JmhValue>) (Object) tuple);
+		}
+	}
+	
+	private static class MultimapEntryToMapEntriesIterator
+					implements Iterator<Map.Entry<JmhValue, JmhValue>> {
+
+		final JmhValue key;
+		final Iterator<JmhValue> valueIterator;
+
+		public MultimapEntryToMapEntriesIterator(JmhValue key, Iterator<JmhValue> valueIterator) {
+			this.key = key;
+			this.valueIterator = valueIterator;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return valueIterator.hasNext();
+		}
+
+		@Override
+		public Entry<JmhValue, JmhValue> next() {
+			return entryOf(key, valueIterator.next());
+		}
+
+	}
+	
+//	  @Override
+//	  public Iterator<V> valueIterator() {
+//	    return valueCollectionsStream().flatMap(Set::stream).iterator();
+//	  }
 //
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
-//		return ((APersistentMap) xs).entrySet().iterator();
-//	}
+//	  @Override
+//	  public Iterator<Map.Entry<K, V>> entryIterator() {
+//	    return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
+//	  }
+//
+//	  @Override
+//	  public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
+//	    return new SetMultimapTupleIterator<>(rootNode, tupleOf);
+//	  }
+//
+//	  private Spliterator<ImmutableSet<V>> valueCollectionsSpliterator() {
+//	    /*
+//	     * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
+//	     */
+//	    int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
+//	    return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
+//	        characteristics);
+//	  }	
 
 }
