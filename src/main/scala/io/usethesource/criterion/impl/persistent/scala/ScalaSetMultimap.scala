@@ -119,6 +119,6 @@ class FlatteningIterator(val entryIterator : java.util.Iterator[java.util.Map.En
 
 object ScalaSetMultimap {
   type Coll = scala.collection.immutable.HashMap[JmhValue, immutable.HashSet[JmhValue]]
-	val empty = scala.collection.immutable.HashMap.empty[JmhValue, immutable.HashSet[JmhValue]]
+  val empty = scala.collection.immutable.HashMap.empty[JmhValue, immutable.HashSet[JmhValue]]
 }
 
