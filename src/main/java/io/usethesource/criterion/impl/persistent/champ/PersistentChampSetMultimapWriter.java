@@ -12,9 +12,7 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.ImmutableSetMultimap;
-import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.TrieSetMultimap_ChampBasedPrototype;
-import io.usethesource.capsule.TrieSetMultimap_HCHAMP;
+import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
@@ -24,27 +22,27 @@ final class PersistentChampSetMultimapWriter implements JmhSetMultimapBuilder {
 	protected ImmutableSetMultimap<JmhValue, JmhValue> mapContent;
 	protected JmhSetMultimap constructedMap;
 
-	PersistentChampSetMultimapWriter(MapFactory mapFactory) {
-		// mapContent = mapFactory.of();
-		mapContent = TrieSetMultimap_HCHAMP.<JmhValue, JmhValue> of();
+	PersistentChampSetMultimapWriter(SetMultimapFactory setMultimapFactory) {
+		mapContent = setMultimapFactory.of();
 		constructedMap = null;
 	}
 
 	@Override
-	public void put(JmhValue key, JmhValue value) {
+	public void insert(JmhValue key, JmhValue value) {
 		checkMutation();
-		mapContent = mapContent.__put(key, value);
+		mapContent = mapContent.__insert(key, value);
 	}
-	
-//	@Override
-//	public void put(int key, int value) {
-//		checkMutation();
-//		mapContent = mapContent.__put(key, value);
-//	}
-	
+
+	// @Override
+	// public void put(int key, int value) {
+	// checkMutation();
+	// mapContent = mapContent.__put(key, value);
+	// }
+
 	protected void checkMutation() {
 		if (constructedMap != null) {
-			throw new UnsupportedOperationException("Mutation of a finalized map is not supported.");
+			throw new UnsupportedOperationException(
+							"Mutation of a finalized map is not supported.");
 		}
 	}
 

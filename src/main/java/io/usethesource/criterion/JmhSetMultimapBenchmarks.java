@@ -217,11 +217,11 @@ public class JmhSetMultimapBenchmarks {
 		}
 
 		final JmhSetMultimapBuilder mapWriter1 = valueFactory.setMultimapBuilder();
-		mapWriter1.put(VALUE_EXISTING, VALUE_EXISTING);
+		mapWriter1.insert(VALUE_EXISTING, VALUE_EXISTING);
 		singletonMapWithExistingValue = mapWriter1.done();
 
 		final JmhSetMultimapBuilder mapWriter2 = valueFactory.setMultimapBuilder();
-		mapWriter2.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
+		mapWriter2.insert(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 		singletonMapWithNotExistingValue = mapWriter2.done();
 
 		// System.out.println(String.format("\n\ncachedNumbers = %s",
@@ -254,11 +254,11 @@ public class JmhSetMultimapBenchmarks {
 			// final IValue current = producer.createFromInt(data[i]);
 
 			if (USE_PRIMITIVE_DATA) {
-				writer1.put(data[i], data[i]);
-				writer2.put(data[i], data[i]);
+				writer1.insert(data[i], data[i]);
+				writer2.insert(data[i], data[i]);
 			} else {
-				writer1.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
-				writer2.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
+				writer1.insert(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
+				writer2.insert(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
 			}
 
 			if (i == existingValueIndex) {
@@ -283,11 +283,23 @@ public class JmhSetMultimapBenchmarks {
 			}
 		}
 
-		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING).put(VALUE_EXISTING,
-						VALUE_EXISTING);
+		// TODO: put is compatible with regular map backends that don't
+		// implement insert, but won't work for real multimaps. fix it.
+		testMapDeltaDuplicate = testMap.put(VALUE_EXISTING, VALUE_NOT_EXISTING)
+						.put(VALUE_EXISTING, VALUE_EXISTING);
+		
+		if (testMap.size() != testMapDeltaDuplicate.size()) {
+			throw new IllegalStateException();
+		}
 
-		testMapRealDuplicateSameSizeButDifferent = testMapRealDuplicate.remove(VALUE_EXISTING, VALUE_EXISTING)
-				.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
+		// TODO: put is compatible with regular map backends that don't
+		// implement insert, but won't work for real multimaps. fix it.
+		testMapRealDuplicateSameSizeButDifferent = testMapRealDuplicate.remove(VALUE_EXISTING)
+						.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
+		
+		if (testMap.size() != testMapRealDuplicateSameSizeButDifferent.size()) {
+			throw new IllegalStateException();
+		}
 	}
 
 	protected static JmhSetMultimap generateMap(JmhValueFactory valueFactory, ElementProducer producer,
@@ -298,9 +310,9 @@ public class JmhSetMultimapBenchmarks {
 
 		for (int i = size - 1; i >= 0; i--) {
 			if (usePrimitiveData) {
-				writer.put(data[i], data[i]);
+				writer.insert(data[i], data[i]);
 			} else {
-				writer.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
+				writer.insert(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
 			}
 		}
 
@@ -376,29 +388,29 @@ public class JmhSetMultimapBenchmarks {
 	// }
 
 	// @Benchmark
-	// public void timeContainsKeySingle(Blackhole bh) {
+	// public void timeMapLikeContainsKeySingle(Blackhole bh) {
 	// bh.consume(testMap.containsKey(VALUE_EXISTING));
 	// }
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeContainsKey(Blackhole bh) {
+	public void timeMapLikeContainsKey(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.containsKey(cachedNumbers[i]));
 		}
 	}
 
-	// @Benchmark /* Type=Int */
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeContainsKeyInt(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMapInt.containsKey(cachedNumbersInt[i]));
-		}
-	}
+//	// @Benchmark /* Type=Int */
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeMapLikeContainsKeyInt(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMapInt.containsKey(cachedNumbersInt[i]));
+//		}
+//	}
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeContainsKeyNotContained(Blackhole bh) {
+	public void timeMapLikeContainsKeyNotContained(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.containsKey(cachedNumbersNotContained[i]));
 		}
@@ -421,16 +433,15 @@ public class JmhSetMultimapBenchmarks {
 		}
 	}
 	
-	// @Benchmark
-	// public void timeIteration(Blackhole bh) {
-	// for (Iterator<JmhValue> iterator = testMap.iterator();
-	// iterator.hasNext();) {
-	// bh.consume(iterator.next());
-	// }
-	// }
+	@Benchmark
+	public void timeMapLikeKeyIteration(Blackhole bh) {
+		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
+			bh.consume(iterator.next());
+		}
+	}
 
 	@Benchmark
-	public void timeEntryIteration(Blackhole bh) {
+	public void timeMapLikeEntryIteration(Blackhole bh) {
 		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
 						.entryIterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
@@ -444,9 +455,25 @@ public class JmhSetMultimapBenchmarks {
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeInsert(Blackhole bh) {
+	public void timeMapLikePut(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
+		}
+	}
+
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeMapLikePutContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.put(cachedNumbers[i], cachedNumbers[i]));
+		}
+	}
+	
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeInsert(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.insert(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
 		}
 	}
 
@@ -462,25 +489,25 @@ public class JmhSetMultimapBenchmarks {
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeInsertContained(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.put(cachedNumbers[i], cachedNumbers[i]));
+			bh.consume(testMap.insert(cachedNumbers[i], cachedNumbers[i]));
 		}
 	}
 
-//	@Benchmark
-//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-//	public void timeRemoveKeyNotContained(Blackhole bh) {
-//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-//			bh.consume(testMap.removeKey(cachedNumbersNotContained[i]));
-//		}
-//	}
-//
-//	@Benchmark
-//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-//	public void timeRemoveKey(Blackhole bh) {
-//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-//			bh.consume(testMap.removeKey(cachedNumbers[i]));
-//		}
-//	}
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeMapLikeRemoveNotContained(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.remove(cachedNumbersNotContained[i]));
+		}
+	}
+
+	@Benchmark
+	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	public void timeMapLikeRemove(Blackhole bh) {
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.remove(cachedNumbers[i]));
+		}
+	}
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -499,17 +526,17 @@ public class JmhSetMultimapBenchmarks {
 	}
 	
 	@Benchmark
-	public void timeEqualsRealDuplicate(Blackhole bh) {
+	public void timeMapLikeEqualsRealDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapRealDuplicate));
 	}
 
-	@Benchmark
-	public void timeEqualsRealDuplicateModified(Blackhole bh) {
-		bh.consume(testMap.equals(testMapRealDuplicateSameSizeButDifferent));
-	}
+//	@Benchmark
+//	public void timeMapLikeEqualsRealDuplicateModified(Blackhole bh) {
+//		bh.consume(testMap.equals(testMapRealDuplicateSameSizeButDifferent));
+//	}
 
 	@Benchmark
-	public void timeEqualsDeltaDuplicate(Blackhole bh) {
+	public void timeMapLikeEqualsDeltaDuplicate(Blackhole bh) {
 		bh.consume(testMap.equals(testMapDeltaDuplicate));
 	}
 
@@ -530,7 +557,7 @@ public class JmhSetMultimapBenchmarks {
 		/*
 		 * /Users/Michael/Development/jku/mx2/graal/jvmci/jdk1.8.0_60/product/
 		 * bin/java -jvmci -jar ./target/benchmarks.jar
-		 * "JmhSetMultimapBenchmarks.timeContainsKey$" -p
+		 * "JmhSetMultimapBenchmarks.timeMapLikeContainsKey$" -p
 		 * valueFactoryFactory=VF_PDB_PERSISTENT_CURRENT,
 		 * VF_PDB_PERSISTENT_BLEEDING_EDGE -p producer=PDB_INTEGER -p
 		 * size=4194304 -jvm
@@ -541,7 +568,7 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeEntryIteration)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeMapLikeEqualsDeltaDuplicate.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
 						.param("dataType", "SET_MULTIMAP").param("run", "0")
@@ -550,13 +577,16 @@ public class JmhSetMultimapBenchmarks {
 //						.param("run", "3")
 //						.param("run", "4")
 						.param("producer", "PURE_INTEGER").param("sampleDataSelection", "MATCH")
-//						.param("size", "16")
-//						.param("size", "2048")
+						.param("size", "16")
+						.param("size", "2048")
 						.param("size", "1048576")
-						.param("valueFactoryFactory", "VF_CHAMP")
+//						.param("valueFactoryFactory", "VF_CHAMP")
 //						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
-						.param("valueFactoryFactory", "VF_CLOJURE")
-						.param("valueFactoryFactory", "VF_SCALA")
+//						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
+						.param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
+						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")						
+//						.param("valueFactoryFactory", "VF_CLOJURE")
+//						.param("valueFactoryFactory", "VF_SCALA")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();

@@ -17,14 +17,18 @@ import java.util.Map.Entry;
 
 public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue> 
 
-//	boolean isEmpty();
-//
-//	int size();
+	boolean isEmpty();
 
-	JmhSetMultimap put(JmhValue key, JmhValue value);	
+	int size();
+
+	JmhSetMultimap insert(JmhValue key, JmhValue value);	
 	
 	JmhSetMultimap remove(JmhValue key, JmhValue value);
 
+	JmhSetMultimap put(JmhValue key, JmhValue value);
+		
+	JmhSetMultimap remove(JmhValue key);	
+	
 	boolean containsKey(JmhValue key);
 	
 	boolean contains(JmhValue key, JmhValue value);
@@ -32,9 +36,9 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 //	JmhValue get(JmhValue key);
 //
 //	boolean containsValue(JmhValue value);
-//
-//	Iterator<JmhValue> iterator();
-//
+
+	Iterator<JmhValue> iterator();
+
 //	Iterator<JmhValue> valueIterator();
 
 	Iterator<Entry<JmhValue, JmhValue>> entryIterator();

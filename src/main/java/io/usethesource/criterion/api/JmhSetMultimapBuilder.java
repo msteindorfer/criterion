@@ -14,11 +14,11 @@ package io.usethesource.criterion.api;
 
 public interface JmhSetMultimapBuilder extends JmhBuilder {
 
-	default void put(int key, int value) {
+	default void insert(int key, int value) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
-	void put(JmhValue key, JmhValue value);
+	void insert(JmhValue key, JmhValue value);
 
 //	void putAll(JmhMap map);
 //

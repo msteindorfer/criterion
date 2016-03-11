@@ -26,15 +26,25 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 		this.content = content;
 	}
 
-	// @Override
-	// public boolean isEmpty() {
-	// return content.isEmpty();
-	// }
-	//
-	// @Override
-	// public int size() {
-	// return content.size();
-	// }
+	@Override
+	public boolean isEmpty() {
+		return content.isEmpty();
+	}
+
+	@Override
+	public int size() {
+		return content.size();
+	}
+
+	@Override
+	public JmhSetMultimap insert(JmhValue key, JmhValue value) {
+		return new ChampSetMultimap(content.__insert(key, value));
+	}
+
+	@Override
+	public JmhSetMultimap remove(JmhValue key, JmhValue value) {
+		return new ChampSetMultimap(content.__removeEntry(key, value));
+	}
 
 	@Override
 	public JmhSetMultimap put(JmhValue key, JmhValue value) {
@@ -42,10 +52,10 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 	}
 
 	@Override
-	public JmhSetMultimap remove(JmhValue key, JmhValue value) {
-		return new ChampSetMultimap(content.__remove(key, value));
+	public JmhSetMultimap remove(JmhValue key) {
+		return new ChampSetMultimap(content.__remove(key));
 	}
-
+	
 	@Override
 	public boolean containsKey(JmhValue key) {
 		return content.containsKey(key);
@@ -76,8 +86,8 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 		if (other instanceof ChampSetMultimap) {
 			ChampSetMultimap that = (ChampSetMultimap) other;
 
-			// if (this.size() != that.size())
-			// return false;
+			if (this.size() != that.size())
+				return false;
 
 			return content.equals(that.content);
 		}
@@ -85,11 +95,11 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 		return false;
 	}
 
-	// @Override
-	// public Iterator<JmhValue> iterator() {
-	// return content.keyIterator();
-	// }
-	//
+	@Override
+	public Iterator<JmhValue> iterator() {
+		return content.keyIterator();
+	}
+
 	// @Override
 	// public Iterator<JmhValue> valueIterator() {
 	// return content.valueIterator();

@@ -33,18 +33,18 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 		this.xs = xs;
 	}
 
-	// @Override
-	// public boolean isEmpty() {
-	// return size() == 0;
-	// }
-	//
-	// @Override
-	// public int size() {
-	// return xs.count();
-	// }
+	 @Override
+	 public boolean isEmpty() {
+	 return size() == 0;
+	 }
+	
+	 @Override
+	 public int size() {
+		 return xs.count(); // TODO: is unique keySet size instead of entrySet size 
+	 }
 
 	@Override
-	public JmhSetMultimap put(JmhValue key, JmhValue value) {
+	public JmhSetMultimap insert(JmhValue key, JmhValue value) {
 		Object singletonOrSet = xs.valAt(key);
 
 		if (singletonOrSet == null) {
@@ -60,6 +60,16 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 		}
 	}
 
+	@Override
+	public JmhSetMultimap put(JmhValue key, JmhValue value) {
+		return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
+	}
+	
+	@Override
+	public JmhSetMultimap remove(JmhValue key) {
+		return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+	}
+	
 	@Override
 	public JmhSetMultimap remove(JmhValue key, JmhValue value) {
 		Object singletonOrSet = xs.valAt(key);
@@ -137,18 +147,21 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 		if (other instanceof ClojureSetMultimap) {
 			ClojureSetMultimap that = (ClojureSetMultimap) other;
 
+			if (this.size() != that.size())
+				return false;
+			
 			return xs.equals(that.xs);
 		}
 
 		return false;
 	}
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public Iterator<JmhValue> iterator() {
-//		return ((APersistentMap) xs).keySet().iterator();
-//	}
-//
+	@SuppressWarnings("unchecked")
+	@Override
+	public Iterator<JmhValue> iterator() {
+		return ((APersistentMap) xs).keySet().iterator();
+	}
+
 //	@SuppressWarnings("unchecked")
 //	@Override
 //	public Iterator<JmhValue> valueIterator() {

@@ -31,7 +31,7 @@ class ClojureSetMultimapWriter implements JmhSetMultimapBuilder {
 	}
 
 	@Override
-	public void put(JmhValue key, JmhValue value) {
+	public void insert(JmhValue key, JmhValue value) {
 		Object singletonOrSet = builderMap.get(key);
 		
 		if (singletonOrSet == null) {

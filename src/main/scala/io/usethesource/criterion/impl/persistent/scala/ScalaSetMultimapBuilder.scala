@@ -23,7 +23,7 @@ sealed class ScalaSetMultimapBuilder extends JmhSetMultimapBuilder {
 
   var xs: ScalaSetMultimap = ScalaSetMultimap(ScalaSetMultimap.empty)
 
-  override def put(k: JmhValue, v: JmhValue) = { xs = xs.put(k, v) }
+  override def insert(k: JmhValue, v: JmhValue) = { xs = xs.insert(k, v) }
 
 //  override def putAll(other: JmhSetMultimap) = other match {
 //    case ScalaMap(ys) => xs ++= ys

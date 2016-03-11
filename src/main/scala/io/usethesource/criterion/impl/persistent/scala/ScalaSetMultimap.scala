@@ -24,11 +24,11 @@ import io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf
 
 case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
-  //	override def isEmpty = xs isEmpty
-  //
-  //	override def size = xs size
+	override def isEmpty = xs isEmpty
 
-  override def put(key: JmhValue, value: JmhValue): ScalaSetMultimap = {
+	override def size = xs size  // TODO: is unique keySet size instead of entrySet size
+
+  override def insert(key: JmhValue, value: JmhValue): ScalaSetMultimap = {
     xs.get(key) match {
       case None =>
         val set = makeSet
@@ -36,12 +36,20 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
       case Some(set) =>
         return ScalaSetMultimap(xs.updated(key, set + value))
     }
-    this
   }
 
+	override def put(key: JmhValue, value: JmhValue): ScalaSetMultimap = {
+		val set = makeSet
+		return ScalaSetMultimap(xs.updated(key, set + value))
+	}
+
+	override def remove(key: JmhValue): ScalaSetMultimap = {
+		return ScalaSetMultimap(xs - key)
+	}
+  
   override def remove(key: JmhValue, value: JmhValue): ScalaSetMultimap = {
     xs.get(key) match {
-      case None =>
+      case None => return this
       case Some(set) =>
         val newSet = set - value
         if (newSet.isEmpty)
@@ -49,7 +57,6 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
         else
           return ScalaSetMultimap(xs.updated(key, newSet))
     }
-    this
   }
 
   override def containsKey(k: JmhValue) = xs contains k
@@ -61,9 +68,9 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 //	override def containsValue(v: JmhValue) = xs exists {
 //		case (_, cv) => v == cv
 //	}
-//
-//	override def iterator = xs.keys iterator
-//
+
+	override def iterator = xs.keys iterator
+
 //	override def valueIterator = xs.values iterator
 
 	override def entryIterator: java.util.Iterator[java.util.Map.Entry[JmhValue, JmhValue]] = {
@@ -74,7 +81,7 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
 
 	override def equals(that: Any): Boolean = that match {
-		case other: ScalaSetMultimap => this.xs equals other.xs
+		case other: ScalaSetMultimap => (this.xs.size == other.xs.size) && (this.xs equals other.xs)
 		case _ => false
 	}
 

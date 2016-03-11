@@ -15,9 +15,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 import io.usethesource.capsule.TrieMap_5Bits;
+import io.usethesource.capsule.TrieMap_5Bits_AsSetMultimap;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.TrieSetMultimap_ChampBasedPrototype;
+import io.usethesource.capsule.TrieSetMultimap_HCHAMP;
 import io.usethesource.capsule.TrieSet_5Bits;
 import io.usethesource.capsule.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.criterion.api.JmhValueFactory;
@@ -38,7 +41,7 @@ public class BenchmarkUtils {
 			@Override
 			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-								TrieSet_5Bits.class, TrieMap_5Bits.class);
+								TrieSet_5Bits.class, TrieMap_5Bits.class, TrieSetMultimap_HCHAMP.class);
 			}
 		},
 		VF_CHAMP_MEMOIZED {
@@ -46,7 +49,8 @@ public class BenchmarkUtils {
 			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
 								TrieSet_5Bits_Memoized_LazyHashCode.class,
-								TrieMap_5Bits_Memoized_LazyHashCode.class);
+								TrieMap_5Bits_Memoized_LazyHashCode.class,
+								TrieSetMultimap_HCHAMP.class);
 			}
 		},
 		VF_CHAMP_HETEROGENEOUS {
@@ -54,7 +58,29 @@ public class BenchmarkUtils {
 			public JmhValueFactory getInstance() {
 				// TODO: replace set implementation with heterogeneous set implementation
 				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-								TrieSet_5Bits.class, TrieMap_5Bits_Heterogeneous_BleedingEdge.class);
+								TrieSet_5Bits.class, TrieMap_5Bits_Heterogeneous_BleedingEdge.class,
+								TrieSetMultimap_HCHAMP.class);
+			}
+		},
+		VF_CHAMP_MAP_AS_MULTIMAP {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieMap_5Bits_AsSetMultimap.class);
+			}
+		},		
+		VF_CHAMP_MULTIMAP_PROTOTYPE_OLD {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_ChampBasedPrototype.class);
+			}
+		},
+		VF_CHAMP_MULTIMAP_HCHAMP {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_HCHAMP.class);
 			}
 		};
 
