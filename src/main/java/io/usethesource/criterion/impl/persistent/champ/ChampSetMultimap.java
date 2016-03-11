@@ -109,5 +109,10 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
 		return content.entryIterator();
 	}
+	
+	@Override
+	public Iterator<Entry<JmhValue, Object>> nativeEntryIterator() {
+		return content.nativeEntryIterator();
+	}
 
 }

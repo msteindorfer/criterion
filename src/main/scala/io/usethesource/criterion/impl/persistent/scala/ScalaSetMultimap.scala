@@ -79,6 +79,9 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 	  new FlatteningIterator(mapAsJavaMap(xs).entrySet.iterator)  
   }
 
+  	override def nativeEntryIterator: java.util.Iterator[java.util.Map.Entry[JmhValue, Object]] = {
+		mapAsJavaMap(xs).entrySet.iterator.asInstanceOf[java.util.Iterator[java.util.Map.Entry[JmhValue, Object]]]
+  	}
 
 	override def equals(that: Any): Boolean = that match {
 		case other: ScalaSetMultimap => (this.xs.size == other.xs.size) && (this.xs equals other.xs)

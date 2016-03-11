@@ -170,6 +170,12 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	public Iterator<Entry<JmhValue, Object>> nativeEntryIterator() {
+		return ((APersistentMap) xs).entrySet().iterator(); 
+	}	
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
 		Iterator<Entry<JmhValue, Object>> it = ((APersistentMap) xs).entrySet().iterator();
 		return new FlatteningIterator(it);

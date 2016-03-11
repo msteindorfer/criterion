@@ -441,13 +441,21 @@ public class JmhSetMultimapBenchmarks {
 	}
 
 	@Benchmark
-	public void timeMapLikeEntryIteration(Blackhole bh) {
-		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
-						.entryIterator(); iterator.hasNext();) {
+	public void timeMapLikeNativeEntryIteration(Blackhole bh) {
+		for (Iterator<java.util.Map.Entry<JmhValue, Object>> iterator = testMap
+						.nativeEntryIterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
 		}
 	}
 
+	@Benchmark
+	public void timeFlattenedEntryIteration(Blackhole bh) {
+		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
+						.entryIterator(); iterator.hasNext();) {
+			bh.consume(iterator.next());
+		}
+	}	
+	
 	// @Benchmark
 	// public void timeInsertSingle(Blackhole bh) {
 	// bh.consume(testMap.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING));
@@ -568,7 +576,7 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeMapLikeEqualsDeltaDuplicate.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeMapLikeNativeEntryIteration.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
 						.param("dataType", "SET_MULTIMAP").param("run", "0")
@@ -585,8 +593,8 @@ public class JmhSetMultimapBenchmarks {
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
 						.param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
 						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")						
-//						.param("valueFactoryFactory", "VF_CLOJURE")
-//						.param("valueFactoryFactory", "VF_SCALA")
+						.param("valueFactoryFactory", "VF_SCALA")
+						.param("valueFactoryFactory", "VF_CLOJURE")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();
