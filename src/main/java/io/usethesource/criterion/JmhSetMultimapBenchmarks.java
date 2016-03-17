@@ -434,14 +434,14 @@ public class JmhSetMultimapBenchmarks {
 	}
 	
 	@Benchmark
-	public void timeMapLikeKeyIteration(Blackhole bh) {
+	public void timeMapLikeIterationKey(Blackhole bh) {
 		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
 		}
 	}
 
 	@Benchmark
-	public void timeMapLikeNativeEntryIteration(Blackhole bh) {
+	public void timeMapLikeIterationNativeEntry(Blackhole bh) {
 		for (Iterator<java.util.Map.Entry<JmhValue, Object>> iterator = testMap
 						.nativeEntryIterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
@@ -449,14 +449,14 @@ public class JmhSetMultimapBenchmarks {
 	}
 
 	@Benchmark
-	public void timeMultimapLikeKeyIteration(Blackhole bh) {
+	public void timeMultimapLikeIterationKey(Blackhole bh) {
 		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
 		}
 	}
 	
 	@Benchmark
-	public void timeMultimapLikeFlattenedEntryIteration(Blackhole bh) {
+	public void timeMultimapLikeIterationFlattenedEntry(Blackhole bh) {
 		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
 						.entryIterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
@@ -593,7 +593,7 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeMultimapLikeRemoveTuple)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeMultimapLike.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(1)
 						.param("dataType", "SET_MULTIMAP").param("run", "0")
@@ -610,9 +610,10 @@ public class JmhSetMultimapBenchmarks {
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
 //						.param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
-						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")												
-						.param("valueFactoryFactory", "VF_SCALA")
-						.param("valueFactoryFactory", "VF_CLOJURE")
+						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
+						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")						
+//						.param("valueFactoryFactory", "VF_SCALA")
+//						.param("valueFactoryFactory", "VF_CLOJURE")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();
