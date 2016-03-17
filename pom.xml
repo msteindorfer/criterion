@@ -117,7 +117,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jmh.version>1.11</jmh.version>
+		<jmh.version>1.11-SNAPSHOT</jmh.version>
 		<gs-collections.version>7.0.1</gs-collections.version>
 	</properties>
 
