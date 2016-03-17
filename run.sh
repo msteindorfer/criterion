@@ -5,7 +5,7 @@ mkdir -p target/results
 mkdir -p target/result-logs
 
 # export VALUE_FACTORY_FACTORY="VF_CHAMP,VF_CHAMP_MEMOIZED,VF_SCALA,VF_CLOJURE"
-export VALUE_FACTORY_FACTORY="VF_CHAMP_MULTIMAP_HHAMT" ### VF_CHAMP_MAP_AS_MULTIMAP,VF_CHAMP_MULTIMAP_HCHAMP ### VF_SCALA,VF_CLOJURE
+export VALUE_FACTORY_FACTORY="VF_CHAMP_MULTIMAP_HHAMT,VF_SCALA,VF_CLOJURE" ### VF_CHAMP_MAP_AS_MULTIMAP,VF_CHAMP_MULTIMAP_HCHAMP,VF_CHAMP_MULTIMAP_HHAMT ### VF_SCALA,VF_CLOJURE
 
 # Old settings
 # export PERF_EVENTS="L1-DCACHE-LOADS,L1-DCACHE-LOAD-MISSES,L2_RQSTS:0x03,L2_RQSTS:0x01,LLC_REFERENCES,LLC_MISSES,MEM_LOAD_RETIRED:0x10"
@@ -23,6 +23,7 @@ export PACKAGE="io.usethesource.criterion"
 export SET_BENCHMARKS="$PACKAGE.JmhSetBenchmarks.(timeContainsKey|timeContainsKeyNotContained|timeInsert|timeInsertContained|timeRemoveKey|timeRemoveKeyNotContained|timeIteration|timeEqualsRealDuplicate|timeEqualsDeltaDuplicate)$"
 export MAP_BENCHMARKS="$PACKAGE.JmhMapBenchmarks.(timeContainsKey|timeContainsKeyNotContained|timeInsert|timeInsertContained|timeRemoveKey|timeRemoveKeyNotContained|timeIteration|timeEntryIteration|timeEqualsRealDuplicate|timeEqualsDeltaDuplicate)$"
 export MAP_VS_SETMULTIMAP_BENCHMARKS="$PACKAGE.JmhSetMultimapBenchmarks.(timeMapLike.*)$"
+export SETMULTIMAP_BENCHMARKS="$PACKAGE.JmhSetMultimapBenchmarks.(timeMultimapLike.*)$"
 
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SET_BENCHMARKS $AGGREGATED_SETTINGS -p run=0 -rff ./target/results/results.JmhSetBenchmarks.run0.log # 1>./target/result-logs/results.std-console.JmhSetBenchmarks.run0.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.run0.log
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SET_BENCHMARKS $AGGREGATED_SETTINGS -p run=1 -rff ./target/results/results.JmhSetBenchmarks.run1.log # 1>./target/result-logs/results.std-console.JmhSetBenchmarks.run1.log 2>./target/result-logs/results.err-console.JmhSetBenchmarks.run1.log
@@ -36,11 +37,17 @@ export MAP_VS_SETMULTIMAP_BENCHMARKS="$PACKAGE.JmhSetMultimapBenchmarks.(timeMap
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=3 -rff ./target/results/results.JmhMapBenchmarks.run3.log # 1>./target/result-logs/results.std-console.JmhMapBenchmarks.run3.log 2>./target/result-logs/results.err-console.JmhMapBenchmarks.run3.log
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=4 -rff ./target/results/results.JmhMapBenchmarks.run4.log # 1>./target/result-logs/results.std-console.JmhMapBenchmarks.run4.log 2>./target/result-logs/results.err-console.JmhMapBenchmarks.run4.log
 
-LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=2 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run2.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run2.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run2.log
-LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=3 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run3.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run3.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run3.log
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=0 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run0.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run0.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run0.log
+# LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=2 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run2.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run2.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run2.log
+# LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=3 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run3.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run3.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run3.log
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=1 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run1.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run1.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run1.log
 # LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $MAP_VS_SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=4 -rff ./target/results/results.JmhMapVsSetMultimapBenchmarks.run4.log 1>./target/result-logs/results.std-console.JmhMapVsSetMultimapBenchmarks.run4.log 2>./target/result-logs/results.err-console.JmhMapVsSetMultimapBenchmarks.run4.log
+
+LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=0 -rff ./target/results/results.JmhSetMultimapBenchmarks.run0.log 1>./target/result-logs/results.std-console.JmhSetMultimapBenchmarks.run0.log 2>./target/result-logs/results.err-console.JmhSetMultimapBenchmarks.run0.log
+LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=1 -rff ./target/results/results.JmhSetMultimapBenchmarks.run1.log 1>./target/result-logs/results.std-console.JmhSetMultimapBenchmarks.run1.log 2>./target/result-logs/results.err-console.JmhSetMultimapBenchmarks.run1.log
+LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=2 -rff ./target/results/results.JmhSetMultimapBenchmarks.run2.log 1>./target/result-logs/results.std-console.JmhSetMultimapBenchmarks.run2.log 2>./target/result-logs/results.err-console.JmhSetMultimapBenchmarks.run2.log
+LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=3 -rff ./target/results/results.JmhSetMultimapBenchmarks.run3.log 1>./target/result-logs/results.std-console.JmhSetMultimapBenchmarks.run3.log 2>./target/result-logs/results.err-console.JmhSetMultimapBenchmarks.run3.log
+LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar $SETMULTIMAP_BENCHMARKS $AGGREGATED_SETTINGS -p run=4 -rff ./target/results/results.JmhSetMultimapBenchmarks.run4.log 1>./target/result-logs/results.std-console.JmhSetMultimapBenchmarks.run4.log 2>./target/result-logs/results.err-console.JmhSetMultimapBenchmarks.run4.log
 ######
 
 TIMESTAMP=`date +"%Y%m%d_%H%M"`
