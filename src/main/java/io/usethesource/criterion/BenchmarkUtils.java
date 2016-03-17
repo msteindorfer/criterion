@@ -21,6 +21,7 @@ import io.usethesource.capsule.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieSetMultimap_ChampBasedPrototype;
 import io.usethesource.capsule.TrieSetMultimap_HCHAMP;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT;
 import io.usethesource.capsule.TrieSet_5Bits;
 import io.usethesource.capsule.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.criterion.api.JmhValueFactory;
@@ -81,6 +82,13 @@ public class BenchmarkUtils {
 			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
 								null, TrieSetMultimap_HCHAMP.class);
+			}
+		},
+		VF_CHAMP_MULTIMAP_HHAMT {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_HHAMT.class);
 			}
 		};
 

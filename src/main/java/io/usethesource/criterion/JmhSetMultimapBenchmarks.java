@@ -418,7 +418,7 @@ public class JmhSetMultimapBenchmarks {
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeContainsTuple(Blackhole bh) {
+	public void timeMultimapLikeContainsTuple(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.contains(cachedNumbers[i], cachedNumbers[i]));
 		}
@@ -426,7 +426,7 @@ public class JmhSetMultimapBenchmarks {
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeContainsTupleNotContained(Blackhole bh) {
+	public void timeMultimapLikeContainsTupleNotContained(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.contains(cachedNumbersNotContained[i],
 							cachedNumbersNotContained[i]));
@@ -449,7 +449,14 @@ public class JmhSetMultimapBenchmarks {
 	}
 
 	@Benchmark
-	public void timeFlattenedEntryIteration(Blackhole bh) {
+	public void timeMultimapLikeKeyIteration(Blackhole bh) {
+		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
+			bh.consume(iterator.next());
+		}
+	}
+	
+	@Benchmark
+	public void timeMultimapLikeFlattenedEntryIteration(Blackhole bh) {
 		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
 						.entryIterator(); iterator.hasNext();) {
 			bh.consume(iterator.next());
@@ -479,7 +486,7 @@ public class JmhSetMultimapBenchmarks {
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeInsert(Blackhole bh) {
+	public void timeMultimapLikeInsertTuple(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.insert(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
 		}
@@ -495,7 +502,7 @@ public class JmhSetMultimapBenchmarks {
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeInsertContained(Blackhole bh) {
+	public void timeMultimapLikeInsertTupleContained(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.insert(cachedNumbers[i], cachedNumbers[i]));
 		}
@@ -519,7 +526,7 @@ public class JmhSetMultimapBenchmarks {
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeRemoveTuple(Blackhole bh) {
+	public void timeMultimapLikeRemoveTuple(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.remove(cachedNumbers[i], cachedNumbers[i]));
 		}
@@ -527,10 +534,20 @@ public class JmhSetMultimapBenchmarks {
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeRemoveTupleNotContained(Blackhole bh) {
+	public void timeMultimapLikeRemoveTupleNotContained(Blackhole bh) {
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.remove(cachedNumbersNotContained[i], cachedNumbersNotContained[i]));
 		}
+	}
+	
+	@Benchmark
+	public void timeMultimapLikeEqualsRealDuplicate(Blackhole bh) {
+		bh.consume(testMap.equals(testMapRealDuplicate));
+	}
+
+	@Benchmark
+	public void timeMultimapLikeEqualsDeltaDuplicate(Blackhole bh) {
+		bh.consume(testMap.equals(testMapDeltaDuplicate));
 	}
 	
 	@Benchmark
@@ -576,23 +593,24 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeMapLikeNativeEntryIteration.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeMultimapLikeRemoveTuple)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
-						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
+						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(1)
 						.param("dataType", "SET_MULTIMAP").param("run", "0")
 //						.param("run", "1")
 //						.param("run", "2")
 //						.param("run", "3")
 //						.param("run", "4")
 						.param("producer", "PURE_INTEGER").param("sampleDataSelection", "MATCH")
-						.param("size", "16")
-						.param("size", "2048")
+//						.param("size", "16")
+//						.param("size", "2048")
 						.param("size", "1048576")
 //						.param("valueFactoryFactory", "VF_CHAMP")
 //						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
-						.param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
-						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")						
+//						.param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
+//						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
+						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")												
 						.param("valueFactoryFactory", "VF_SCALA")
 						.param("valueFactoryFactory", "VF_CLOJURE")
 						// .resultFormat(ResultFormatType.CSV)
