@@ -16,7 +16,7 @@ export VALUE_FACTORY_FACTORY="VF_CHAMP_MULTIMAP_HHAMT,VF_CHAMP_MULTIMAP_HHAMT_SP
 # export COMMON_SETTINGS="-wi 0 -i 200 -r 10 -f 1 -t 1 -p run=0 -p sampleDataSelection=MATCH -gc true -rf csv -v EXTRA -foe true -bm ss"
 
 ######
-export AGGREGATED_SETTINGS="-jvmArgsPrepend -Xms8g -jvmArgsPrepend -Xmx8g -wi 10 -i 20 -f 1 -r 1 -gc true -rf csv -v NORMAL -foe true -bm avgt -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -p sampleDataSelection=MATCH -p producer=PDB_INTEGER"
+export AGGREGATED_SETTINGS="-jvmArgsPrepend -Xms8g -jvmArgsPrepend -Xmx8g -wi 20 -i 20 -f 1 -r 1 -gc true -rf csv -v NORMAL -foe true -bm avgt -p valueFactoryFactory=$VALUE_FACTORY_FACTORY -p sampleDataSelection=MATCH -p producer=PDB_INTEGER"
 
 export PACKAGE="io.usethesource.criterion"
 
