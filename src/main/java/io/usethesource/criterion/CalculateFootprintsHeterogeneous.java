@@ -32,23 +32,48 @@ import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.TrieMap_5Bits;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
+import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.FootprintUtils.Archetype;
-import io.usethesource.criterion.api.JmhValue;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+
 public final class CalculateFootprintsHeterogeneous {
 
-	private static int multimapValueCount = 1;
+	static final String memoryArchitecture;
+	
+	static {
+		/*
+		 * http://stackoverflow.com/questions/1518213/read-java-jvm-startup-
+		 * parameters-eg-xmx
+		 */
+		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+		List<String> args = bean.getInputArguments();
+
+		if (args.contains("-XX:-UseCompressedOops")) {
+			memoryArchitecture = "64bit";
+		} else {
+			memoryArchitecture = "32bit";
+		}
+	}
+	
+	private static int multimapValueSize = 2;
+	
+	private static int stepSizeOneToOneSelector = 2;
 	
 	public static void main(String[] args) {
-		testOneConfiguration(2097152);
+//		testOneConfiguration(2097152);
 		
 		String userHome = System.getProperty("user.home");
 		String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
 		boolean appendToFile = true;
+
+//		FootprintUtils.createExponentialRange(10, 11).stream().flatMap(size -> testOneConfiguration(size).stream())
+//				.collect(Collectors.toList());
 		
-		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential.csv"), appendToFile,
+		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
 				FootprintUtils.createExponentialRange(0, 24).stream()
 						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 
@@ -122,9 +147,10 @@ public final class CalculateFootprintsHeterogeneous {
 		System.out.println();
 
 		EnumSet<MemoryFootprintPreset> presets = EnumSet.of(
-				// MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD
-				// ,
-				MemoryFootprintPreset.RETAINED_SIZE);
+				 MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD
+//				 ,
+//				MemoryFootprintPreset.RETAINED_SIZE
+				 );
 
 		// for (MemoryFootprintPreset preset : presets) {
 		//// createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true);
@@ -138,8 +164,28 @@ public final class CalculateFootprintsHeterogeneous {
 
 		return presets.stream()
 				.flatMap(preset -> Arrays.stream(new String[] { 
+						/* Map<K, V> vs Multimap<K, V> */
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, data, size,
+								0, preset),						
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, data, size,
+								0, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, data, size,
+								0, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, data,
+								size, 0, preset),
+						
+//						/* Multimap<K, V> */
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, data, size,
+//								multimapValueSize, stepSizeOneToOneSelector, 0, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, data,
+//								size, multimapValueSize, stepSizeOneToOneSelector, 0, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, data, size, multimapValueSize, stepSizeOneToOneSelector, 0,
+//								preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, data, size, multimapValueSize, stepSizeOneToOneSelector, 
+//								0, preset),						
+						
 						/* Map[int, int] */
-						createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset)
+//						, createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset)
 //						, createAndMeasureMahoutMutableIntIntHashMap(data, size, 0, preset)
 //						, createAndMeasureGsImmutableIntIntMap(data, size, 0, preset)
 						
@@ -174,7 +220,7 @@ public final class CalculateFootprintsHeterogeneous {
 		com.gs.collections.api.multimap.set.MutableSetMultimap<Integer, Integer> mutableYs = com.gs.collections.impl.factory.Multimaps.mutable.set.with();
 		
 		for (Object o : data) {
-			for(int i = 0; i < multimapValueCount; i++) {				
+			for(int i = 0; i < multimapValueSize; i++) {				
 				mutableYs.put((Integer) o, (Integer) i);
 			}			
 		}
@@ -190,7 +236,7 @@ public final class CalculateFootprintsHeterogeneous {
 		it.unimi.dsi.fastutil.ints.AbstractInt2IntMap mutableYs = new Int2IntOpenHashMap();
 		
 		for (Object o : data) {
-			for(int i = 0; i < multimapValueCount; i++) {				
+			for(int i = 0; i < multimapValueSize; i++) {				
 				mutableYs.put((Integer) o, (Integer) i);
 			}			
 		}
@@ -203,7 +249,7 @@ public final class CalculateFootprintsHeterogeneous {
 		org.apache.mahout.math.map.AbstractIntIntMap mutableYs = new OpenIntIntHashMap();
 		
 		for (Object o : data) {
-			for(int i = 0; i < multimapValueCount; i++) {				
+			for(int i = 0; i < multimapValueSize; i++) {				
 				mutableYs.put((Integer) o, (Integer) i);
 			}			
 		}
@@ -216,7 +262,7 @@ public final class CalculateFootprintsHeterogeneous {
 		com.gs.collections.api.map.primitive.MutableIntIntMap mutableYs = new IntIntHashMap();
 		
 		for (Object o : data) {
-			for(int i = 0; i < multimapValueCount; i++) {				
+			for(int i = 0; i < multimapValueSize; i++) {				
 				mutableYs.put((Integer) o, (Integer) i);
 			}			
 		}
@@ -231,7 +277,7 @@ public final class CalculateFootprintsHeterogeneous {
 		com.google.common.collect.ImmutableSetMultimap.Builder<Integer, Integer> ysBldr = com.google.common.collect.ImmutableSetMultimap.builder();
 		
 		for (Object o : data) {
-			for (int i = 0; i < multimapValueCount; i++) { 
+			for (int i = 0; i < multimapValueSize; i++) { 
 				ysBldr.put((Integer) o, (Integer) i);
 			}
 		}
@@ -240,6 +286,41 @@ public final class CalculateFootprintsHeterogeneous {
 		
 		return measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.SET_MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
 	}
+
+	public static String createAndMeasureTrieMap(ValueFactoryFactory valueFactoryFactory, final Object[] data, int elementCount, int run, MemoryFootprintPreset preset) {
+		try {
+			final int fixedMultimapValueSize = 1;
+			final int fixedStepSizeOneToOneSelector = 1;
+			
+			final Object setMultimapInstance = JmhSetMultimapBenchmarks.generateSetMultimap(
+					valueFactoryFactory.getInstance(), ElementProducer.PDB_INTEGER, false, elementCount,
+					fixedMultimapValueSize, fixedStepSizeOneToOneSelector, run);
+
+			return measureAndReport(setMultimapInstance, valueFactoryFactory.name(), DataType.MAP,
+					Archetype.PERSISTENT, false, elementCount, run, preset);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "ERROR";
+	}	
+		
+	public static String createAndMeasureTrieSetMultimap(ValueFactoryFactory valueFactoryFactory, final Object[] data,
+			int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
+			MemoryFootprintPreset preset) {
+		try {
+			final Object setMultimapInstance = JmhSetMultimapBenchmarks.generateSetMultimap(
+					valueFactoryFactory.getInstance(), ElementProducer.PDB_INTEGER, false, elementCount,
+					multimapValueSize, stepSizeOneToOneSelector, run);
+
+			return measureAndReport(setMultimapInstance, valueFactoryFactory.name(), DataType.SET_MULTIMAP,
+					Archetype.PERSISTENT, false, elementCount, run, preset);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "ERROR";
+	}	
 	
 	public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount, int run,
 			MemoryFootprintPreset preset) {
@@ -376,10 +457,13 @@ public final class CalculateFootprintsHeterogeneous {
 
 		switch (preset) {
 		case DATA_STRUCTURE_OVERHEAD:
-			predicate = Predicates
-					.not(Predicates.or(Predicates.instanceOf(Integer.class), Predicates.instanceOf(BigInteger.class),
-							Predicates.instanceOf(JmhValue.class), Predicates.instanceOf(PureInteger.class)));
-			break;
+			// TODO: create JmhLeaf
+//			predicate = Predicates
+//					.not(Predicates.or(Predicates.instanceOf(Integer.class), Predicates.instanceOf(BigInteger.class),
+//							Predicates.instanceOf(JmhValue.class), Predicates.instanceOf(PureInteger.class)));
+			predicate = Predicates.not(Predicates.or(Predicates.instanceOf(PureInteger.class),
+					Predicates.instanceOf(PureIntegerWithCustomHashCode.class)));
+			break; 
 		case RETAINED_SIZE:
 			predicate = Predicates.alwaysTrue();
 			break;

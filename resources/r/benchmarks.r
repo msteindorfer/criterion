@@ -6,11 +6,18 @@ args <- commandArgs(TRUE)
 # setwd(args[1])
 # dataDirectory <- args[2]
 # timestamp <- args[3]
+# timestampMemoryMeasurement <- args[3]
 
-setwd("~/Development/jmh-dscg-benchmarks/resources/r")
-dataDirectory <- "~/Development/jmh-dscg-benchmarks"
-timestamp <- "20150817_0732"
+setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
+dataDirectory <- "~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data"
+timestamp <- "20160318_1204"
 timestampMemoryMeasurement <- "latest"
+
+# data map:
+# results.all-20160318_1204
+
+# data multimap:
+# results.all-20160318_1002
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
 cran_rstudio_repo="http://cran.rstudio.com/"
@@ -48,11 +55,11 @@ loadMemoryFootprintData <- function() {
   ###
   # Load 32-bit and 64-bit data and combine them.
   ##
-  dss32_fileName <- paste(paste(dataDirectory, paste("map-sizes-and-statistics", "32bit", timestampMemoryMeasurement, sep="-"), sep="/"), "csv", sep=".")
+  dss32_fileName <- paste(paste(dataDirectory, paste("map_sizes_heterogeneous_exponential", "32bit", timestampMemoryMeasurement, sep="_"), sep="/"), "csv", sep=".")
   dss32_stats <- read.csv(dss32_fileName, sep=",", header=TRUE)
   dss32_stats <- within(dss32_stats, arch <- factor(32))
   #
-  dss64_fileName <- paste(paste(dataDirectory, paste("map-sizes-and-statistics", "64bit", timestampMemoryMeasurement, sep="-"), sep="/"), "csv", sep=".")
+  dss64_fileName <- paste(paste(dataDirectory, paste("map_sizes_heterogeneous_exponential", "64bit", timestampMemoryMeasurement, sep="_"), sep="/"), "csv", sep=".")
   dss64_stats <- read.csv(dss64_fileName, sep=",", header=TRUE)
   dss64_stats <- within(dss64_stats, arch <- factor(64))
   #
@@ -365,8 +372,32 @@ calculateMemoryFootprintSummary <- function(inputData) {
 orderedBenchmarkNames <- function(dataType) {
   candidates <- c("ContainsKey", "ContainsKeyNotContained", "Insert", "InsertContained", "RemoveKey", "RemoveKeyNotContained", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "Footprint32", "Footprint64")
   
-  if (dataType == "MAP") {
-    candidates
+  if (dataType == "SET_MULTIMAP") {
+    c("MultimapLikeContainsTuple", 
+      "MultimapLikeContainsTupleNotContained", 
+      "MultimapLikeInsertTuple", 
+      "MultimapLikeInsertTupleContained", 
+      "MultimapLikeRemoveTuple", 
+      "MultimapLikeRemoveTupleNotContained", 
+      "MultimapLikeIterationKey", 
+      "MultimapLikeIterationFlattenedEntry", 
+#       "MultimapLikeEqualsRealDuplicate", 
+#       "MultimapLikeEqualsDeltaDuplicate", 
+      "Footprint32", 
+      "Footprint64")
+  } else if (dataType == "MAP") {
+    c("MapLikeContainsKey",
+      "MapLikeContainsKeyNotContained",
+      "MapLikePut",
+      "MapLikePutContained",
+      "MapLikeRemove",
+      "MapLikeRemoveNotContained",
+      "MapLikeIterationKey",
+      "MapLikeIterationNativeEntry",
+      "MapLikeEqualsRealDuplicate",
+      "MapLikeEqualsDeltaDuplicate",
+      "Footprint32",
+      "Footprint64")
   } else {
     candidates[candidates != "EntryIteration"]
   }
@@ -375,14 +406,40 @@ orderedBenchmarkNames <- function(dataType) {
 orderedBenchmarkNamesForBoxplot <- function(dataType) {
   candidates <- c("Lookup\n", "Lookup\n(Fail)", "Insert\n", "Insert\n(Fail)", "Delete\n", "Delete\n(Fail)", "Iteration\n(Key)", "Iteration\n(Entry)", "Equality\n(Distinct)", "Equality\n(Derived)", "Footprint\n(32-bit)", "Footprint\n(64-bit)")
   
-  if (dataType == "MAP") {
-    candidates
-  } else {
+  candidates <- c("Iter. (Key)", "Iter. (Entry)")
+  candidates <- c("Eq. (Distinct)", "Eq. (Derived)")
+    
+  if (dataType == "SET_MULTIMAP") {
+    c("Lookup\n", 
+      "Lookup\n(Fail)", 
+      "Insert\n", 
+      "Insert\n(Fail)", 
+      "Delete\n", 
+      "Delete\n(Fail)", 
+      "Iteration\n(Key)", 
+      "Iteration\n(Entry)", 
+#       "Equality\n(Distinct)", 
+#       "Equality\n(Derived)", 
+      "Footprint\n(32-bit)", 
+      "Footprint\n(64-bit)")
+  } else if (dataType == "MAP") {
+    c("Lookup\n", 
+      "Lookup\n(Fail)", 
+      "Insert\n", 
+      "Insert\n(Fail)", 
+      "Delete\n", 
+      "Delete\n(Fail)", 
+      "Iteration\n(Key)", 
+      "Iteration\n(Entry)", 
+      "Equality\n(Distinct)", 
+      "Equality\n(Derived)", 
+      "Footprint\n(32-bit)", 
+      "Footprint\n(64-bit)")  } else {
     candidates[candidates != "Iteration\n(Entry)"]
   }
 }
 
-createTable <- function(input, dataType, dataStructureCandidate, dataStructureBaseline, dataFormatter, compare, nameAppendix, includeMemory = F) {
+createTable <- function(input, dataType, dataStructureCandidate, dataStructureBaseline, dataFormatter, compare, boxplotFunction, nameAppendix, includeMemory = F) {
   lowerBoundExclusive <- 1
   filteredInput <- input[input$Param_dataType == dataType & input$variable == "Score" & input$Param_size > lowerBoundExclusive,]
 
@@ -444,17 +501,18 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
   outputFolder <- "./tables-latex/tables"
   
   fileNameSummary <- paste(outputFolder, paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, "summary", sep="-"), "tex", sep="."), sep="/")
-  write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  #write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_summary_fmt), file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
   fileName <- paste(outputFolder, paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, sep="-"), "tex", sep="."), sep="/")
-  write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  #write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 
-  createBoxplot(tableAll, dataType, baselineAndOtherPairName);
+  # createBoxplot(tableAll, dataType, baselineAndOtherPairName, nameAppendix);
+  boxplotFunction(tableAll, dataType, baselineAndOtherPairName, nameAppendix);
 }
 
-createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
+createBoxplotPercentages <- function(tableAll, dataType, baselineAndOtherPairName, nameAppendix) {
 
 #   options( tikzLatexPackages = c(
 #     "\\usepackage{tikz}",
@@ -481,7 +539,7 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   ###
   # Create boxplots as well
   ##
-  outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", sep="-"), "pdf", sep=".")
+  outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
   fontScalingFactor <- 0.6
 
   pdf(outFileName, family = "Times", width = 7, height = 1.65)
@@ -516,7 +574,87 @@ createBoxplot <- function(tableAll, dataType, baselineAndOtherPairName) {
   embed_fonts(outFileName)
 }
 
+createBoxplotSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, nameAppendix) {
+  
+  ###
+  # Create boxplots as well
+  ##
+  outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
+  fontScalingFactor <- 0.6
+  
+  pdf(outFileName, family = "Times", width = 7, height = 2)
+  #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
+  
+  selection <- tableAll[2:NCOL(tableAll)]
+  names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
+  
+  par(mar = c(1.6,2.3,0,0) + 0.15) # c(bottom, left, top, right)
+  par(mgp=c(1.8, 0.425, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  
+  par(tck = -0.025)
+  boxplot(selection, ylim=range(-1.5, 4.5), yaxt="n", las=0, ylab="Regression or Improvement (Factor)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
+          cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  
+  z  <- c(-1, 0, 1, 2, 3, 4)
+  zz <- c("2x", "neutral", "2x", "3x", "4x", "5x")
 
+  #zz <- c("\\SI{-80}{\\percent}", "\\SI{-60}{\\percent}", "\\SI{-40}{\\percent}", "\\SI{-20}{\\percent}", "\\SI{0}{\\percent}", "\\SI{20}{\\percent}", "\\SI{40}{\\percent}", "\\SI{60}{\\percent}", "\\SI{80}{\\percent}", "\\SI{100}{\\percent}")
+  par(mgp=c(0, 0.25, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  axis(2, at=z, labels=zz, las=2, tck = -0.0225,  
+       cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  #  axis(1, labels = NA, tck = -0.025)
+  
+  #   abline(v =  5.5)
+  
+  #abline(h =  0.75, lty=3)
+  #abline(h =  0.5, lty=3)
+  #abline(h =  0.25, lty=3)
+  abline(h = 0)
+  #abline(h = -0.5, lty=3)
+  dev.off()
+  embed_fonts(outFileName)
+}
+
+createBoxplotMapVsSetMultimapSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, nameAppendix) {
+  
+  ###
+  # Create boxplots as well
+  ##
+  outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
+  fontScalingFactor <- 0.6
+  
+  pdf(outFileName, family = "Times", width = 7, height = 2)
+  #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
+  
+  selection <- tableAll[2:NCOL(tableAll)]
+  names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
+  
+  par(mar = c(1.6,2.3,0,0) + 0.15) # c(bottom, left, top, right)
+  par(mgp=c(1.8, 0.425, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  
+  par(tck = -0.025)
+  boxplot(selection, ylim=range(-2, 1), yaxt="n", las=0, ylab="Regression or Improvement (Factor)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
+          cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  
+  z  <- c(-2, -1.75, -1.50, -1.25, -1, -0.75, -0.50, -0.25, 0, 0.25, 0.50, 0.75, 1)
+  zz <- c("3x", "2.75x", "2.50x", "2.25x", "2x", "1.75x", "1.50x", "1.25x", "neutral", "1.25x", "1.50x", "1.75x", "2x")
+
+  #zz <- c("\\SI{-80}{\\percent}", "\\SI{-60}{\\percent}", "\\SI{-40}{\\percent}", "\\SI{-20}{\\percent}", "\\SI{0}{\\percent}", "\\SI{20}{\\percent}", "\\SI{40}{\\percent}", "\\SI{60}{\\percent}", "\\SI{80}{\\percent}", "\\SI{100}{\\percent}")
+  par(mgp=c(0, 0.25, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  axis(2, at=z, labels=zz, las=2, tck = -0.0225,  
+       cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  #  axis(1, labels = NA, tck = -0.025)
+  
+  #   abline(v =  5.5)
+  
+  #abline(h =  0.75, lty=3)
+  #abline(h =  0.5, lty=3)
+  #abline(h =  0.25, lty=3)
+  abline(h = 0)
+  #abline(h = -0.5, lty=3)
+  dev.off()
+  embed_fonts(outFileName)
+}
 
 
 
@@ -527,25 +665,38 @@ benchmarksByNameOutput$Param_out_sizeLog2 <- latexMath(paste("2^{", log2(benchma
 # Comparising functions
 ##
 compareSpeedup <- Vectorize(function(candidate, baseline) {
-  (baseline / candidate)
+  speedup <- baseline/candidate
+  slowdown <- candidate/baseline
+
+  ifelse(speedup >= 1, speedup-1, -(slowdown-1))
 })
 
 compareSaving <- Vectorize(function(candidate, baseline) {
   1 - (candidate / baseline)
 })
 
-createAllTables <- function(dataFormatter, compareFunction, nameAppendix) {
-  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
-  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
-  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
-  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+createAllTables <- function(dataFormatter, compareFunction, boxplotFunction, nameAppendix) {
+#   createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+# 
+#   # createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_PDB_PERSISTENT_CURRENT", dataFormatter, compareFunction, nameAppendix)
+# 
+#   createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
 
-  # createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_MEMOIZED_LAZY", "VF_PDB_PERSISTENT_CURRENT", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
-  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
-  createTable(benchmarksByNameOutput, "MAP", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
-  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_SCALA", dataFormatter, compareFunction, nameAppendix)
-  createTable(benchmarksByNameOutput, "SET", "VF_PDB_PERSISTENT_CURRENT", "VF_CLOJURE", dataFormatter, compareFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
+
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 }
 
 
@@ -556,19 +707,21 @@ createAllTables <- function(dataFormatter, compareFunction, nameAppendix) {
 dataFormatter <- latexMathFactor
 compareFunction <- compareSpeedup
 nameAppendix <- "speedup"
+boxplotFunction <- createBoxplotSpeedups
 
-createAllTables(dataFormatter, compareFunction, nameAppendix)
+createAllTables(dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
 
 
 ###
 # Results as saving percentages
 ##
-dataFormatter <- latexMathPercent
-compareFunction <- compareSaving
-nameAppendix <- "savings"
-
-createAllTables(dataFormatter, compareFunction, nameAppendix)
+# dataFormatter <- latexMathPercent
+# compareFunction <- compareSaving
+# nameAppendix <- "savings"
+# boxplotFunction <- createBoxplotPercentages
+# 
+# createAllTables(dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
 
 

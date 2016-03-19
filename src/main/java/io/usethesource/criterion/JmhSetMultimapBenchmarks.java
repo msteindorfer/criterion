@@ -66,8 +66,14 @@ public class JmhSetMultimapBenchmarks {
 					"2097152", "4194304", "8388608" })
 	protected int size;
 
+	@Param({ "2" })
+	protected int multimapValueSize;	
+
+	@Param({ "2" })
+	protected int stepSizeOneToOneSelector;
+	
 	@Param({ "0" }) // "1", "2", "3", "4", "5", "6", "7", "8", "9"
-	protected int run;
+	protected int run;	
 
 	@Param
 	public ElementProducer producer;
@@ -108,14 +114,14 @@ public class JmhSetMultimapBenchmarks {
 
 		valueFactory = valueFactoryFactory.getInstance();
 
-		testMap = generateMap(valueFactory, producer, false, size, run);
-		testMapRealDuplicate = generateMap(valueFactory, producer, false, size, run);
+		testMap = generateSetMultimap(valueFactory, producer, false, size, multimapValueSize, stepSizeOneToOneSelector, run);
+		testMapRealDuplicate = generateSetMultimap(valueFactory, producer, false, size, multimapValueSize, stepSizeOneToOneSelector, run);
 
 		VALUE_EXISTING = (JmhValue) generateExistingAndNonExistingValue(valueFactory, producer, false, size, run)[0];
 		VALUE_NOT_EXISTING = (JmhValue) generateExistingAndNonExistingValue(valueFactory, producer, false, size, run)[1];
 
 		if (USE_PRIMITIVE_DATA) {
-			testMapInt = generateMap(valueFactory, producer, true, size, run);
+			testMapInt = generateSetMultimap(valueFactory, producer, true, size, multimapValueSize, stepSizeOneToOneSelector, run);
 			// TODO: testMapRealDuplicateInt = ...
 
 			VALUE_EXISTING_INT = (int) generateExistingAndNonExistingValue(valueFactory, producer,
@@ -302,17 +308,34 @@ public class JmhSetMultimapBenchmarks {
 		}
 	}
 
-	protected static JmhSetMultimap generateMap(JmhValueFactory valueFactory, ElementProducer producer,
-					boolean usePrimitiveData, int size, int run) throws Exception {
+	protected static JmhSetMultimap generateSetMultimap(JmhValueFactory valueFactory, ElementProducer producer,
+			boolean usePrimitiveData, int size, int multimapValueSize, int stepSizeOneToOneSelector, int run)
+			throws Exception {
 
 		final int[] data = BenchmarkUtils.generateTestData(size, run);
 		final JmhSetMultimapBuilder writer = valueFactory.setMultimapBuilder();
 
+		/*
+		 * TODO: update algorithm for selection data contained/not-contained to
+		 * use idx % multimapValueSize == 0 for checking contained keys, and idx
+		 * % multimapValueSize != 0 for checking contained values.
+		 */
+		
 		for (int i = size - 1; i >= 0; i--) {
-			if (usePrimitiveData) {
-				writer.insert(data[i], data[i]);
+			int keyIdx = i;
+
+			if (keyIdx % stepSizeOneToOneSelector == 0) {
+				writer.insert(producer.createFromInt(data[keyIdx]), producer.createFromInt(data[keyIdx]));
 			} else {
-				writer.insert(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
+				for (int j = multimapValueSize - 1; j >= 0 && i >= 0; j--) {
+					int valIdx = (i + j) % size;
+
+					if (usePrimitiveData) {
+						writer.insert(data[keyIdx], data[valIdx]);
+					} else {
+						writer.insert(producer.createFromInt(data[keyIdx]), producer.createFromInt(data[valIdx]));
+					}
+				}
 			}
 		}
 
@@ -417,8 +440,13 @@ public class JmhSetMultimapBenchmarks {
 	}
 
 	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	@OperationsPerInvocation(2 * CACHED_NUMBERS_SIZE)
 	public void timeMultimapLikeContainsTuple(Blackhole bh) {
+		// partial match
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.contains(cachedNumbers[i], cachedNumbersNotContained[i]));
+		}
+		// full match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.contains(cachedNumbers[i], cachedNumbers[i]));
 		}
@@ -448,26 +476,21 @@ public class JmhSetMultimapBenchmarks {
 		}
 	}
 
-	@Benchmark
-	public void timeMultimapLikeIterationKey(Blackhole bh) {
-		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
-			bh.consume(iterator.next());
-		}
-	}
+//	@Benchmark
+//	public void timeMultimapLikeIterationKey(Blackhole bh) {
+//		for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
+//			bh.consume(iterator.next());
+//		}
+//	}
+//	
+//	@Benchmark
+//	public void timeMultimapLikeIterationFlattenedEntry(Blackhole bh) {
+//		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
+//						.entryIterator(); iterator.hasNext();) {
+//			bh.consume(iterator.next());
+//		}
+//	}	
 	
-	@Benchmark
-	public void timeMultimapLikeIterationFlattenedEntry(Blackhole bh) {
-		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
-						.entryIterator(); iterator.hasNext();) {
-			bh.consume(iterator.next());
-		}
-	}	
-	
-	// @Benchmark
-	// public void timeInsertSingle(Blackhole bh) {
-	// bh.consume(testMap.put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING));
-	// }
-
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeMapLikePut(Blackhole bh) {
@@ -485,28 +508,29 @@ public class JmhSetMultimapBenchmarks {
 	}
 	
 	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	@OperationsPerInvocation(3 * CACHED_NUMBERS_SIZE)
 	public void timeMultimapLikeInsertTuple(Blackhole bh) {
+		// full match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.insert(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
+			bh.consume(testMap.insert(cachedNumbers[i], cachedNumbers[i]));
+		}
+		// partial match
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.insert(cachedNumbers[i], cachedNumbersNotContained[i]));
+		}
+		// no match
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.insert(cachedNumbersNotContained[i], cachedNumbers[i]));
 		}
 	}
 
 //	@Benchmark
 //	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-//	public void timeInsertInt(Blackhole bh) {
+//	public void timeMultimapLikeInsertTupleContained(Blackhole bh) {
 //		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-//			bh.consume(testMapInt.put(cachedNumbersIntNotContained[i], VALUE_NOT_EXISTING_INT));
+//			bh.consume(testMap.insert(cachedNumbers[i], cachedNumbers[i]));
 //		}
 //	}
-
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeMultimapLikeInsertTupleContained(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.insert(cachedNumbers[i], cachedNumbers[i]));
-		}
-	}
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -527,28 +551,33 @@ public class JmhSetMultimapBenchmarks {
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeMultimapLikeRemoveTuple(Blackhole bh) {
+		// full match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.remove(cachedNumbers[i], cachedNumbers[i]));
 		}
-	}
-	
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeMultimapLikeRemoveTupleNotContained(Blackhole bh) {
+		// partial match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.remove(cachedNumbersNotContained[i], cachedNumbersNotContained[i]));
+			bh.consume(testMap.remove(cachedNumbers[i], cachedNumbersNotContained[i]));
 		}
 	}
 	
-	@Benchmark
-	public void timeMultimapLikeEqualsRealDuplicate(Blackhole bh) {
-		bh.consume(testMap.equals(testMapRealDuplicate));
-	}
-
-	@Benchmark
-	public void timeMultimapLikeEqualsDeltaDuplicate(Blackhole bh) {
-		bh.consume(testMap.equals(testMapDeltaDuplicate));
-	}
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeMultimapLikeRemoveTupleNotContained(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.remove(cachedNumbersNotContained[i], cachedNumbersNotContained[i]));
+//		}
+//	}
+	
+//	@Benchmark
+//	public void timeMultimapLikeEqualsRealDuplicate(Blackhole bh) {
+//		bh.consume(testMap.equals(testMapRealDuplicate));
+//	}
+//
+//	@Benchmark
+//	public void timeMultimapLikeEqualsDeltaDuplicate(Blackhole bh) {
+//		bh.consume(testMap.equals(testMapDeltaDuplicate));
+//	}
 	
 	@Benchmark
 	public void timeMapLikeEqualsRealDuplicate(Blackhole bh) {
@@ -591,29 +620,32 @@ public class JmhSetMultimapBenchmarks {
 		 */
 
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
-		Options opt = new OptionsBuilder()
+		Options opt = new OptionsBuilder() // timeMultimapLikeContainsTuple|timeMultimapLikeContainsTupleNotContained|timeMultimapLikeInsertTuple|timeMultimapLikeRemoveTuple
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeMultimapLike.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
-						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
-						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(1)
+										+ ".(timeMultimapLikeContainsTuple)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
+						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(20)
+						.warmupTime(TimeValue.seconds(1)).measurementIterations(20).forks(1)
 						.param("dataType", "SET_MULTIMAP").param("run", "0")
 //						.param("run", "1")
 //						.param("run", "2")
 //						.param("run", "3")
 //						.param("run", "4")
-						.param("producer", "PURE_INTEGER").param("sampleDataSelection", "MATCH")
-//						.param("size", "16")
-//						.param("size", "2048")
-						.param("size", "1048576")
+						.param("producer", "PDB_INTEGER").param("sampleDataSelection", "MATCH")
+						.param("size", "16")
+						.param("size", "2048")
+//						.param("size", "1048576")
+//						.param("size", "8388608")
+						.param("multimapValueSize", "2")
+						.param("stepSizeOneToOneSelector", "2")
 //						.param("valueFactoryFactory", "VF_CHAMP")
 //						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
 //						.param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
-						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
-						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")						
-//						.param("valueFactoryFactory", "VF_SCALA")
-//						.param("valueFactoryFactory", "VF_CLOJURE")
+//						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
+//						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")						
+						.param("valueFactoryFactory", "VF_SCALA")
+						.param("valueFactoryFactory", "VF_CLOJURE")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();
