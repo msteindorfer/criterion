@@ -10,14 +10,16 @@ args <- commandArgs(TRUE)
 
 setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
 dataDirectory <- "~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data"
+# timestamp <- "20160321_0946"
 timestamp <- "mapVsSetMultimap-latest"
 timestampMemoryMeasurement <- "latest"
 
 # data map:
-# results.all-20160318_1204
+# mapVsSetMultimap-latest
+# 20160318_1204
 
 # data multimap:
-# results.all-20160321_0946
+# 20160321_0946
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
 cran_rstudio_repo="http://cran.rstudio.com/"
@@ -398,8 +400,8 @@ orderedBenchmarkNames <- function(dataType) {
       , "MapLikeIterationNativeEntry"
       # "MapLikeEqualsRealDuplicate",
       # "MapLikeEqualsDeltaDuplicate",
-      , "Footprint32"
-      , "Footprint64"
+#       , "Footprint32"
+#       , "Footprint64"
       )
   } else {
     candidates[candidates != "EntryIteration"]
@@ -436,8 +438,8 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
       , "Iteration\n(Entry)"
       # , "Equality\n(Distinct)"
       # , "Equality\n(Derived)"
-      , "Footprint\n(32-bit)" 
-      , "Footprint\n(64-bit)"
+#       , "Footprint\n(32-bit)" 
+#       , "Footprint\n(64-bit)"
       )  
     } else {
     candidates[candidates != "Iteration\n(Entry)"]
@@ -622,22 +624,65 @@ createBoxplotSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, 
   embed_fonts(outFileName)
 }
 
+createBoxplotSetMultimapSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, nameAppendix) {
+  
+  ###
+  # Create boxplots as well
+  ##
+  outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
+  fontScalingFactor <- 0.9
+  
+  pdf(outFileName, family = "Times", width = 6, height = 3.05)
+  #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
+  
+  selection <- tableAll[2:NCOL(tableAll)]
+  names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
+  
+  par(mar = c(2.6,3.3,0.3,0) + 0.15) # c(bottom, left, top, right)
+  par(mgp=c(2.6, 1.25, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  
+  #par(tck = -0.025)
+  boxplot(selection, ylim=range(-1.5, 4.5), yaxt="n", las=0, ylab="Regression or Improvement (Factor)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
+          cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  
+  z  <- c(-1, 0, 1, 2, 3, 4)
+  zz <- c("2x", "neutral", "2x", "3x", "4x", "5x")
+  
+  #zz <- c("\\SI{-80}{\\percent}", "\\SI{-60}{\\percent}", "\\SI{-40}{\\percent}", "\\SI{-20}{\\percent}", "\\SI{0}{\\percent}", "\\SI{20}{\\percent}", "\\SI{40}{\\percent}", "\\SI{60}{\\percent}", "\\SI{80}{\\percent}", "\\SI{100}{\\percent}")
+  par(mgp=c(0, 0.25, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  axis(2, at=z, labels=zz, las=2, tck = -0.0225,  
+       cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
+  #  axis(1, labels = NA, tck = -0.025)
+  
+  #   abline(v =  5.5)
+  
+  # abline(h =  0.75, lty=3)
+  # abline(h =  0.5,  lty=3)
+  # abline(h =  0.25, lty=3)
+  abline(h =  0)
+  # abline(h = -0.25, lty=3)
+  # abline(h = -0.5,  lty=3)  
+  # abline(h = -0.75, lty=3)
+  dev.off()
+  embed_fonts(outFileName)
+}
+
 createBoxplotMapVsSetMultimapSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, nameAppendix) {
   
   ###
   # Create boxplots as well
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
-  fontScalingFactor <- 0.6
+  fontScalingFactor <- 0.85
   
-  pdf(outFileName, family = "Times", width = 7, height = 1.75)
+  pdf(outFileName, family = "Times", width = 6.1, height = 3.05)
   #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
   
   selection <- tableAll[2:NCOL(tableAll)]
   names(selection) <- orderedBenchmarkNamesForBoxplot(dataType)
   
-  par(mar = c(1.6,2.3,0,0) + 0.15) # c(bottom, left, top, right)
-  par(mgp=c(1.8, 0.425, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
+  par(mar = c(2.6,3.3,0.3,0) + 0.15) # c(bottom, left, top, right)
+  par(mgp=c(2.6, 1.25, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   
   par(tck = -0.025)
   boxplot(selection, ylim=range(-0.5, 0.5), yaxt="n", las=0, ylab="Regression or Improvement (Factor)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
@@ -701,13 +746,13 @@ createAllTables <- function(dataFormatter, compareFunction, boxplotFunction, nam
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
-#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
-#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
+#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
 
-#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 #   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-    createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MULTIMAP_HHAMT", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+#   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MULTIMAP_HHAMT", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 }
 
 

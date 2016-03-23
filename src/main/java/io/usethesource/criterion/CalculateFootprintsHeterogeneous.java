@@ -16,9 +16,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.mahout.math.map.OpenIntIntHashMap;
@@ -29,11 +31,14 @@ import com.gs.collections.impl.map.mutable.primitive.IntIntHashMap;
 
 import gnu.trove.map.hash.TIntIntHashMap;
 import io.usethesource.capsule.ImmutableMap;
+import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.TrieMap_5Bits;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.TrieSet_5Bits_Spec0To8_IntKey;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.FootprintUtils.Archetype;
+import io.usethesource.criterion.api.JmhValue;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
@@ -68,15 +73,24 @@ public final class CalculateFootprintsHeterogeneous {
 		
 		String userHome = System.getProperty("user.home");
 		String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
-		boolean appendToFile = true;
+		boolean appendToFile = false;
 
 //		FootprintUtils.createExponentialRange(10, 11).stream().flatMap(size -> testOneConfiguration(size).stream())
 //				.collect(Collectors.toList());
 		
-		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
-				FootprintUtils.createExponentialRange(0, 24).stream()
-						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
+//				FootprintUtils.createExponentialRange(0, 24).stream()
+//						.flatMap(size -> testOneConfiguration(size, 0).stream()).collect(Collectors.toList()));
 
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
+//		FootprintUtils.createLinearRange(0, 5, 1).stream().flatMap(run -> FootprintUtils
+//				.createExponentialRange(0, 24).stream().flatMap(size -> testOneConfiguration(size, run).stream())).collect(Collectors.toList()));
+		
+		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_primitive_latest.csv"), appendToFile,
+		FootprintUtils.createLinearRange(0, 1, 1).stream().flatMap(run -> FootprintUtils
+				.createExponentialRange(0, 24).stream().flatMap(size -> testOnePrimitiveConfiguration(size, run).stream())).collect(Collectors.toList()));					
+		
+		
 //		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_tiny.csv"), appendToFile,
 //				FootprintUtils.createLinearRange(0, 101, 1).stream()
 //						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
@@ -111,7 +125,97 @@ public final class CalculateFootprintsHeterogeneous {
 	// int size = thisExpSize - m * stride;
 	// }
 
-	public static List<String> testOneConfiguration(int size) {
+	public static List<String> testOneConfiguration(int size, int run) {
+		/*		
+		// int size = 32;
+		double percentageOfPrimitives = 1.00;
+
+		Object[] data = new Object[size];
+
+		int countForPrimitives = (int) ((percentageOfPrimitives) * size);
+		int smallCount = 0;
+		int bigCount = 0;
+
+		Random rand = new Random(13);
+		for (int i = 0; i < size; i++) {
+			final int j = rand.nextInt();
+			final BigInteger bigJ = BigInteger.valueOf(j).multiply(BigInteger.valueOf(j));
+
+			if (i < countForPrimitives) {
+				// System.out.println("SMALL");
+				smallCount++;
+				data[i] = j;
+			} else {
+				// System.out.println("BIG");
+				bigCount++;
+				data[i] = bigJ;
+			}
+		}
+
+		System.out.println();
+		System.out.println(String.format("PRIMITIVE:   %10d (%.2f percent)", smallCount,
+				100. * smallCount / (smallCount + bigCount)));
+		System.out.println(
+				String.format("BIG_INTEGER: %10d (%.2f percent)", bigCount, 100. * bigCount / (smallCount + bigCount)));
+		// System.out.println(String.format("UNIQUE: %10d (%.2f percent)",
+		// map.size(), 100. * map.size() / (smallCount + bigCount)));
+		System.out.println();
+		
+		*/
+
+		EnumSet<MemoryFootprintPreset> presets = EnumSet.of(
+				 MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD
+//				 ,
+//				MemoryFootprintPreset.RETAINED_SIZE
+				 );
+
+		// for (MemoryFootprintPreset preset : presets) {
+		//// createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true);
+		//// createAndMeasureTrieMapHomogeneous(data, size, 0, preset, false);
+		// createAndMeasureJavaUtilHashMap(data, size, 0, preset);
+		// createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true);
+		// createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false);
+		// createAndMeasureTrove4jIntArrayList(data, size, 0, preset);
+		// System.out.println();
+		// }
+
+		return presets.stream()
+				.flatMap(preset -> Arrays.stream(new String[] { 
+						/* Map<K, V> vs Multimap<K, V> */
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run,
+								preset),
+
+//						/* Multimap<K, V> */
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, multimapValueSize,
+//								stepSizeOneToOneSelector, run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size,
+//								multimapValueSize, stepSizeOneToOneSelector, run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize, stepSizeOneToOneSelector,
+//								run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize, stepSizeOneToOneSelector,
+//								run, preset),		
+						
+//						/* Map[int, int] */
+////						, createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset)
+////						, createAndMeasureMahoutMutableIntIntHashMap(data, size, 0, preset)
+////						, createAndMeasureGsImmutableIntIntMap(data, size, 0, preset)
+						
+						/* SetMultimap */
+//						, createAndMeasureGsImmutableSetMultimap(data, size, 0, preset)
+//						, createAndMeasureGuavaImmutableSetMultimap(data, size, 0, preset)
+						
+//						createAndMeasureJavaUtilHashMap(data, size, 0, preset)
+//						, createAndMeasureTrieMapHomogeneous(data, size, 0, preset)
+//						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
+//						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
+//						, createAndMeasureTrove4jTIntIntHashMap(data, size, 0, preset)
+				})).collect(Collectors.toList());
+	}
+
+	public static List<String> testOnePrimitiveConfiguration(int size, int run) {		
 		// int size = 32;
 		double percentageOfPrimitives = 1.00;
 
@@ -146,12 +250,6 @@ public final class CalculateFootprintsHeterogeneous {
 		// map.size(), 100. * map.size() / (smallCount + bigCount)));
 		System.out.println();
 
-		EnumSet<MemoryFootprintPreset> presets = EnumSet.of(
-				 MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD
-//				 ,
-//				MemoryFootprintPreset.RETAINED_SIZE
-				 );
-
 		// for (MemoryFootprintPreset preset : presets) {
 		//// createAndMeasureTrieMapHomogeneous(data, size, 0, preset, true);
 		//// createAndMeasureTrieMapHomogeneous(data, size, 0, preset, false);
@@ -162,45 +260,57 @@ public final class CalculateFootprintsHeterogeneous {
 		// System.out.println();
 		// }
 
-		return presets.stream()
-				.flatMap(preset -> Arrays.stream(new String[] { 
-						/* Map<K, V> vs Multimap<K, V> */
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, data, size,
-								0, preset),						
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, data, size,
-								0, preset),
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, data, size,
-								0, preset),
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, data,
-								size, 0, preset),
-						
+		final MemoryFootprintPreset preset = MemoryFootprintPreset.RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER;
+		return Arrays.stream(new String[] { 
+//						/* Map<K, V> vs Multimap<K, V> */
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run,
+//								preset)
+
 //						/* Multimap<K, V> */
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, data, size,
-//								multimapValueSize, stepSizeOneToOneSelector, 0, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, data,
-//								size, multimapValueSize, stepSizeOneToOneSelector, 0, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, data, size, multimapValueSize, stepSizeOneToOneSelector, 0,
-//								preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, data, size, multimapValueSize, stepSizeOneToOneSelector, 
-//								0, preset),						
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, multimapValueSize,
+//								stepSizeOneToOneSelector, run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size,
+//								multimapValueSize, stepSizeOneToOneSelector, run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize, stepSizeOneToOneSelector,
+//								run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize, stepSizeOneToOneSelector,
+//								run, preset),		
 						
-						/* Map[int, int] */
-//						, createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset)
-//						, createAndMeasureMahoutMutableIntIntHashMap(data, size, 0, preset)
-//						, createAndMeasureGsImmutableIntIntMap(data, size, 0, preset)
-						
-						/* SetMultimap */
-//						, createAndMeasureGsImmutableSetMultimap(data, size, 0, preset)
-//						, createAndMeasureGuavaImmutableSetMultimap(data, size, 0, preset)
+				// createAndMeasureJavaUtilHashMap(data, size, 0, preset),
+				
+				/* Map[int, int] */
+				createAndMeasureGuavaImmutableMap(data, size, run, preset), // Reference
+				createAndMeasureTrieMapHeterogeneous_asMap(data, size, run, preset),
+				/* ******************* */
+				createAndMeasureTrove4jTIntIntHashMap(data, size, 0, preset),
+				createAndMeasureMahoutMutableIntIntHashMap(data, size, 0, preset),
+				createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset),
+				createAndMeasureGsImmutableIntIntMap(data, size, 0, preset),
+				/* ******************* */				
+				
+				/* Multimap[int, int] */
+				createAndMeasureGuavaImmutableSetMultimap(data, size, run, preset), // Reference
+				createAndMeasureTrieMapHeterogeneous_asMultimap(data, size, run, preset),
+				/* ******************* */
+				/** NOTHING AVAILABLE **/
+				/* ******************* */										
+
+//				/* SetMultimap */
+//				createAndMeasureGsImmutableSetMultimap(data, size, 0, preset),
+//				createAndMeasureGuavaImmutableSetMultimap(data, size, 0, preset)
 						
 //						createAndMeasureJavaUtilHashMap(data, size, 0, preset)
 //						, createAndMeasureTrieMapHomogeneous(data, size, 0, preset)
 //						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
 //						, createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
 //						, createAndMeasureTrove4jTIntIntHashMap(data, size, 0, preset)
-				})).collect(Collectors.toList());
+				}).collect(Collectors.toList());
 	}
-
+	
+	
 //	public static String createAndMeasureMultiChamp(final Object[] data, int elementCount, int run,
 //			MemoryFootprintPreset preset) {
 //		ImmutableSetMultimap<Integer, Integer> ys = TrieSetMultimap_BleedingEdge.of();
@@ -272,22 +382,102 @@ public final class CalculateFootprintsHeterogeneous {
 		return measureAndReport(ys, "com.gs.collections.api.map.primitive.ImmutableIntIntMap", DataType.MAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
 	}	
 	
+	private final static JmhValue box(int i) {
+		return new PureIntegerWithCustomHashCode(i);
+	}
+	
+	public static String createAndMeasureGuavaImmutableMap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		com.google.common.collect.ImmutableMap.Builder<JmhValue, JmhValue> ysBldr = com.google.common.collect.ImmutableMap
+				.builder();
+		
+		// filters duplicates (because builder can't handle them)
+		Set<Object> seenKeys = new HashSet<>(data.length);
+
+		for (Object o : data) {
+			if (!seenKeys.contains(o)) {
+				seenKeys.add(o);
+				ysBldr.put(box((Integer) o), box((Integer) o));
+			}
+		}
+
+		com.google.common.collect.ImmutableMap<JmhValue, JmhValue> ys = ysBldr.build();	
+
+		return measureAndReport(ys, "com.google.common.collect.ImmutableMap", DataType.MAP, Archetype.IMMUTABLE, false,
+				elementCount, run, preset);
+	}
+	
 	public static String createAndMeasureGuavaImmutableSetMultimap(final Object[] data, int elementCount, int run,
 			MemoryFootprintPreset preset) {
-		com.google.common.collect.ImmutableSetMultimap.Builder<Integer, Integer> ysBldr = com.google.common.collect.ImmutableSetMultimap.builder();
+		com.google.common.collect.ImmutableSetMultimap.Builder<JmhValue, JmhValue> ysBldr = com.google.common.collect.ImmutableSetMultimap
+				.builder();
+
+		for (int keyIdx = 0; keyIdx < data.length; keyIdx++) {
+			Object o = data[keyIdx];
+
+			if (keyIdx % stepSizeOneToOneSelector == 0) {
+				ysBldr.put(box((Integer) o), box((Integer) o));
+			} else {
+				for (int i = 0; i < multimapValueSize; i++) {
+					ysBldr.put(box((Integer) o), box((Integer) i));
+				}
+			}
+		}
+
+		com.google.common.collect.ImmutableMultimap<JmhValue, JmhValue> ys = ysBldr.build();
+
+		return measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.SET_MULTIMAP,
+				Archetype.IMMUTABLE, false, elementCount, run, preset);
+	}
+
+	public static String createAndMeasureTrieMapHeterogeneous_asMap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		TrieMap_5Bits_Heterogeneous_BleedingEdge ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) TrieMap_5Bits_Heterogeneous_BleedingEdge
+				.of();
+
+		// simulating a multimap with a specialized nested integer set
+		for (int keyIdx = 0; keyIdx < data.length; keyIdx++) {
+			Object o = data[keyIdx];
+			int intValue = ((Integer) o).intValue();
+
+			ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);			
+		}
 		
-		for (Object o : data) {
-			for (int i = 0; i < multimapValueSize; i++) { 
-				ysBldr.put((Integer) o, (Integer) i);
+		final String shortName = "HHAMT_AS_MAP<int, int>";
+
+		return measureAndReport(ys, shortName, DataType.MAP, Archetype.PERSISTENT, false, elementCount, run, preset);
+	}	
+	
+	public static String createAndMeasureTrieMapHeterogeneous_asMultimap(final Object[] data, int elementCount, int run,
+			MemoryFootprintPreset preset) {
+		TrieMap_5Bits_Heterogeneous_BleedingEdge ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) TrieMap_5Bits_Heterogeneous_BleedingEdge
+				.of();
+
+		// simulating a multimap with a specialized nested integer set
+		for (int keyIdx = 0; keyIdx < data.length; keyIdx++) {
+			Object o = data[keyIdx];
+			int intValue = ((Integer) o).intValue();
+
+			if (keyIdx % stepSizeOneToOneSelector == 0) {
+				ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);
+			} else {
+				ImmutableSet<Integer> nestedSet = TrieSet_5Bits_Spec0To8_IntKey.of();
+
+				for (int i = 0; i < multimapValueSize; i++) {
+					nestedSet = nestedSet.__insert(i);
+				}
+
+				ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(o, nestedSet);
 			}
 		}
 		
-		com.google.common.collect.ImmutableMultimap<Integer, Integer> ys = ysBldr.build();
-		
-		return measureAndReport(ys, "com.google.common.collect.ImmutableSetMultimap", DataType.SET_MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
-	}
+		final String shortName = "HHAMT_AS_SET_MULTIMAP<int, int>";
 
-	public static String createAndMeasureTrieMap(ValueFactoryFactory valueFactoryFactory, final Object[] data, int elementCount, int run, MemoryFootprintPreset preset) {
+		return measureAndReport(ys, shortName, DataType.SET_MULTIMAP, Archetype.PERSISTENT, false, elementCount, run,
+				preset);
+	}	
+
+	public static String createAndMeasureTrieMap(ValueFactoryFactory valueFactoryFactory, int elementCount, int run, MemoryFootprintPreset preset) {
 		try {
 			final int fixedMultimapValueSize = 1;
 			final int fixedStepSizeOneToOneSelector = 1;
@@ -305,9 +495,8 @@ public final class CalculateFootprintsHeterogeneous {
 		return "ERROR";
 	}	
 		
-	public static String createAndMeasureTrieSetMultimap(ValueFactoryFactory valueFactoryFactory, final Object[] data,
-			int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
-			MemoryFootprintPreset preset) {
+	public static String createAndMeasureTrieSetMultimap(ValueFactoryFactory valueFactoryFactory, int elementCount,
+			int multimapValueSize, int stepSizeOneToOneSelector, int run, MemoryFootprintPreset preset) {
 		try {
 			final Object setMultimapInstance = JmhSetMultimapBenchmarks.generateSetMultimap(
 					valueFactoryFactory.getInstance(), ElementProducer.PDB_INTEGER, false, elementCount,
@@ -439,15 +628,11 @@ public final class CalculateFootprintsHeterogeneous {
 			assert ys.containsKey(value);
 		}
 
-		String shortName = "TIntIntHashMap";
-
-		String longName = "gnu.trove.map.hash.TIntIntHashMap";
-
-		return measureAndReport(ys, shortName, DataType.MAP, Archetype.MUTABLE, false, elementCount, run, preset);
+		return measureAndReport(ys, "gnu.trove.map.hash.TIntIntHashMap", DataType.MAP, Archetype.MUTABLE, false, elementCount, run, preset);
 	}
 		
 	enum MemoryFootprintPreset {
-		RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD
+		RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD, RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER
 	}
 
 	@SuppressWarnings("unchecked")
@@ -466,6 +651,9 @@ public final class CalculateFootprintsHeterogeneous {
 			break; 
 		case RETAINED_SIZE:
 			predicate = Predicates.alwaysTrue();
+			break;
+		case RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER:
+			predicate = Predicates.not(Predicates.instanceOf(Integer.class));
 			break;
 		default:
 			throw new IllegalStateException();
