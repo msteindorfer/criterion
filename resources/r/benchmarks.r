@@ -10,14 +10,14 @@ args <- commandArgs(TRUE)
 
 setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
 dataDirectory <- "~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data"
-timestamp <- "20160318_1204"
+timestamp <- "mapVsSetMultimap-latest"
 timestampMemoryMeasurement <- "latest"
 
 # data map:
 # results.all-20160318_1204
 
 # data multimap:
-# results.all-20160318_1002
+# results.all-20160321_0946
 
 # http://stackoverflow.com/questions/17705133/package-error-when-running-r-code-on-command-line
 cran_rstudio_repo="http://cran.rstudio.com/"
@@ -281,7 +281,9 @@ getBenchmarkAnnotationName <- Vectorize(getBenchmarkAnnotationName__)
 benchmarksFileName <- paste(paste(dataDirectory, paste("results.all", timestamp, sep="-"), sep="/"), "log", sep=".")
 benchmarks <- read.csv(benchmarksFileName, sep=",", header=TRUE, stringsAsFactors=FALSE)
 # colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
-colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError_90_0", "RelativeScoreError_90_0", "ScoreError_95_0", "RelativeScoreError_95_0", "ScoreError_99_9", "RelativeScoreError_99_9", "MedianScore", "MedianAbsoluteDeviation", "RelativeMedianAbsoluteDeviation", "Unit", "Param_dataType", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_valueFactoryFactory")
+colnames(benchmarks) <- c("Benchmark", "Mode", "Threads", "Samples", "Score", "ScoreError_90_0", "RelativeScoreError_90_0", "ScoreError_95_0", "RelativeScoreError_95_0", "ScoreError_99_9", "RelativeScoreError_99_9", "MedianScore", "MedianAbsoluteDeviation", "RelativeMedianAbsoluteDeviation", "Unit", "Param_dataType", "Param_multimapValueSize", "Param_producer", "Param_run", "Param_sampleDataSelection", "Param_size", "Param_stepSizeOneToOneSelector", "Param_valueFactoryFactory")
+
+# "Benchmark","Mode","Threads","Samples","Score","Score Error (90.0%)","Relative Score Error (90.0%)","Score Error (95.0%)","Relative Score Error (95.0%)","Score Error (99.9%)","Relative Score Error (99.9%)","Median Score","Median Absolute Deviation","Relative Median Absolute Deviation","Unit","Param: dataType","Param: multimapValueSize","Param: producer","Param: run","Param: sampleDataSelection","Param: size","Param: stepSizeOneToOneSelector","Param: valueFactoryFactory"
 
 # View(benchmarks$Score - benchmarks$MedianScore)
 
@@ -376,13 +378,13 @@ orderedBenchmarkNames <- function(dataType) {
     c("MultimapLikeContainsTuple", 
       "MultimapLikeContainsTupleNotContained", 
       "MultimapLikeInsertTuple", 
-      "MultimapLikeInsertTupleContained", 
+      # "MultimapLikeInsertTupleContained", 
       "MultimapLikeRemoveTuple", 
-      "MultimapLikeRemoveTupleNotContained", 
-      "MultimapLikeIterationKey", 
-      "MultimapLikeIterationFlattenedEntry", 
-#       "MultimapLikeEqualsRealDuplicate", 
-#       "MultimapLikeEqualsDeltaDuplicate", 
+      # "MultimapLikeRemoveTupleNotContained", 
+      # "MultimapLikeIterationKey", 
+      # "MultimapLikeIterationFlattenedEntry", 
+      # "MultimapLikeEqualsRealDuplicate", 
+      # "MultimapLikeEqualsDeltaDuplicate", 
       "Footprint32", 
       "Footprint64")
   } else if (dataType == "MAP") {
@@ -392,12 +394,13 @@ orderedBenchmarkNames <- function(dataType) {
       "MapLikePutContained",
       "MapLikeRemove",
       "MapLikeRemoveNotContained",
-      "MapLikeIterationKey",
-      "MapLikeIterationNativeEntry",
-      "MapLikeEqualsRealDuplicate",
-      "MapLikeEqualsDeltaDuplicate",
-      "Footprint32",
-      "Footprint64")
+      "MapLikeIterationKey"
+      , "MapLikeIterationNativeEntry"
+      # "MapLikeEqualsRealDuplicate",
+      # "MapLikeEqualsDeltaDuplicate",
+      , "Footprint32"
+      , "Footprint64"
+      )
   } else {
     candidates[candidates != "EntryIteration"]
   }
@@ -413,28 +416,30 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
     c("Lookup\n", 
       "Lookup\n(Fail)", 
       "Insert\n", 
-      "Insert\n(Fail)", 
+      # "Insert\n(Fail)", 
       "Delete\n", 
-      "Delete\n(Fail)", 
-      "Iteration\n(Key)", 
-      "Iteration\n(Entry)", 
-#       "Equality\n(Distinct)", 
-#       "Equality\n(Derived)", 
+      # "Delete\n(Fail)", 
+      # "Iteration\n(Key)", 
+      # "Iteration\n(Entry)", 
+      # "Equality\n(Distinct)", 
+      # "Equality\n(Derived)", 
       "Footprint\n(32-bit)", 
       "Footprint\n(64-bit)")
   } else if (dataType == "MAP") {
-    c("Lookup\n", 
-      "Lookup\n(Fail)", 
-      "Insert\n", 
-      "Insert\n(Fail)", 
-      "Delete\n", 
-      "Delete\n(Fail)", 
-      "Iteration\n(Key)", 
-      "Iteration\n(Entry)", 
-      "Equality\n(Distinct)", 
-      "Equality\n(Derived)", 
-      "Footprint\n(32-bit)", 
-      "Footprint\n(64-bit)")  } else {
+    c("Lookup\n"
+      , "Lookup\n(Fail)"
+      , "Insert\n"
+      , "Insert\n(Fail)"
+      , "Delete\n"
+      , "Delete\n(Fail)"
+      , "Iteration\n(Key)"
+      , "Iteration\n(Entry)"
+      # , "Equality\n(Distinct)"
+      # , "Equality\n(Derived)"
+      , "Footprint\n(32-bit)" 
+      , "Footprint\n(64-bit)"
+      )  
+    } else {
     candidates[candidates != "Iteration\n(Entry)"]
   }
 }
@@ -501,11 +506,11 @@ createTable <- function(input, dataType, dataStructureCandidate, dataStructureBa
   outputFolder <- "./tables-latex/tables"
   
   fileNameSummary <- paste(outputFolder, paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, "summary", sep="-"), "tex", sep="."), sep="/")
-  #write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  write.table(tableAll_summary_fmt, file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_summary_fmt), file = fileNameSummary, sep = " & ", row.names = TRUE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   
   fileName <- paste(outputFolder, paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), nameAppendix, sep="-"), "tex", sep="."), sep="/")
-  #write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
+  write.table(tableAll_fmt, file = fileName, sep = " & ", row.names = FALSE, col.names = TRUE, append = FALSE, quote = FALSE, eol = " \\\\ \n")
   #write.table(t(tableAll_fmt), file = fileName, sep = " & ", row.names = FALSE, col.names = FALSE, append = FALSE, quote = FALSE, eol = " \\\\ \n")  
 
   # createBoxplot(tableAll, dataType, baselineAndOtherPairName, nameAppendix);
@@ -582,7 +587,7 @@ createBoxplotSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, 
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
   fontScalingFactor <- 0.6
   
-  pdf(outFileName, family = "Times", width = 7, height = 2)
+  pdf(outFileName, family = "Times", width = 7, height = 1.75)
   #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
   
   selection <- tableAll[2:NCOL(tableAll)]
@@ -606,11 +611,13 @@ createBoxplotSpeedups <- function(tableAll, dataType, baselineAndOtherPairName, 
   
   #   abline(v =  5.5)
   
-  #abline(h =  0.75, lty=3)
-  #abline(h =  0.5, lty=3)
-  #abline(h =  0.25, lty=3)
-  abline(h = 0)
-  #abline(h = -0.5, lty=3)
+  # abline(h =  0.75, lty=3)
+  # abline(h =  0.5,  lty=3)
+  # abline(h =  0.25, lty=3)
+  abline(h =  0)
+  # abline(h = -0.25, lty=3)
+  # abline(h = -0.5,  lty=3)  
+  # abline(h = -0.75, lty=3)
   dev.off()
   embed_fonts(outFileName)
 }
@@ -623,7 +630,7 @@ createBoxplotMapVsSetMultimapSpeedups <- function(tableAll, dataType, baselineAn
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
   fontScalingFactor <- 0.6
   
-  pdf(outFileName, family = "Times", width = 7, height = 2)
+  pdf(outFileName, family = "Times", width = 7, height = 1.75)
   #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
   
   selection <- tableAll[2:NCOL(tableAll)]
@@ -633,7 +640,7 @@ createBoxplotMapVsSetMultimapSpeedups <- function(tableAll, dataType, baselineAn
   par(mgp=c(1.8, 0.425, 0)) # c(axis.title.position, axis.label.position, axis.line.position)
   
   par(tck = -0.025)
-  boxplot(selection, ylim=range(-2, 1), yaxt="n", las=0, ylab="Regression or Improvement (Factor)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
+  boxplot(selection, ylim=range(-0.5, 0.5), yaxt="n", las=0, ylab="Regression or Improvement (Factor)", lwd = 0.5, boxlwd = 0.5, outcex = 0.5,
           cex.lab=fontScalingFactor, cex.axis=fontScalingFactor, cex.main=fontScalingFactor, cex.sub=fontScalingFactor)
   
   z  <- c(-2, -1.75, -1.50, -1.25, -1, -0.75, -0.50, -0.25, 0, 0.25, 0.50, 0.75, 1)
@@ -647,11 +654,14 @@ createBoxplotMapVsSetMultimapSpeedups <- function(tableAll, dataType, baselineAn
   
   #   abline(v =  5.5)
   
-  #abline(h =  0.75, lty=3)
-  #abline(h =  0.5, lty=3)
-  #abline(h =  0.25, lty=3)
-  abline(h = 0)
-  #abline(h = -0.5, lty=3)
+  # abline(h =  0.75, lty=3)
+  # abline(h =  0.5,  lty=3)
+  # abline(h =  0.25, lty=3)
+  abline(h =  0)
+  # abline(h = -0.25, lty=3)
+  # abline(h = -0.5,  lty=3)  
+  # abline(h = -0.75, lty=3)
+
   dev.off()
   embed_fonts(outFileName)
 }
@@ -694,9 +704,10 @@ createAllTables <- function(dataFormatter, compareFunction, boxplotFunction, nam
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
-  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+#   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+    createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MULTIMAP_HHAMT", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 }
 
 
@@ -773,3 +784,17 @@ c(min(sub$RelativeMedianAbsoluteDeviation), median(sub$RelativeMedianAbsoluteDev
 quantile(sub[order(sub$RelativeMedianAbsoluteDeviation),]$RelativeMedianAbsoluteDeviation, c(.50, .90, .95, .99))
 
 View(sub[order(-sub$RelativeMedianAbsoluteDeviation) & sub$RelativeMedianAbsoluteDeviation > 0.05, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory')])
+
+
+
+
+df <- benchmarksCleaned
+
+df$overheadPerTuple <- df$Score / (df$Param_size * 1.5) - 8
+dfSubOur <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & df$Param_valueFactoryFactory == "VF_CHAMP_MULTIMAP_HHAMT",]
+dfSubOurSpecialized <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & df$Param_valueFactoryFactory == "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED",]
+dfSubOther <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & (df$Param_valueFactoryFactory == "VF_SCALA" | df$Param_valueFactoryFactory == "VF_CLOJURE"),]
+
+median(dfSubOur$overheadPerTuple)
+median(dfSubOurSpecialized$overheadPerTuple)
+median(dfSubOther$overheadPerTuple)

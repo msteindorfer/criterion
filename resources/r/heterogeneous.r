@@ -3,7 +3,8 @@ setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
 
 library(reshape2)
 
-benchmark_fileName <- "map_sizes_heterogeneous_exponential"
+# benchmark_fileName <- "map_sizes_heterogeneous_exponential"
+benchmark_fileName <- "map_sizes_heterogeneous_exponential_32bit_primitive_latest"
 benchmark_data <- read.csv(paste0(benchmark_fileName, ".csv"), sep=",", header=TRUE)
 
 # benchmark_data <- subset(benchmark_data, className != "TrieMapIntInt")
@@ -19,11 +20,34 @@ normalize <- function(x) {
   sweep(x, 2, apply(x, 2, max), "/") 
 } 
 
-benchmark_data.c.norm <- benchmark_data.c
-benchmark_data.c.norm[-1] <- normalize(benchmark_data.c[-1]) 
+ratio <- function(x) { 
+  x_min <- apply(x, 2, min)
+  sweep(x, 2, x_min, "/") 
+}
 
 result_fileName <- paste0(benchmark_fileName, "_result.csv")
 write.csv2(benchmark_data.c, file = result_fileName, quote = FALSE)
+
+benchmark_data.c.transposed <- data.frame(t(benchmark_data.c[-1]))
+colnames(benchmark_data.c.transposed) <-  benchmark_data.c[,1]
+
+resultTransposed_fileName <- paste0(benchmark_fileName, "_result.transposed.csv")
+write.csv2(benchmark_data.c.transposed, file = resultTransposed_fileName, quote = FALSE)
+
+benchmark_data.c.ratio <- benchmark_data.c
+benchmark_data.c.ratio[-1] <- ratio(benchmark_data.c[-1]) 
+
+resultRatio_fileName <- paste0(benchmark_fileName, "_result.ratio.csv")
+write.csv2(benchmark_data.c.ratio, file = resultRatio_fileName, quote = FALSE)
+
+benchmark_data.c.ratio.transposed <- data.frame(t(benchmark_data.c.ratio[-1]))
+colnames(benchmark_data.c.ratio.transposed) <-  benchmark_data.c[,1]
+
+resultRatioTransposed_fileName <- paste0(benchmark_fileName, "_result.ratio.transposed.csv")
+write.csv2(benchmark_data.c.ratio.transposed, file = resultRatioTransposed_fileName, quote = FALSE)
+
+benchmark_data.c.norm <- benchmark_data.c
+benchmark_data.c.norm[-1] <- normalize(benchmark_data.c[-1]) 
 
 resultNorm_fileName <- paste0(benchmark_fileName, "_result.norm.csv")
 write.csv2(benchmark_data.c.norm, file = resultNorm_fileName, quote = FALSE)
