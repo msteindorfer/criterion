@@ -10,8 +10,8 @@ args <- commandArgs(TRUE)
 
 setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
 dataDirectory <- "~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data"
-# timestamp <- "20160321_0946"
-timestamp <- "mapVsSetMultimap-latest"
+timestamp <- "20160321_0946"
+# timestamp <- "mapVsSetMultimap-latest"
 timestampMemoryMeasurement <- "latest"
 
 # data map:
@@ -673,7 +673,7 @@ createBoxplotMapVsSetMultimapSpeedups <- function(tableAll, dataType, baselineAn
   # Create boxplots as well
   ##
   outFileName <-paste(paste("all", "benchmarks", tolower(baselineAndOtherPairName), tolower(dataType), "boxplot", nameAppendix, sep="-"), "pdf", sep=".")
-  fontScalingFactor <- 0.85
+  fontScalingFactor <- 0.84
   
   pdf(outFileName, family = "Times", width = 6.1, height = 3.05)
   #tikz(outFileName, standAlone = FALSE, width = 15, height = 3.5, engine = "pdftex")
@@ -746,11 +746,11 @@ createAllTables <- function(dataFormatter, compareFunction, boxplotFunction, nam
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
-#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
-#   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
 
-  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 #   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 #   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MULTIMAP_HHAMT", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
 }
@@ -820,16 +820,18 @@ sub <- benchmarks
 c(min(sub$RelativeScoreError_90_0), median(sub$RelativeScoreError_90_0), max(sub$RelativeScoreError_90_0))
 c(min(sub$RelativeScoreError_95_0), median(sub$RelativeScoreError_95_0), max(sub$RelativeScoreError_95_0))
 c(min(sub$RelativeScoreError_99_9), median(sub$RelativeScoreError_99_9), max(sub$RelativeScoreError_99_9))
-
-View(sub[order(-sub$RelativeScoreError_99_9) & sub$RelativeScoreError_99_9 > 0.10, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory','RelativeScoreError_99_9')])
+####
+# View(sub[order(-sub$RelativeScoreError_99_9) & sub$RelativeScoreError_99_9 > 0.10, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory','RelativeScoreError_99_9')])
+####
 
 # c(min(sub$MedianAbsoluteDeviation), median(sub$MedianAbsoluteDeviation), max(sub$MedianAbsoluteDeviation))
 c(min(sub$RelativeMedianAbsoluteDeviation), median(sub$RelativeMedianAbsoluteDeviation), max(sub$RelativeMedianAbsoluteDeviation))
 
 quantile(sub[order(sub$RelativeMedianAbsoluteDeviation),]$RelativeMedianAbsoluteDeviation, c(.50, .90, .95, .99))
 
-View(sub[order(-sub$RelativeMedianAbsoluteDeviation) & sub$RelativeMedianAbsoluteDeviation > 0.05, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory')])
-
+###
+# View(sub[order(-sub$RelativeMedianAbsoluteDeviation) & sub$RelativeMedianAbsoluteDeviation > 0.05, c('Benchmark','Param_dataType','Param_run','Param_size','Param_valueFactoryFactory')])
+###
 
 
 

@@ -1,9 +1,16 @@
 package dom;
 
+import dom.multimap.DominatorsSetMultimap_Default;
 
 public class DominatorBenchmarkUtils {
 
 	public static enum DominatorBenchmarkEnum {
+		HHAMT {
+			@Override
+			public DominatorBenchmark getBenchmark() {
+				return new DominatorsSetMultimap_Default();
+			}
+		},
 		CHART {
 			@Override
 			public DominatorBenchmark getBenchmark() {

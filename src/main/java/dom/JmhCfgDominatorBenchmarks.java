@@ -46,6 +46,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
 import io.usethesource.criterion.BenchmarkUtils;
+import joptsimple.internal.Strings;
 
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -152,18 +153,40 @@ public class JmhCfgDominatorBenchmarks {
 		}
 	}
 
+	public static long unique = 0;
+	public static long tuples = 0; 
+	public static long tuples_one2one = 0;	
+	
 	@Benchmark
 	public void timeDominatorCalculation(Blackhole bh) {
+		unique = 0;
+		tuples = 0; 
+		tuples_one2one = 0;	
+		
 		dominatorBenchmark.performBenchmark(bh, sampledGraphsNative);
+		
+//		System.out.println("unique:" + unique);
+//		System.out.println("tuples:" + tuples);
+//		System.out.println("tuples_one2one:" + tuples_one2one);
+//
+//		System.out.println("ratio:" + 1.0 * tuples / unique);
+		
+		System.out.println(String.format("csv;unique;tuples;tuples_one2one"));
+		System.out.println(String.format("csv;%d;%d;%d", unique, tuples, tuples_one2one));
 	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
-										+ ".(timeDominatorCalculation)").warmupIterations(3)
-						.measurementIterations(5).mode(Mode.AverageTime).forks(1)
-						.timeUnit(TimeUnit.SECONDS).param("size", "16").param("run", "0")
-						.param("dominatorBenchmarkEnum", "SCALA").shouldDoGC(true).build();
+										+ ".(timeDominatorCalculation)").warmupIterations(0)
+						.measurementIterations(1).mode(Mode.AverageTime).forks(1)
+						.timeUnit(TimeUnit.SECONDS)
+//						.param("size", "16")
+						.param("run", "0")
+						.param("dominatorBenchmarkEnum", "HHAMT")
+//						.param("dominatorBenchmarkEnum", "CLOJURE_LAZY")
+//						.param("dominatorBenchmarkEnum", "SCALA")
+						.shouldDoGC(true).build();
 
 		new Runner(opt).run();
 	}
