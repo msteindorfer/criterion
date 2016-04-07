@@ -482,14 +482,14 @@ public class JmhSetMultimapBenchmarks {
 //			bh.consume(iterator.next());
 //		}
 //	}
-//	
-//	@Benchmark
-//	public void timeMultimapLikeIterationFlattenedEntry(Blackhole bh) {
-//		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
-//						.entryIterator(); iterator.hasNext();) {
-//			bh.consume(iterator.next());
-//		}
-//	}	
+	
+	@Benchmark
+	public void timeMultimapLikeIterationFlattenedEntry(Blackhole bh) {
+		for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator = testMap
+						.entryIterator(); iterator.hasNext();) {
+			bh.consume(iterator.next());
+		}
+	}	
 	
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
@@ -622,7 +622,7 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder() // timeMultimapLikeContainsTuple|timeMultimapLikeContainsTupleNotContained|timeMultimapLikeInsertTuple|timeMultimapLikeRemoveTuple
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeMapLike.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeMultimapLikeIterationFlattenedEntry.*)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
 						.param("dataType", "SET_MULTIMAP")
@@ -634,9 +634,9 @@ public class JmhSetMultimapBenchmarks {
 						.param("producer", "PDB_INTEGER").param("sampleDataSelection", "MATCH")
 //						.param("size", "2")
 //						.param("size", "2048")
-//						.param("size", "16")
+						.param("size", "16")
 						.param("size", "1048576")
-//						.param("size", "8388608")
+						.param("size", "8388608")
 						.param("multimapValueSize", "2")
 						.param("stepSizeOneToOneSelector", "2")
 //						.param("valueFactoryFactory", "VF_CHAMP")
