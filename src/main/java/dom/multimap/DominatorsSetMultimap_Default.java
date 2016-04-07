@@ -73,67 +73,6 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 	}
 
 	public ImmutableSetMultimap<IConstructor, IConstructor> calculateDominators(ImmutableSet<ITuple> graph) {
-//		IConstructor n0 = getTop(graph);
-//		ImmutableSet<IConstructor> nodes = carrier(graph);
-//		// if (!nodes.getElementType().isAbstractData()) {
-//		// throw new RuntimeException("nodes is not the right type");
-//		// }
-//		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> preds = toMap(project(graph, 1, 0));
-//		// nodes = nodes.delete(n0);
-//
-//		TransientMap<IConstructor, ImmutableSet<IConstructor>> w = DefaultTrieMap.transientOf();
-//		w.__put(n0, DefaultTrieSet.of(n0));
-//		for (IConstructor n : nodes.__remove(n0)) {
-//			w.__put(n, nodes);
-//		}
-//		ImmutableMap<IConstructor, ImmutableSet<IConstructor>> dom = w.freeze();
-//		
-//		ImmutableMap prev = DefaultTrieMap.of();
-//		/*
-//		 * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <-
-//		 * preds[n]?{}});
-//		 */
-//		while (!prev.equals(dom)) {
-//			prev = dom;
-//
-//			TransientMap<IConstructor, ImmutableSet<IConstructor>> newDom = DefaultTrieMap.transientOf();
-//
-//			for (IConstructor n : nodes) {
-//				ImmutableSet ps = (ImmutableSet) preds.get(n);
-//				if (ps == null) {
-//					ps = EMPTY;
-//				}
-//				ImmutableSet sos = setofdomsets(dom, ps);
-//				// if (!sos.getType().isSet() ||
-//				// !sos.getType().getElementType().isSet() ||
-//				// !sos.getType().getElementType().getElementType().isAbstractData())
-//				// {
-//				// throw new RuntimeException("not the right type: " +
-//				// sos.getType());
-//				// }
-//				ImmutableSet intersected = intersect(sos);
-//				// if (!intersected.getType().isSet() ||
-//				// !intersected.getType().getElementType().isAbstractData()) {
-//				// throw new RuntimeException("not the right type: " +
-//				// intersected.getType());
-//				// }
-//				ImmutableSet newValue = union(intersected, DefaultTrieSet.of(n));
-//				// ImmutableSet newValue = intersected.__insert(n);
-//				// if (!newValue.getElementType().isAbstractData()) {
-//				// System.err.println("problem");
-//				// }
-//				newDom.__put(n, newValue);
-//			}
-//	
-//			// if
-//			// (!newDom.done().getValueType().getElementType().isAbstractData())
-//			// {
-//			// System.err.println("not good");
-//			// }
-//			dom = newDom.freeze();
-//		}
-//	
-//		return dom;
 		
 //		long totalNrOfUniqueKeys = 0;
 //		long totalNrOfTuple = 0; 
@@ -345,21 +284,6 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 
 		return builder.done();
 	}
-
-	// private static <K extends IValue, V extends IValue> IMap
-	// immutableMapToPdbMap(
-	// ImmutableMap<K, V> map) {
-	// IValueFactory vf =
-	// org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
-	//
-	// IMapWriter builder = vf.mapWriter();
-	//
-	// for (Map.Entry<K, V> entry : map.entrySet()) {
-	// builder.put(entry.getKey(), entry.getValue());
-	// }
-	//
-	// return builder.done();
-	// }
 
 	private static ImmutableSet<ITuple> pdbSetToImmutableSet(ISet set) {
 		TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
@@ -621,30 +545,4 @@ class Util_Default {
 		return mm.freeze();
 	}	
 	
-//	/*
-//	 * Convert a set of tuples to a map; value in old map is associated with a
-//	 * set of keys in old map.
-//	 */
-//	@SuppressWarnings("unchecked")
-//	public static <K, V> ImmutableMap<K, ImmutableSet<V>> toMap(ImmutableSet<ITuple> st) {
-//		Map<K, TransientSet<V>> hm = new HashMap<>();
-//
-//		for (ITuple t : st) {
-//			K key = (K) t.get(0);
-//			V val = (V) t.get(1);
-//			TransientSet<V> wValSet = hm.get(key);
-//			if (wValSet == null) {
-//				wValSet = DefaultTrieSet.transientOf();
-//				hm.put(key, wValSet);
-//			}
-//			wValSet.__insert(val);
-//		}
-//
-//		TransientMap<K, ImmutableSet<V>> w = DefaultTrieMap.transientOf();
-//		for (K k : hm.keySet()) {
-//			w.__put(k, hm.get(k).freeze());
-//		}
-//		return w.freeze();
-//	}
-
 }
