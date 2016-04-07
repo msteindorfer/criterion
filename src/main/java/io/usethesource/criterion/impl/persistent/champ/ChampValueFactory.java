@@ -32,7 +32,12 @@ public class ChampValueFactory implements JmhValueFactory {
 					final Class<?> targetSetMultimapClass) {
 		setFactory = targetSetClass == null ? null : new SetFactory(targetSetClass);
 		mapFactory = targetMapClass == null ? null : new MapFactory(targetMapClass);
-		setMultimapFactory = new SetMultimapFactory(targetSetMultimapClass);
+		
+		if (targetSetMultimapClass == null) {
+			setMultimapFactory = null;
+		} else {
+			setMultimapFactory = new SetMultimapFactory(targetSetMultimapClass);
+		}
 	}
 
 	public JmhSet set() {
@@ -60,7 +65,11 @@ public class ChampValueFactory implements JmhValueFactory {
 
 	@Override
 	public JmhSetMultimapBuilder setMultimapBuilder() {
-		return new PersistentChampSetMultimapWriter(setMultimapFactory);
+		if (setMultimapFactory == null) {
+			return new PersistentChampSetMultimapWriterNew();
+		} else {
+			return new PersistentChampSetMultimapWriter(setMultimapFactory);		
+		}		
 	}
 
 	@Override

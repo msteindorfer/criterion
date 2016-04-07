@@ -1,8 +1,6 @@
 package dom.multimap;
 
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
-import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
-import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
 import static dom.multimap.Util_Default.EMPTY;
 import static dom.multimap.Util_Default.carrier;
 import static dom.multimap.Util_Default.intersect;
@@ -13,16 +11,15 @@ import static dom.multimap.Util_Default.union;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
+import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
 import org.rascalmpl.value.IMap;
 import org.rascalmpl.value.IMapWriter;
@@ -32,24 +29,16 @@ import org.rascalmpl.value.ITuple;
 import org.rascalmpl.value.IValue;
 import org.rascalmpl.value.IValueFactory;
 import org.rascalmpl.value.io.BinaryValueReader;
-import org.rascalmpl.value.io.BinaryValueWriter;
-import org.rascalmpl.value.io.StandardTextWriter;
 
 import dom.DominatorBenchmark;
 import dom.JmhCfgDominatorBenchmarks;
-import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.ImmutableSetMultimap;
-import io.usethesource.capsule.SetMultimap;
-import io.usethesource.capsule.TransientMap;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.capsule.TransientSetMultimap;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT;
-
-import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
 
 @SuppressWarnings("deprecation")
 public class DominatorsSetMultimap_Default implements DominatorBenchmark {

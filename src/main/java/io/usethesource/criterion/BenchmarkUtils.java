@@ -98,6 +98,13 @@ public class BenchmarkUtils {
 				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
 								null, TrieSetMultimap_HHAMT_Specialized.class);
 			}
+		},
+		VF_CHAMP_MULTIMAP_HHAMT_NEW {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, null);
+			}
 		};
 
 		public abstract JmhValueFactory getInstance();
