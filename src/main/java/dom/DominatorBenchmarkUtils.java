@@ -1,6 +1,7 @@
 package dom;
 
 import dom.multimap.DominatorsSetMultimap_Default;
+import dom.multimap.DominatorsSetMultimap_New;
 
 public class DominatorBenchmarkUtils {
 
@@ -9,6 +10,12 @@ public class DominatorBenchmarkUtils {
 			@Override
 			public DominatorBenchmark getBenchmark() {
 				return new DominatorsSetMultimap_Default();
+			}
+		},
+		HHAMT_NEW {
+			@Override
+			public DominatorBenchmark getBenchmark() {
+				return new DominatorsSetMultimap_New();
 			}
 		},
 		CHART {
