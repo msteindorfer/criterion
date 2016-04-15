@@ -75,8 +75,8 @@ public final class CalculateFootprintsHeterogeneous {
 		String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
 		boolean appendToFile = false;
 
-//		FootprintUtils.createExponentialRange(10, 11).stream().flatMap(size -> testOneConfiguration(size).stream())
-//				.collect(Collectors.toList());
+		FootprintUtils.createExponentialRange(10, 11).stream().flatMap(size -> testOneConfiguration(size, 0).stream())
+				.collect(Collectors.toList());
 		
 //		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
 //				FootprintUtils.createExponentialRange(0, 24).stream()
@@ -86,9 +86,9 @@ public final class CalculateFootprintsHeterogeneous {
 //		FootprintUtils.createLinearRange(0, 5, 1).stream().flatMap(run -> FootprintUtils
 //				.createExponentialRange(0, 24).stream().flatMap(size -> testOneConfiguration(size, run).stream())).collect(Collectors.toList()));
 		
-		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_primitive_latest.csv"), appendToFile,
-		FootprintUtils.createLinearRange(0, 1, 1).stream().flatMap(run -> FootprintUtils
-				.createExponentialRange(0, 24).stream().flatMap(size -> testOnePrimitiveConfiguration(size, run).stream())).collect(Collectors.toList()));					
+//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_primitive_latest.csv"), appendToFile,
+//		FootprintUtils.createLinearRange(0, 1, 1).stream().flatMap(run -> FootprintUtils
+//				.createExponentialRange(0, 24).stream().flatMap(size -> testOnePrimitiveConfiguration(size, run).stream())).collect(Collectors.toList()));					
 		
 		
 //		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_tiny.csv"), appendToFile,
@@ -182,17 +182,18 @@ public final class CalculateFootprintsHeterogeneous {
 		return presets.stream()
 				.flatMap(preset -> Arrays.stream(new String[] { 
 						/* Map<K, V> vs Multimap<K, V> */
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
-						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run,
-								preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED, size, run, preset),
+//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run, preset),
 
 //						/* Multimap<K, V> */
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, multimapValueSize,
-//								stepSizeOneToOneSelector, run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size,
-//								multimapValueSize, stepSizeOneToOneSelector, run, preset),
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),												 						
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
 //						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize, stepSizeOneToOneSelector,
 //								run, preset),
 //						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize, stepSizeOneToOneSelector,

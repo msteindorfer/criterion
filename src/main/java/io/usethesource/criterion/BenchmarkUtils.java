@@ -22,7 +22,10 @@ import io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieSetMultimap_ChampBasedPrototype;
 import io.usethesource.capsule.TrieSetMultimap_HCHAMP;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Interlinked;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Interlinked;
 import io.usethesource.capsule.TrieSet_5Bits;
 import io.usethesource.capsule.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.criterion.api.JmhValueFactory;
@@ -92,6 +95,13 @@ public class BenchmarkUtils {
 								null, TrieSetMultimap_HHAMT.class);
 			}
 		},
+		VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_HHAMT_Interlinked.class);
+			}
+		},
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED {
 			@Override
 			public JmhValueFactory getInstance() {
@@ -99,6 +109,20 @@ public class BenchmarkUtils {
 								null, TrieSetMultimap_HHAMT_Specialized.class);
 			}
 		},
+		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_HHAMT_Specialized_Interlinked.class);
+			}
+		},
+		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.class);
+			}
+		},		
 		VF_CHAMP_MULTIMAP_HHAMT_NEW {
 			@Override
 			public JmhValueFactory getInstance() {
