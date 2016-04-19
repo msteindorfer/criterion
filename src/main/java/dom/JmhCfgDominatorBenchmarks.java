@@ -159,6 +159,11 @@ public class JmhCfgDominatorBenchmarks {
 	
 	@Benchmark
 	public void timeDominatorCalculation(Blackhole bh) {
+		dominatorBenchmark.performBenchmark(bh, sampledGraphsNative);
+	}
+	
+	@Benchmark
+	public void timeDominatorCalculationInstrumented(Blackhole bh) {
 		unique = 0;
 		tuples = 0; 
 		tuples_one2one = 0;	
@@ -173,12 +178,12 @@ public class JmhCfgDominatorBenchmarks {
 		
 		System.out.println(String.format("csv;unique;tuples;tuples_one2one"));
 		System.out.println(String.format("csv;%d;%d;%d", unique, tuples, tuples_one2one));
-	}
+	}	
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
-										+ ".(timeDominatorCalculation)").warmupIterations(0)
+										+ ".(timeDominatorCalculation$)").warmupIterations(0)
 						.measurementIterations(1).mode(Mode.AverageTime).forks(1)
 						.timeUnit(TimeUnit.SECONDS)
 //						.param("size", "16")

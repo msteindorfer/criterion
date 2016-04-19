@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
@@ -32,20 +30,19 @@ import org.rascalmpl.value.IValueFactory;
 import org.rascalmpl.value.io.BinaryValueReader;
 
 import dom.DominatorBenchmark;
-import dom.JmhCfgDominatorBenchmarks;
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.TrieSet;
 import io.usethesource.capsule.TrieSetMultimap;
 
-@SuppressWarnings("deprecation")
 public class DominatorsSetMultimap_New implements DominatorBenchmark {
 
 	private Set.Immutable<Set.Immutable<IConstructor>> setofdomsets(SetMultimap.Immutable<IConstructor, IConstructor> dom, Set.Immutable<IConstructor> preds) {
 		Set.Transient<Set.Immutable<IConstructor>> result = TrieSet.transientOf();
 
 		for (IConstructor p : preds) {
+			@SuppressWarnings("unchecked")
 			Set.Immutable<IConstructor> ps = dom.apply(p).orElse(EMPTY);
 			result.insert(ps);
 		}
@@ -72,44 +69,15 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
 
 	public SetMultimap.Immutable<IConstructor, IConstructor> calculateDominators(Set.Immutable<ITuple> graph) {
 		
-//		long totalNrOfUniqueKeys = 0;
-//		long totalNrOfTuple = 0; 
-
-//		long unique = 0;
-//		long tuples = 0; 
-//		long one2one = 0;
-		
 		IConstructor n0 = getTop(graph);
 		Set.Immutable<IConstructor> nodes = carrier(graph);
 		
 		SetMultimap.Immutable<IConstructor, IConstructor> preds = toMultimap(project(graph, 1, 0));
 		
-		Iterator<Entry<IConstructor, Object>> it = preds.nativeEntryIterator();
-		
-		while (it.hasNext()) {
-			Entry<IConstructor, Object> tuple = it.next();
-			
-			Object singletonOrSet = tuple.getValue();
-			
-			if (singletonOrSet instanceof Set.Immutable) {
-				JmhCfgDominatorBenchmarks.unique++;
-				JmhCfgDominatorBenchmarks.tuples+=((Set.Immutable) singletonOrSet).size();				
-			} else {
-				JmhCfgDominatorBenchmarks.unique++;
-				JmhCfgDominatorBenchmarks.tuples++;
-				JmhCfgDominatorBenchmarks.tuples_one2one++;
-			}
-		}
-		
 		SetMultimap.Transient<IConstructor, IConstructor> w = TrieSetMultimap.transientOf();
 		w.insert(n0, n0);
-//		JmhCfgDominatorBenchmarks.unique++;
-//		JmhCfgDominatorBenchmarks.tuples++;
-//		JmhCfgDominatorBenchmarks.one2one++;
 		for (IConstructor n : nodes.remove(n0)) {
-			w.put(n, nodes); // TODO: implement method to put a whole set at once!
-//			JmhCfgDominatorBenchmarks.unique++;
-//			JmhCfgDominatorBenchmarks.tuples+=nodes.size();
+			w.put(n, nodes);
 		}
 		SetMultimap.Immutable<IConstructor, IConstructor> dom = w.asImmutable();
 		
@@ -121,43 +89,27 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
 		 */
 		while (!prev.equals(dom)) {
 			prev = dom;
-//			System.out.println(prev.size());
 			
 			SetMultimap.Transient<IConstructor, IConstructor> newDom = TrieSetMultimap.transientOf();
 
 			for (IConstructor n : nodes) {
+				@SuppressWarnings("unchecked")
 				Set.Immutable<IConstructor> ps = preds.apply(n).orElse(EMPTY);
-//				System.out.println(" ps: " + ps.size());
 				
 				Set.Immutable<Set.Immutable<IConstructor>> sos = setofdomsets(dom, ps);
-//				System.out.println(" sos: " + sos.size());
 				Set.Immutable<IConstructor> intersected = intersect(sos);
-//				System.out.println(" intersected: " + intersected.size());
 				
 				if (!intersected.isEmpty()) {
 					Set.Immutable<IConstructor> newValue = union(intersected, TrieSet.of(n));
-					newDom.put(n, newValue); // TODO: implement method to put a whole set at once!
-//					JmhCfgDominatorBenchmarks.unique++;
-//					JmhCfgDominatorBenchmarks.tuples+=newValue.size();					
+					newDom.put(n, newValue);
 				} else {
-					newDom.insert(n, n); // TODO: implement method to put a
-											// whole set at once!
-//					JmhCfgDominatorBenchmarks.unique++;
-//					JmhCfgDominatorBenchmarks.tuples++;
-//					JmhCfgDominatorBenchmarks.one2one++;
+					newDom.insert(n, n);
 				}
 			}
 
 			dom = newDom.asImmutable();
-//			return dom; // TODO: remove
 		}
 
-//		System.out.println("unique:" + unique);
-//		System.out.println("tuples:" + tuples);
-//		System.out.println("one2one:" + one2one);
-//
-//		System.out.println("ratio:" + tuples / unique);
-		
 		return dom;
 	}
 
