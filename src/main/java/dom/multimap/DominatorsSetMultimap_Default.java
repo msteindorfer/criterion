@@ -34,12 +34,19 @@ import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.ImmutableSetMultimap;
+import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.capsule.TransientSetMultimap;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT;
 
 public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 
+	private final SetMultimapFactory setMultimapFactory;
+	
+	public DominatorsSetMultimap_Default(SetMultimapFactory setMultimapFactory) {
+		this.setMultimapFactory = setMultimapFactory;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private ImmutableSet<ImmutableSet<IConstructor>> setofdomsets(
 					ImmutableSetMultimap<IConstructor, IConstructor> dom,
@@ -78,16 +85,16 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 		IConstructor n0 = getTop(graph);
 		ImmutableSet<IConstructor> nodes = carrier(graph);
 		
-		ImmutableSetMultimap<IConstructor, IConstructor> preds = toMultimap(project(graph, 1, 0));
+		ImmutableSetMultimap<IConstructor, IConstructor> preds = toMultimap(setMultimapFactory, project(graph, 1, 0));
 		
-		TransientSetMultimap<IConstructor, IConstructor> w = TrieSetMultimap_HHAMT.transientOf();
+		TransientSetMultimap<IConstructor, IConstructor> w = setMultimapFactory.transientOf();
 		w.__insert(n0, n0);
 		for (IConstructor n : nodes.__remove(n0)) {
 			w.__put(n, nodes);
 		}
 		ImmutableSetMultimap<IConstructor, IConstructor> dom = w.freeze();
 		
-		ImmutableSetMultimap<IConstructor, IConstructor> prev = TrieSetMultimap_HHAMT.of();
+		ImmutableSetMultimap<IConstructor, IConstructor> prev = setMultimapFactory.of();
 		
 		/*
 		 * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <-
@@ -96,7 +103,7 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 		while (!prev.equals(dom)) {
 			prev = dom;
 
-			TransientSetMultimap<IConstructor, IConstructor> newDom = TrieSetMultimap_HHAMT.transientOf();
+			TransientSetMultimap<IConstructor, IConstructor> newDom = setMultimapFactory.transientOf();
 
 			for (IConstructor n : nodes) {
 				ImmutableSet<IConstructor> ps = preds.get(n);
@@ -120,6 +127,8 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 		return dom;
 	}
 
+	private static SetMultimapFactory DEFAULT_SET_MULTIMAP_FACTORY = new SetMultimapFactory(TrieSetMultimap_HHAMT.class);
+	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		testOne();
 		// assertDominatorsEqual();
@@ -134,7 +143,7 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 		ImmutableSet<ITuple> graph = pdbSetToImmutableSet(data);
 
 		long before = Timing.getCpuTime();
-		ImmutableSetMultimap<IConstructor, IConstructor> results = new DominatorsSetMultimap_Default()
+		ImmutableSetMultimap<IConstructor, IConstructor> results = new DominatorsSetMultimap_Default(DEFAULT_SET_MULTIMAP_FACTORY)
 				.calculateDominators(graph);
 		System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: " + ((Timing.getCpuTime() - before) / 1000000000)
 				+ " seconds\n");
@@ -161,7 +170,7 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 		long before = Timing.getCpuTime();
 		for (ImmutableSet<ITuple> graph : graphs) {
 			try {
-				result.__insert(new DominatorsSetMultimap_Default().calculateDominators(graph));
+				result.__insert(new DominatorsSetMultimap_Default(DEFAULT_SET_MULTIMAP_FACTORY).calculateDominators(graph));
 			} catch (RuntimeException e) {
 				System.err.println(e.getMessage());
 			}
@@ -272,7 +281,7 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
 		for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
 			try {
-				bh.consume(new DominatorsSetMultimap_Default().calculateDominators(graph));
+				bh.consume(new DominatorsSetMultimap_Default(DEFAULT_SET_MULTIMAP_FACTORY).calculateDominators(graph));
 			} catch (NoSuchElementException e) {
 				System.err.println(e.getMessage());
 			}
@@ -492,8 +501,8 @@ class Util_Default {
 	 * set of keys in old map.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <K, V> ImmutableSetMultimap<K, V> toMultimap(ImmutableSet<ITuple> st) {
-		TransientSetMultimap<K, V> mm = TrieSetMultimap_HHAMT.transientOf();
+	public static <K, V> ImmutableSetMultimap<K, V> toMultimap(SetMultimapFactory setMultimapFactory, ImmutableSet<ITuple> st) {
+		TransientSetMultimap<K, V> mm = setMultimapFactory.transientOf();
 
 		for (ITuple t : st) {
 			K key = (K) t.get(0);
