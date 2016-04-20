@@ -84,8 +84,9 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
 		SetMultimap.Immutable<IConstructor, IConstructor> prev = TrieSetMultimap.of();
 		
 		/*
-		 * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <-
-		 * preds[n]?{}});
+		 * solve (dom) 
+		 *   for (n <- nodes) 
+		 *     dom[n] = {n} + intersect({dom[p] | p <- preds[n]?{}});
 		 */
 		while (!prev.equals(dom)) {
 			prev = dom;
@@ -105,6 +106,10 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
 				} else {
 					newDom.insert(n, n);
 				}
+				
+				// TODO: check if structural join of preds and dom is possible
+				// TODO: implement structural intersect/union that is oblivious of size/hashCode 
+				// TODO: check streaming solution dom.filter(preds(n)).values().intersect().union(n)
 			}
 
 			dom = newDom.asImmutable();

@@ -109,6 +109,17 @@ public class BenchmarkUtils {
 								null, TrieSetMultimap_HHAMT_Specialized.class);
 			}
 		},
+		/**
+		 * Option is equal to {@value #VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED}, but used to tag the usage of system property
+		 * {@literal -Dio.usethesource.capsule.RangecopyUtils.dontUseSunMiscUnsafeCopyMemory=true}.
+		 */
+		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_NO_COPYMEMORY {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
+								null, TrieSetMultimap_HHAMT_Specialized.class);
+			}
+		},
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED {
 			@Override
 			public JmhValueFactory getInstance() {
