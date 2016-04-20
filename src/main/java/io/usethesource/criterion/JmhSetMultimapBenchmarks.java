@@ -507,19 +507,32 @@ public class JmhSetMultimapBenchmarks {
 		}
 	}	
 	
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeMapLikePut(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
+//		}
+//	}
+//
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeMapLikePutContained(Blackhole bh) {
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.put(cachedNumbers[i], cachedNumbers[i]));
+//		}
+//	}
+	
 	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	@OperationsPerInvocation(2 * CACHED_NUMBERS_SIZE)
 	public void timeMapLikePut(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
-		}
-	}
-
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeMapLikePutContained(Blackhole bh) {
+		// full match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.put(cachedNumbers[i], cachedNumbers[i]));
+		}
+		// no match
+		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+			bh.consume(testMap.put(cachedNumbersNotContained[i], VALUE_NOT_EXISTING));
 		}
 	}
 	
@@ -550,22 +563,24 @@ public class JmhSetMultimapBenchmarks {
 
 	@Benchmark
 	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-	public void timeMapLikeRemoveNotContained(Blackhole bh) {
-		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
-			bh.consume(testMap.remove(cachedNumbersNotContained[i]));
-		}
-	}
-
-	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
 	public void timeMapLikeRemove(Blackhole bh) {
+		// full match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
 			bh.consume(testMap.remove(cachedNumbers[i]));
 		}
 	}
 	
+//	@Benchmark
+//	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+//	public void timeMapLikeRemoveNotContained(Blackhole bh) {
+//		// no match
+//		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+//			bh.consume(testMap.remove(cachedNumbersNotContained[i]));
+//		}
+//	}
+
 	@Benchmark
-	@OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+	@OperationsPerInvocation(2 * CACHED_NUMBERS_SIZE)
 	public void timeMultimapLikeRemoveTuple(Blackhole bh) {
 		// full match
 		for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
@@ -595,20 +610,20 @@ public class JmhSetMultimapBenchmarks {
 //		bh.consume(testMap.equals(testMapDeltaDuplicate));
 //	}
 	
-	@Benchmark
-	public void timeMapLikeEqualsRealDuplicate(Blackhole bh) {
-		bh.consume(testMap.equals(testMapRealDuplicate));
-	}
-
 //	@Benchmark
-//	public void timeMapLikeEqualsRealDuplicateModified(Blackhole bh) {
-//		bh.consume(testMap.equals(testMapRealDuplicateSameSizeButDifferent));
+//	public void timeMapLikeEqualsRealDuplicate(Blackhole bh) {
+//		bh.consume(testMap.equals(testMapRealDuplicate));
 //	}
-
-	@Benchmark
-	public void timeMapLikeEqualsDeltaDuplicate(Blackhole bh) {
-		bh.consume(testMap.equals(testMapDeltaDuplicate));
-	}
+//
+////	@Benchmark
+////	public void timeMapLikeEqualsRealDuplicateModified(Blackhole bh) {
+////		bh.consume(testMap.equals(testMapRealDuplicateSameSizeButDifferent));
+////	}
+//
+//	@Benchmark
+//	public void timeMapLikeEqualsDeltaDuplicate(Blackhole bh) {
+//		bh.consume(testMap.equals(testMapDeltaDuplicate));
+//	}
 
 	// @Benchmark
 	// @BenchmarkMode(Mode.SingleShotTime)
