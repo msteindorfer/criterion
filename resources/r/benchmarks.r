@@ -10,7 +10,7 @@ args <- commandArgs(TRUE)
 
 setwd("~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data")
 dataDirectory <- "~/Research/datastructures-for-metaprogramming/hamt-heterogeneous/data"
-timestamp <- "20160321_0946"
+timestamp <- "20160426_1056"
 # timestamp <- "mapVsSetMultimap-latest"
 timestampMemoryMeasurement <- "latest"
 
@@ -377,29 +377,30 @@ orderedBenchmarkNames <- function(dataType) {
   candidates <- c("ContainsKey", "ContainsKeyNotContained", "Insert", "InsertContained", "RemoveKey", "RemoveKeyNotContained", "Iteration", "EntryIteration", "EqualsRealDuplicate", "EqualsDeltaDuplicate", "Footprint32", "Footprint64")
   
   if (dataType == "SET_MULTIMAP") {
-    c("MultimapLikeContainsTuple", 
-      "MultimapLikeContainsTupleNotContained", 
-      "MultimapLikeInsertTuple", 
-      # "MultimapLikeInsertTupleContained", 
-      "MultimapLikeRemoveTuple", 
-      # "MultimapLikeRemoveTupleNotContained", 
-      # "MultimapLikeIterationKey", 
-      # "MultimapLikeIterationFlattenedEntry", 
-      # "MultimapLikeEqualsRealDuplicate", 
-      # "MultimapLikeEqualsDeltaDuplicate", 
-      "Footprint32", 
-      "Footprint64")
+    c("MultimapLikeContainsTuple" 
+      , "MultimapLikeContainsTupleNotContained"
+      , "MultimapLikeInsertTuple"
+      # , "MultimapLikeInsertTupleContained"
+      , "MultimapLikeRemoveTuple"
+      # , "MultimapLikeRemoveTupleNotContained"
+      # , "MultimapLikeIterationKey"
+      # , "MultimapLikeIterationFlattenedEntry"
+      # , "MultimapLikeEqualsRealDuplicate" 
+      # , "MultimapLikeEqualsDeltaDuplicate"
+      , "Footprint32"
+      , "Footprint64"
+      )
   } else if (dataType == "MAP") {
-    c("MapLikeContainsKey",
-      "MapLikeContainsKeyNotContained",
-      "MapLikePut",
-      "MapLikePutContained",
-      "MapLikeRemove",
-      "MapLikeRemoveNotContained",
-      "MapLikeIterationKey"
+    c("MapLikeContainsKey"
+      , "MapLikeContainsKeyNotContained"
+      , "MapLikePut"
+      , "MapLikePutContained"
+      , "MapLikeRemove"
+      , "MapLikeRemoveNotContained"
+      , "MapLikeIterationKey"
       , "MapLikeIterationNativeEntry"
-      # "MapLikeEqualsRealDuplicate",
-      # "MapLikeEqualsDeltaDuplicate",
+      # , "MapLikeEqualsRealDuplicate"
+      # , "MapLikeEqualsDeltaDuplicate"
 #       , "Footprint32"
 #       , "Footprint64"
       )
@@ -415,25 +416,26 @@ orderedBenchmarkNamesForBoxplot <- function(dataType) {
   candidates <- c("Eq. (Distinct)", "Eq. (Derived)")
     
   if (dataType == "SET_MULTIMAP") {
-    c("Lookup\n", 
-      "Lookup\n(Fail)", 
-      "Insert\n", 
-      # "Insert\n(Fail)", 
-      "Delete\n", 
-      # "Delete\n(Fail)", 
-      # "Iteration\n(Key)", 
-      # "Iteration\n(Entry)", 
-      # "Equality\n(Distinct)", 
-      # "Equality\n(Derived)", 
-      "Footprint\n(32-bit)", 
-      "Footprint\n(64-bit)")
+    c("Lookup\n" 
+      , "Lookup\n(Fail)" 
+      , "Insert\n" 
+      # , "Insert\n(Fail)" 
+      , "Delete\n" 
+      # , "Delete\n(Fail)" 
+      # , "Iteration\n(Key)" 
+      # , "Iteration\n(Entry)"
+      # , "Equality\n(Distinct)" 
+      # , "Equality\n(Derived)" 
+      , "Footprint\n(32-bit)" 
+      , "Footprint\n(64-bit)"
+      )
   } else if (dataType == "MAP") {
     c("Lookup\n"
       , "Lookup\n(Fail)"
       , "Insert\n"
-      , "Insert\n(Fail)"
+#       , "Insert\n(Fail)"
       , "Delete\n"
-      , "Delete\n(Fail)"
+#       , "Delete\n(Fail)"
       , "Iteration\n(Key)"
       , "Iteration\n(Entry)"
       # , "Equality\n(Distinct)"
@@ -746,13 +748,19 @@ createAllTables <- function(dataFormatter, compareFunction, boxplotFunction, nam
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_SCALA", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 #   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CLOJURE", dataFormatter, compareFunction, boxplotFunction, nameAppendix)
 
+  ### MAP VS MULTIMAP ###
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MULTIMAP_HHAMT", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  #
+  createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_NO_COPYMEMORY", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  ###  
+  
+  ### MULTIMAP ###
   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_SCALA", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
   createTable(benchmarksByNameOutput, "SET_MULTIMAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CLOJURE", dataFormatter, compareFunction, createBoxplotSetMultimapSpeedups, nameAppendix)
-
-#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HCHAMP", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-#   createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-#   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MAP_AS_MULTIMAP", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
-#   # createTable(benchmarksByNameOutput, "MAP", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED", "VF_CHAMP_MULTIMAP_HHAMT", dataFormatter, compareFunction, createBoxplotMapVsSetMultimapSpeedups, nameAppendix)
+  ###
 }
 
 
@@ -839,7 +847,7 @@ df <- benchmarksCleaned
 
 df$overheadPerTuple <- df$Score / (df$Param_size * 1.5) - 8
 dfSubOur <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & df$Param_valueFactoryFactory == "VF_CHAMP_MULTIMAP_HHAMT",]
-dfSubOurSpecialized <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & df$Param_valueFactoryFactory == "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED",]
+dfSubOurSpecialized <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & df$Param_valueFactoryFactory == "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED",]
 dfSubOther <- df[df$Benchmark == "Footprint32" & df$Param_dataType == "SET_MULTIMAP" & (df$Param_valueFactoryFactory == "VF_SCALA" | df$Param_valueFactoryFactory == "VF_CLOJURE"),]
 
 median(dfSubOur$overheadPerTuple)

@@ -13,6 +13,7 @@ package io.usethesource.criterion;
 
 import java.math.BigInteger;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -45,6 +46,8 @@ import objectexplorer.ObjectGraphMeasurer.Footprint;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
+import static io.usethesource.criterion.FootprintUtils.*;
+
 public final class CalculateFootprintsHeterogeneous {
 
 	static final String memoryArchitecture;
@@ -75,36 +78,49 @@ public final class CalculateFootprintsHeterogeneous {
 		String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
 		boolean appendToFile = false;
 
-		FootprintUtils.createExponentialRange(10, 11).stream().flatMap(size -> testOneConfiguration(size, 0).stream())
-				.collect(Collectors.toList());
+//		createExponentialRange(10, 11).stream().flatMap(size -> testOneConfiguration(size, 0).stream())
+//				.collect(Collectors.toList());		
 		
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
-//				FootprintUtils.createExponentialRange(0, 24).stream()
+		// createExponentialRangeWithIntermediatePoints()		
+		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"),
+					appendToFile,
+					createExponentialRangeWithIntermediatePoints().stream()
+									.flatMap(size -> createLinearRange(0, 5, 1).stream().flatMap(run -> testOneConfiguration(size, run).stream())) 
+									.collect(Collectors.toList()));
+
+		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_primitive_latest.csv"),
+						appendToFile,
+						createExponentialRangeWithIntermediatePoints().stream()
+						.flatMap(size -> createLinearRange(0, 5, 1).stream().flatMap(run -> testOnePrimitiveConfiguration(size, run).stream())) 
+						.collect(Collectors.toList()));		
+		
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
+//				createExponentialRange(0, 24).stream()
 //						.flatMap(size -> testOneConfiguration(size, 0).stream()).collect(Collectors.toList()));
 
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
-//		FootprintUtils.createLinearRange(0, 5, 1).stream().flatMap(run -> FootprintUtils
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"), appendToFile,
+//		createLinearRange(0, 5, 1).stream().flatMap(run -> FootprintUtils
 //				.createExponentialRange(0, 24).stream().flatMap(size -> testOneConfiguration(size, run).stream())).collect(Collectors.toList()));
 		
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_primitive_latest.csv"), appendToFile,
-//		FootprintUtils.createLinearRange(0, 1, 1).stream().flatMap(run -> FootprintUtils
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_primitive_latest.csv"), appendToFile,
+//		createLinearRange(0, 1, 1).stream().flatMap(run -> FootprintUtils
 //				.createExponentialRange(0, 24).stream().flatMap(size -> testOnePrimitiveConfiguration(size, run).stream())).collect(Collectors.toList()));					
 		
 		
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_tiny.csv"), appendToFile,
-//				FootprintUtils.createLinearRange(0, 101, 1).stream()
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_tiny.csv"), appendToFile,
+//				createLinearRange(0, 101, 1).stream()
 //						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 //		
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_small.csv"), appendToFile,
-//				FootprintUtils.createLinearRange(0, 10_100, 100).stream()
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_small.csv"), appendToFile,
+//				createLinearRange(0, 10_100, 100).stream()
 //						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 //
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_medium.csv"), appendToFile,
-//				FootprintUtils.createLinearRange(10_000, 101_000, 1_000).stream()
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_medium.csv"), appendToFile,
+//				createLinearRange(10_000, 101_000, 1_000).stream()
 //						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 //
-//		FootprintUtils.writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_large.csv"), appendToFile,
-//				FootprintUtils.createLinearRange(100_000, 8_100_000, 100_000).stream()
+//		writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_large.csv"), appendToFile,
+//				createLinearRange(100_000, 8_100_000, 100_000).stream()
 //						.flatMap(size -> testOneConfiguration(size).stream()).collect(Collectors.toList()));
 	}
 
@@ -125,6 +141,23 @@ public final class CalculateFootprintsHeterogeneous {
 	// int size = thisExpSize - m * stride;
 	// }
 
+	
+	public static List<Integer> createExponentialRangeWithIntermediatePoints() {
+		List<Integer> tmpExponentialRange1 = createExponentialRange(0, 24);
+		List<Integer> tmpExponentialRange2 = createExponentialRange(-1, 23);
+
+		List<Integer> tmpExponentialRange = new ArrayList<>(2 * tmpExponentialRange1.size());
+		for (int i = 0; i < tmpExponentialRange1.size(); i++) {
+			tmpExponentialRange.add(tmpExponentialRange1.get(i));
+			tmpExponentialRange.add(tmpExponentialRange1.get(i) + tmpExponentialRange2.get(i));
+		}
+
+		List<Integer> exponentialRange = tmpExponentialRange.stream().skip(1)
+						.limit(2 * tmpExponentialRange1.size() - 2).collect(Collectors.toList());
+
+		return exponentialRange;
+	}
+	
 	public static List<String> testOneConfiguration(int size, int run) {
 		/*		
 		// int size = 32;
@@ -182,27 +215,27 @@ public final class CalculateFootprintsHeterogeneous {
 		return presets.stream()
 				.flatMap(preset -> Arrays.stream(new String[] { 
 						/* Map<K, V> vs Multimap<K, V> */
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
+						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run, preset),
 
-//						/* Multimap<K, V> */
+						/* Multimap<K, V> */
 						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),												 						
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),												 						
 						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
 						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize, stepSizeOneToOneSelector,
-//								run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize, stepSizeOneToOneSelector,
-//								run, preset),		
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize, stepSizeOneToOneSelector, run, preset),		
 						
 //						/* Map[int, int] */
-////						, createAndMeasureFastUtilInt2IntOpenHashMap(data, size, 0, preset)
-////						, createAndMeasureMahoutMutableIntIntHashMap(data, size, 0, preset)
-////						, createAndMeasureGsImmutableIntIntMap(data, size, 0, preset)
+//						createAndMeasureTrieMapHeterogeneous(data, size, run, preset, false),
+//						
+//						createAndMeasureFastUtilInt2IntOpenHashMap(data, size, run, preset),
+//						createAndMeasureMahoutMutableIntIntHashMap(data, size, run, preset),
+//						createAndMeasureTrove4jTIntIntHashMap(data, size, run, preset),
+//						createAndMeasureGsImmutableIntIntMap(data, size, run, preset),
 						
 						/* SetMultimap */
 //						, createAndMeasureGsImmutableSetMultimap(data, size, 0, preset)
@@ -263,25 +296,6 @@ public final class CalculateFootprintsHeterogeneous {
 
 		final MemoryFootprintPreset preset = MemoryFootprintPreset.RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER;
 		return Arrays.stream(new String[] { 
-//						/* Map<K, V> vs Multimap<K, V> */
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
-//						createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size, run,
-//								preset)
-
-//						/* Multimap<K, V> */
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, multimapValueSize,
-//								stepSizeOneToOneSelector, run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size,
-//								multimapValueSize, stepSizeOneToOneSelector, run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize, stepSizeOneToOneSelector,
-//								run, preset),
-//						createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize, stepSizeOneToOneSelector,
-//								run, preset),		
-						
-				// createAndMeasureJavaUtilHashMap(data, size, 0, preset),
-				
 				/* Map[int, int] */
 				createAndMeasureGuavaImmutableMap(data, size, run, preset), // Reference
 				createAndMeasureTrieMapHeterogeneous_asMap(data, size, run, preset),
@@ -293,8 +307,8 @@ public final class CalculateFootprintsHeterogeneous {
 				/* ******************* */				
 				
 				/* Multimap[int, int] */
-				createAndMeasureGuavaImmutableSetMultimap(data, size, run, preset), // Reference
-				createAndMeasureTrieMapHeterogeneous_asMultimap(data, size, run, preset),
+				// createAndMeasureGuavaImmutableSetMultimap(data, size, run, preset), // Reference
+				// createAndMeasureTrieMapHeterogeneous_asMultimap(data, size, run, preset),
 				/* ******************* */
 				/** NOTHING AVAILABLE **/
 				/* ******************* */										
@@ -677,7 +691,7 @@ public final class CalculateFootprintsHeterogeneous {
 		long memoryInBytes = objectexplorer.MemoryMeasurer.measureBytes(objectToMeasure, predicate);
 		Footprint memoryFootprint = objectexplorer.ObjectGraphMeasurer.measure(objectToMeasure, predicate);
 
-		final String statString = String.format("%d\t %60s\t\t %s", memoryInBytes, className, memoryFootprint);
+		final String statString = String.format("%d (%d@%d)\t %60s\t\t %s", size, run, memoryInBytes, className, memoryFootprint);
 		System.out.println(statString);
 
 		// final String statLatexString = String.format("%s & %s & %s & %b & %d

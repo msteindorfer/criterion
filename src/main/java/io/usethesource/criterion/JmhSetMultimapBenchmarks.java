@@ -48,7 +48,7 @@ public class JmhSetMultimapBenchmarks {
 
 	private static boolean USE_PRIMITIVE_DATA = false;
 
-	@Param({ "SET_MULTIMAP" })
+	@Param // ({ "SET_MULTIMAP" })
 	public DataType dataType;
 
 	@Param({ "MATCH" })
@@ -653,25 +653,38 @@ public class JmhSetMultimapBenchmarks {
 		System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder() // timeMultimapLikeContainsTuple|timeMultimapLikeContainsTupleNotContained|timeMultimapLikeInsertTuple|timeMultimapLikeRemoveTuple
 						.include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-										+ ".(timeMultimapLikeInsertTuple)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeMultimapLikeIterationFlattenedEntry)$") // ".(timeMapLikeContainsKey|timeMapLikeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
 						.param("dataType", "SET_MULTIMAP")
-						.param("run", "0")
-//						.param("run", "1")
+//						.param("run", "0")
+						.param("run", "1")
 //						.param("run", "2")
 //						.param("run", "3")
 //						.param("run", "4")
 						.param("producer", "PDB_INTEGER").param("sampleDataSelection", "MATCH")
+						
 //						.param("size", "2")
-//						.param("size", "2048")
+//						.param("size", "3")
+//						.param("size", "4")
+//						.param("size", "6")
+//						.param("size", "8")
+//						.param("size", "12")
 //						.param("size", "16")
-						.param("size", "1048576")
+//						.param("size", "24")
+//						.param("size", "32")
+						
+						.param("size", "16")
+//						.param("size", "2048")
+//						.param("size", "1048576")
 //						.param("size", "8388608")
-						.param("multimapValueSize", "1")
-						.param("stepSizeOneToOneSelector", "1")
-//						.param("multimapValueSize", "2")
-//						.param("stepSizeOneToOneSelector", "2")
+						
+//						.param("multimapValueSize", "1")
+//						.param("stepSizeOneToOneSelector", "1")
+						
+						.param("multimapValueSize", "2")
+						.param("stepSizeOneToOneSelector", "2")
+						
 //						.param("valueFactoryFactory", "VF_CHAMP")
 //						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //						.param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")

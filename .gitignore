@@ -1,5 +1,7 @@
 target/
 
+git.commit.*.txt
+
 *.log
 *.tgz
 *.xz
