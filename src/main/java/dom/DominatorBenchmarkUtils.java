@@ -29,14 +29,14 @@ public class DominatorBenchmarkUtils {
 			@Override
 			public DominatorBenchmark getBenchmark() {
 				return new DominatorsSetMultimap_Default(
-								new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized.class));
+								new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized_Interlinked.class));
 			}
 		},				
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED {
 			@Override
 			public DominatorBenchmark getBenchmark() {
 				return new DominatorsSetMultimap_Default(
-								new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized_Interlinked.class));
+								new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized.class));
 			}
 		},				
 		VF_CHAMP_MULTIMAP_HHAMT_NEW {
