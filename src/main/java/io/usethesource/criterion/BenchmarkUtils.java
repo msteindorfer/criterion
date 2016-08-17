@@ -59,7 +59,13 @@ public class BenchmarkUtils {
 			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.unclejim.UnclejimValueFactory();
 			}
-		},        
+		},
+		VF_DEXX {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.dexx.DexxValueFactory();
+			}
+		},		
 		VF_CHAMP_MEMOIZED {
 			@Override
 			public JmhValueFactory getInstance() {

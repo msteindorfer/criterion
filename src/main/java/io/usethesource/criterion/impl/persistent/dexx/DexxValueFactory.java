@@ -9,7 +9,7 @@
  *
  *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI  
  *******************************************************************************/
-package io.usethesource.criterion.impl.persistent.unclejim;
+package io.usethesource.criterion.impl.persistent.dexx;
 
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
@@ -19,9 +19,9 @@ import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
-public class UnclejimValueFactory implements JmhValueFactory {
+public class DexxValueFactory implements JmhValueFactory {
 
-	public UnclejimValueFactory() {
+	public DexxValueFactory() {
 	}
 
 	public JmhSet set() {
@@ -39,7 +39,7 @@ public class UnclejimValueFactory implements JmhValueFactory {
 
 	@Override
 	public JmhMapBuilder mapBuilder() {
-		return new UnclejimMapWriter();
+		return new DexxMapWriter();
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class UnclejimValueFactory implements JmhValueFactory {
 
 	@Override
 	public String toString() {
-		return "VF_UNCLEJIM";
+		return "VF_DEXX";
 	}
 
 }

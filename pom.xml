@@ -290,6 +290,11 @@
 			<artifactId>UncleJim</artifactId>
 			<version>1.0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.andrewoma.dexx</groupId>
+			<artifactId>collection</artifactId>
+			<version>0.6</version>
+		</dependency>		
 	</dependencies>
 
 </project>

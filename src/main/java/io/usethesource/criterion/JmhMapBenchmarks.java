@@ -525,6 +525,7 @@ public class JmhMapBenchmarks {
 						.param("valueFactoryFactory", "VF_SCALA")
 	                    .param("valueFactoryFactory", "VF_JAVASLANG")
 	                    .param("valueFactoryFactory", "VF_UNCLEJIM")
+	                    .param("valueFactoryFactory", "VF_DEXX")	                    
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();
