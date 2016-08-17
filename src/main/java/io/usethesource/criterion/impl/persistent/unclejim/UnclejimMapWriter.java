@@ -9,30 +9,31 @@
  *
  *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
  *******************************************************************************/
-package io.usethesource.criterion.impl.persistent.javaslang;
+package io.usethesource.criterion.impl.persistent.unclejim;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import org.organicdesign.fp.collections.PersistentHashMap;
+
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
-import javaslang.collection.HashMap;
 
-final class JavaslangMapWriter implements JmhMapBuilder {
+final class UnclejimMapWriter implements JmhMapBuilder {
 
-	protected HashMap<JmhValue, JmhValue> mapContent;
+	protected PersistentHashMap<JmhValue, JmhValue> mapContent;
 	protected JmhMap constructedMap;
 
-	JavaslangMapWriter() {
-		mapContent = HashMap.empty();
+	UnclejimMapWriter() {
+		mapContent = PersistentHashMap.empty();
 		constructedMap = null;
 	}
 
 	@Override
 	public void put(JmhValue key, JmhValue value) {
 		checkMutation();
-		mapContent = mapContent.put(key, value);
+		mapContent = mapContent.assoc(key, value);
 	}
 
 	@Override
@@ -53,7 +54,7 @@ final class JavaslangMapWriter implements JmhMapBuilder {
 			final JmhValue key = entry.getKey();
 			final JmhValue value = entry.getValue();
 
-			mapContent = mapContent.put(key, value);
+			mapContent = mapContent.assoc(key, value);
 		}
 	}
 
@@ -67,7 +68,7 @@ final class JavaslangMapWriter implements JmhMapBuilder {
 	@Override
 	public JmhMap done() {
 		if (constructedMap == null) {
-			constructedMap = new JavaslangMap(mapContent);
+			constructedMap = new UnclejimMap(mapContent);
 		}
 
 		return constructedMap;

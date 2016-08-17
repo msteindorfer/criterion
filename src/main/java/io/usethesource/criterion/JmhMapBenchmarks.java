@@ -521,9 +521,10 @@ public class JmhMapBenchmarks {
 //						.param("size", "2048")
 						.param("size", "1048576")
 						.param("valueFactoryFactory", "VF_CHAMP")
-	                    .param("valueFactoryFactory", "VF_JAVASLANG")
 						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
-//						.param("valueFactoryFactory", "VF_SCALA")
+						.param("valueFactoryFactory", "VF_SCALA")
+	                    .param("valueFactoryFactory", "VF_JAVASLANG")
+	                    .param("valueFactoryFactory", "VF_UNCLEJIM")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();

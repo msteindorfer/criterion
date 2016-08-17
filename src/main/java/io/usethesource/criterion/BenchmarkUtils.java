@@ -48,12 +48,18 @@ public class BenchmarkUtils {
 								TrieSet_5Bits.class, TrieMap_5Bits.class, TrieSetMultimap_HCHAMP.class);
 			}
 		},
-        VF_JAVASLANG {
-          @Override
-          public JmhValueFactory getInstance() {
-            return new io.usethesource.criterion.impl.persistent.javaslang.JavaslangValueFactory();
-          }
-        },
+		VF_JAVASLANG {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.javaslang.JavaslangValueFactory();
+			}
+		},
+		VF_UNCLEJIM {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.unclejim.UnclejimValueFactory();
+			}
+		},        
 		VF_CHAMP_MEMOIZED {
 			@Override
 			public JmhValueFactory getInstance() {

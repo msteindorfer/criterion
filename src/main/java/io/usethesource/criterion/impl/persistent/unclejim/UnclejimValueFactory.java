@@ -9,7 +9,7 @@
  *
  *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI  
  *******************************************************************************/
-package io.usethesource.criterion.impl.persistent.javaslang;
+package io.usethesource.criterion.impl.persistent.unclejim;
 
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
@@ -19,9 +19,9 @@ import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
-public class JavaslangValueFactory implements JmhValueFactory {
+public class UnclejimValueFactory implements JmhValueFactory {
 
-	public JavaslangValueFactory() {
+	public UnclejimValueFactory() {
 	}
 
 	public JmhSet set() {
@@ -39,7 +39,7 @@ public class JavaslangValueFactory implements JmhValueFactory {
 
 	@Override
 	public JmhMapBuilder mapBuilder() {
-		return new JavaslangMapWriter();
+		return new UnclejimMapWriter();
 	}
 
 	@Override
