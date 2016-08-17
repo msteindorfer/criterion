@@ -20,6 +20,7 @@
 
 	<groupId>io.usethesource</groupId>
 	<artifactId>criterion</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<prerequisites>
@@ -86,7 +87,7 @@
 		<dependency>
 			<groupId>org.rascalmpl</groupId>
 			<artifactId>rascal</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.8.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
@@ -113,6 +114,11 @@
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>io.javaslang</groupId>
+			<artifactId>javaslang</artifactId>
+			<version>2.0.2</version>
+		</dependency>		
 	</dependencies>
 
 	<properties>
@@ -301,5 +307,4 @@
 <!-- 		</pluginRepository> -->
 <!-- 	</pluginRepositories> -->
 
-	<version>0.0.1-SNAPSHOT</version>
 </project>
