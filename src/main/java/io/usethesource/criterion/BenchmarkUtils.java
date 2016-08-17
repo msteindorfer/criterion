@@ -16,18 +16,17 @@ import java.util.Random;
 
 import io.usethesource.capsule.TrieMap_5Bits;
 import io.usethesource.capsule.TrieMap_5Bits_AsSetMultimap;
-import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.TrieMap_5Bits_Memoized_LazyHashCode;
-import io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.TrieSetMultimap_ChampBasedPrototype;
-import io.usethesource.capsule.TrieSetMultimap_HCHAMP;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Interlinked;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Interlinked;
 import io.usethesource.capsule.TrieSet_5Bits;
-import io.usethesource.capsule.TrieSet_5Bits_Memoized_LazyHashCode;
+import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
+import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_ChampBasedPrototype;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Interlinked;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class BenchmarkUtils {
@@ -49,6 +48,12 @@ public class BenchmarkUtils {
 								TrieSet_5Bits.class, TrieMap_5Bits.class, TrieSetMultimap_HCHAMP.class);
 			}
 		},
+        VF_JAVASLANG {
+          @Override
+          public JmhValueFactory getInstance() {
+            return new io.usethesource.criterion.impl.persistent.javaslang.JavaslangValueFactory();
+          }
+        },
 		VF_CHAMP_MEMOIZED {
 			@Override
 			public JmhValueFactory getInstance() {

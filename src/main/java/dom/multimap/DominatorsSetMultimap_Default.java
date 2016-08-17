@@ -37,7 +37,7 @@ import io.usethesource.capsule.ImmutableSetMultimap;
 import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.capsule.TransientSetMultimap;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 
 public class DominatorsSetMultimap_Default implements DominatorBenchmark {
 

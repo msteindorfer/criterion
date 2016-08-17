@@ -11,6 +11,12 @@
  *******************************************************************************/
 package io.usethesource.criterion;
 
+import static io.usethesource.criterion.FootprintUtils.createExponentialRange;
+import static io.usethesource.criterion.FootprintUtils.createLinearRange;
+import static io.usethesource.criterion.FootprintUtils.writeToFile;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,19 +40,14 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.TrieMap_5Bits;
-import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.TrieSet_5Bits_Spec0To8_IntKey;
+import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8_IntKey;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.FootprintUtils.Archetype;
 import io.usethesource.criterion.api.JmhValue;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-
-import static io.usethesource.criterion.FootprintUtils.*;
 
 public final class CalculateFootprintsHeterogeneous {
 

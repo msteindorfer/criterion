@@ -510,7 +510,7 @@ public class JmhMapBenchmarks {
 						.include(".*" + JmhMapBenchmarks.class.getSimpleName()
 										+ ".(timeInsert)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
-						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(0)
+						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(1)
 						.param("dataType", "MAP").param("run", "0")
 //						.param("run", "1")
 //						.param("run", "2")
@@ -521,6 +521,7 @@ public class JmhMapBenchmarks {
 //						.param("size", "2048")
 						.param("size", "1048576")
 						.param("valueFactoryFactory", "VF_CHAMP")
+	                    .param("valueFactoryFactory", "VF_JAVASLANG")
 						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //						.param("valueFactoryFactory", "VF_SCALA")
 						// .resultFormat(ResultFormatType.CSV)

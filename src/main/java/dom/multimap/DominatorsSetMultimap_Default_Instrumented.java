@@ -45,8 +45,7 @@ import io.usethesource.capsule.ImmutableSetMultimap;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.capsule.TransientSetMultimap;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT;
-import objectexplorer.ObjectGraphMeasurer.Footprint;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 
 @SuppressWarnings("deprecation")
 public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenchmark {

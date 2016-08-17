@@ -6,8 +6,8 @@ import static dom.multimap.Util_Default_Instrumented2.carrier;
 import static dom.multimap.Util_Default_Instrumented2.intersect;
 import static dom.multimap.Util_Default_Instrumented2.project;
 import static dom.multimap.Util_Default_Instrumented2.subtract;
-import static dom.multimap.Util_Default_Instrumented2.toMultimap;
 import static dom.multimap.Util_Default_Instrumented2.toMap;
+import static dom.multimap.Util_Default_Instrumented2.toMultimap;
 import static dom.multimap.Util_Default_Instrumented2.union;
 
 import java.io.FileInputStream;
@@ -45,8 +45,7 @@ import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.capsule.TransientSetMultimap;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 
 public class DominatorsSetMultimap_Default_Instrumented2 implements DominatorBenchmark {
 

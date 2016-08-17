@@ -12,7 +12,7 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.SetMultimap;
-import io.usethesource.capsule.TrieSetMultimap;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;

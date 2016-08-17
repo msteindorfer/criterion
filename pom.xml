@@ -33,7 +33,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jmh.version>1.11-SNAPSHOT</jmh.version>
+		<!-- Internal customized build of JMH -->
+		<!-- <jmh.version>1.11-SNAPSHOT</jmh.version> -->
+		<jmh.version>1.13</jmh.version>
 		<gs-collections.version>7.0.3</gs-collections.version>
 	</properties>
 
@@ -230,11 +232,6 @@
 			<artifactId>fastutil</artifactId>
 			<version>7.0.10</version>
 		</dependency>
-		<dependency>
-			<groupId>io.usethesource</groupId>
-			<artifactId>capsule</artifactId>
-			<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
-		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.rascalmpl</groupId> -->
 		<!-- <artifactId>value</artifactId> -->
@@ -244,7 +241,18 @@
 			<groupId>org.rascalmpl</groupId>
 			<artifactId>rascal</artifactId>
 			<version>0.8.3-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.usethesource</groupId>
+					<artifactId>capsule</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>io.usethesource</groupId>
+			<artifactId>capsule</artifactId>
+			<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+		</dependency>		
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
