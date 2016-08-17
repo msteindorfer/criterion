@@ -153,6 +153,9 @@ public class JmhCfgDominatorBenchmarks {
 		}
 	}
 
+	public static long memoryInBytes_multimap = 0;
+	public static long memoryInBytes_mapWithNestedSets = 0;	
+	
 	public static long unique = 0;
 	public static long tuples = 0; 
 	public static long tuples_one2one = 0;	
@@ -164,11 +167,17 @@ public class JmhCfgDominatorBenchmarks {
 	
 	@Benchmark
 	public void timeDominatorCalculationInstrumented(Blackhole bh) {
+		memoryInBytes_multimap = 0;
+		memoryInBytes_mapWithNestedSets = 0;	
+		
 		unique = 0;
 		tuples = 0; 
 		tuples_one2one = 0;	
 		
 		dominatorBenchmark.performBenchmark(bh, sampledGraphsNative);
+		
+		System.out.println("memoryInBytes_multimap:          " + memoryInBytes_multimap);
+		System.out.println("memoryInBytes_mapWithNestedSets: " + memoryInBytes_mapWithNestedSets);
 		
 //		System.out.println("unique:" + unique);
 //		System.out.println("tuples:" + tuples);
@@ -184,21 +193,23 @@ public class JmhCfgDominatorBenchmarks {
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhCfgDominatorBenchmarks.class.getSimpleName()
 										+ ".(timeDominatorCalculation$)").warmupIterations(0)
-						.measurementIterations(1).mode(Mode.AverageTime).forks(5)
+						.measurementIterations(1).mode(Mode.AverageTime).forks(1)
 						.timeUnit(TimeUnit.SECONDS)
 //						.param("size", "16")
 //						.param("size", "128")
 						.param("size", "4096")
 						.param("run", "0")
-						.param("dominatorBenchmarkEnum", "CHART")
+//						.param("dominatorBenchmarkEnum", "CHART")
 //						.param("dominatorBenchmarkEnum", "CLOJURE_LAZY")
 //						.param("dominatorBenchmarkEnum", "SCALA")
-//						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
+//						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_INSTRUMENTED")
+						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
 						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT")
-						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
-						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
-						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED")
-						.output("JmhCfgDominatorBenchmarks.log")
+//						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
+//						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
+//						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED")
+//						.param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED_INSTR")						
+//						.output("JmhCfgDominatorBenchmarks.log")
 						.shouldDoGC(true).build();
 
 		new Runner(opt).run();

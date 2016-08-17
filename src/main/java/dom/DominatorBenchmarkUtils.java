@@ -1,6 +1,8 @@
 package dom;
 
 import dom.multimap.DominatorsSetMultimap_Default;
+import dom.multimap.DominatorsSetMultimap_Default_Instrumented;
+import dom.multimap.DominatorsSetMultimap_Default_Instrumented2;
 import dom.multimap.DominatorsSetMultimap_New;
 import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT;
@@ -11,6 +13,12 @@ import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Interlinked;
 public class DominatorBenchmarkUtils {
 
 	public static enum DominatorBenchmarkEnum {
+		VF_CHAMP_MULTIMAP_INSTRUMENTED {
+			@Override
+			public DominatorBenchmark getBenchmark() {
+				return new DominatorsSetMultimap_Default_Instrumented();
+			}
+		},		
 		VF_CHAMP_MULTIMAP_HHAMT {
 			@Override
 			public DominatorBenchmark getBenchmark() {
@@ -31,7 +39,14 @@ public class DominatorBenchmarkUtils {
 				return new DominatorsSetMultimap_Default(
 								new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized_Interlinked.class));
 			}
-		},				
+		},
+		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED_INSTR {
+			@Override
+			public DominatorBenchmark getBenchmark() {
+				return new DominatorsSetMultimap_Default_Instrumented2(
+								new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized_Interlinked.class));
+			}
+		},
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED {
 			@Override
 			public DominatorBenchmark getBenchmark() {

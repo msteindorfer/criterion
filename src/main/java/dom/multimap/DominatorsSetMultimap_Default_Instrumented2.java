@@ -1,14 +1,14 @@
 package dom.multimap;
 
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
-import static dom.multimap.Util_Default_Instrumented.EMPTY;
-import static dom.multimap.Util_Default_Instrumented.carrier;
-import static dom.multimap.Util_Default_Instrumented.intersect;
-import static dom.multimap.Util_Default_Instrumented.project;
-import static dom.multimap.Util_Default_Instrumented.subtract;
-import static dom.multimap.Util_Default_Instrumented.toMap;
-import static dom.multimap.Util_Default_Instrumented.toMultimap;
-import static dom.multimap.Util_Default_Instrumented.union;
+import static dom.multimap.Util_Default_Instrumented2.EMPTY;
+import static dom.multimap.Util_Default_Instrumented2.carrier;
+import static dom.multimap.Util_Default_Instrumented2.intersect;
+import static dom.multimap.Util_Default_Instrumented2.project;
+import static dom.multimap.Util_Default_Instrumented2.subtract;
+import static dom.multimap.Util_Default_Instrumented2.toMultimap;
+import static dom.multimap.Util_Default_Instrumented2.toMap;
+import static dom.multimap.Util_Default_Instrumented2.union;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import org.openjdk.jmh.infra.Blackhole;
@@ -42,20 +41,29 @@ import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.ImmutableSetMultimap;
+import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.capsule.TransientSetMultimap;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT;
-import objectexplorer.ObjectGraphMeasurer.Footprint;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 
-@SuppressWarnings("deprecation")
-public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenchmark {
+public class DominatorsSetMultimap_Default_Instrumented2 implements DominatorBenchmark {
 
-	private ImmutableSet setofdomsets(ImmutableSetMultimap dom, ImmutableSet preds) {
-		TransientSet result = DefaultTrieSet.transientOf();
+	private final SetMultimapFactory setMultimapFactory;
+	
+	public DominatorsSetMultimap_Default_Instrumented2(SetMultimapFactory setMultimapFactory) {
+		this.setMultimapFactory = setMultimapFactory;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ImmutableSet<ImmutableSet<IConstructor>> setofdomsets(
+					ImmutableSetMultimap<IConstructor, IConstructor> dom,
+					ImmutableSet<IConstructor> preds) {
+		TransientSet<ImmutableSet<IConstructor>> result = DefaultTrieSet.transientOf();
 
 		for (Object p : preds) {
-			ImmutableSet ps = dom.get(p);
+			ImmutableSet<IConstructor> ps = dom.get(p);
 
 			result.__insert(ps == null ? EMPTY : ps);
 		}
@@ -80,22 +88,16 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 		throw new NoSuchElementException("No candidate found.");
 	}
 
+	@SuppressWarnings("unchecked")
 	public ImmutableSetMultimap<IConstructor, IConstructor> calculateDominators(ImmutableSet<ITuple> graph) {
-		
-//		long totalNrOfUniqueKeys = 0;
-//		long totalNrOfTuple = 0; 
-
-//		long unique = 0;
-//		long tuples = 0; 
-//		long one2one = 0;
 		
 		IConstructor n0 = getTop(graph);
 		ImmutableSet<IConstructor> nodes = carrier(graph);
 		
-		ImmutableSetMultimap<IConstructor, IConstructor> preds = toMultimap(project(graph, 1, 0));
+		ImmutableSetMultimap<IConstructor, IConstructor> preds = toMultimap(setMultimapFactory, project(graph, 1, 0));
 		
 		{
-		
+			
 			Predicate<Object> predicate = Predicates.not(Predicates.instanceOf(IValue.class));
 						
 			JmhCfgDominatorBenchmarks.memoryInBytes_multimap += objectexplorer.MemoryMeasurer.measureBytes(preds, predicate);
@@ -105,39 +107,16 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 			
 			JmhCfgDominatorBenchmarks.memoryInBytes_mapWithNestedSets += objectexplorer.MemoryMeasurer.measureBytes(mapWithNestedSets, predicate);
 			// Footprint memoryFootprint_mapWithNestedSets = objectexplorer.ObjectGraphMeasurer.measure(mapWithNestedSets, predicate);
-		}
+		}		
 		
-		
-		Iterator<Entry<IConstructor, Object>> it = preds.nativeEntryIterator();
-		
-		while (it.hasNext()) {
-			Entry<IConstructor, Object> tuple = it.next();
-			
-			Object singletonOrSet = tuple.getValue();
-			
-			if (singletonOrSet instanceof ImmutableSet) {
-				JmhCfgDominatorBenchmarks.unique++;
-				JmhCfgDominatorBenchmarks.tuples+=((ImmutableSet) singletonOrSet).size();				
-			} else {
-				JmhCfgDominatorBenchmarks.unique++;
-				JmhCfgDominatorBenchmarks.tuples++;
-				JmhCfgDominatorBenchmarks.tuples_one2one++;
-			}
-		}
-		
-		TransientSetMultimap<IConstructor, IConstructor> w = TrieSetMultimap_HHAMT.transientOf();
+		TransientSetMultimap<IConstructor, IConstructor> w = setMultimapFactory.transientOf();
 		w.__insert(n0, n0);
-//		JmhCfgDominatorBenchmarks.unique++;
-//		JmhCfgDominatorBenchmarks.tuples++;
-//		JmhCfgDominatorBenchmarks.one2one++;
 		for (IConstructor n : nodes.__remove(n0)) {
-			w.__put(n, nodes); // TODO: implement method to put a whole set at once!
-//			JmhCfgDominatorBenchmarks.unique++;
-//			JmhCfgDominatorBenchmarks.tuples+=nodes.size();
+			w.__put(n, nodes);
 		}
 		ImmutableSetMultimap<IConstructor, IConstructor> dom = w.freeze();
 		
-		ImmutableSetMultimap<IConstructor, IConstructor> prev = TrieSetMultimap_HHAMT.of();
+		ImmutableSetMultimap<IConstructor, IConstructor> prev = setMultimapFactory.of();
 		
 		/*
 		 * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <-
@@ -145,48 +124,33 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 		 */
 		while (!prev.equals(dom)) {
 			prev = dom;
-//			System.out.println(prev.size());
-			
-			TransientSetMultimap<IConstructor, IConstructor> newDom = TrieSetMultimap_HHAMT.transientOf();
+
+			TransientSetMultimap<IConstructor, IConstructor> newDom = setMultimapFactory.transientOf();
 
 			for (IConstructor n : nodes) {
-				ImmutableSet ps = (ImmutableSet) preds.get(n);
+				ImmutableSet<IConstructor> ps = preds.get(n);
 				if (ps == null) {
 					ps = EMPTY;
 				}
-//				System.out.println(" ps: " + ps.size());
 				ImmutableSet<ImmutableSet<IConstructor>> sos = setofdomsets(dom, ps);
-//				System.out.println(" sos: " + sos.size());				
 				ImmutableSet<IConstructor> intersected = intersect(sos);
-//				System.out.println(" intersected: " + intersected.size());
-				
+
 				if (!intersected.isEmpty()) {
 					ImmutableSet<IConstructor> newValue = union(intersected, DefaultTrieSet.of(n));
-					newDom.__put(n, newValue); // TODO: implement method to put a whole set at once!
-//					JmhCfgDominatorBenchmarks.unique++;
-//					JmhCfgDominatorBenchmarks.tuples+=newValue.size();					
+					newDom.__put(n, newValue);
 				} else {
-					newDom.__insert(n, n); // TODO: implement method to put a
-											// whole set at once!
-//					JmhCfgDominatorBenchmarks.unique++;
-//					JmhCfgDominatorBenchmarks.tuples++;
-//					JmhCfgDominatorBenchmarks.one2one++;
+					newDom.__insert(n, n);
 				}
 			}
 
 			dom = newDom.freeze();
-//			return dom; // TODO: remove
 		}
-
-//		System.out.println("unique:" + unique);
-//		System.out.println("tuples:" + tuples);
-//		System.out.println("one2one:" + one2one);
-//
-//		System.out.println("ratio:" + tuples / unique);
 		
 		return dom;
 	}
 
+	private static SetMultimapFactory DEFAULT_SET_MULTIMAP_FACTORY = new SetMultimapFactory(TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.class);
+	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		testOne();
 		// assertDominatorsEqual();
@@ -201,7 +165,7 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 		ImmutableSet<ITuple> graph = pdbSetToImmutableSet(data);
 
 		long before = Timing.getCpuTime();
-		ImmutableSetMultimap<IConstructor, IConstructor> results = new DominatorsSetMultimap_Default_Instrumented()
+		ImmutableSetMultimap<IConstructor, IConstructor> results = new DominatorsSetMultimap_Default_Instrumented2(DEFAULT_SET_MULTIMAP_FACTORY)
 				.calculateDominators(graph);
 		System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: " + ((Timing.getCpuTime() - before) / 1000000000)
 				+ " seconds\n");
@@ -228,7 +192,7 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 		long before = Timing.getCpuTime();
 		for (ImmutableSet<ITuple> graph : graphs) {
 			try {
-				result.__insert(new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph));
+				result.__insert(new DominatorsSetMultimap_Default_Instrumented2(DEFAULT_SET_MULTIMAP_FACTORY).calculateDominators(graph));
 			} catch (RuntimeException e) {
 				System.err.println(e.getMessage());
 			}
@@ -339,7 +303,7 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
 		for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
 			try {
-				bh.consume(new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph));
+				bh.consume(new DominatorsSetMultimap_Default_Instrumented2(setMultimapFactory).calculateDominators(graph));
 			} catch (NoSuchElementException e) {
 				System.err.println(e.getMessage());
 			}
@@ -366,7 +330,7 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
 
 }
 
-class Util_Default_Instrumented {
+class Util_Default_Instrumented2 {
 
 	@SuppressWarnings("rawtypes")
 	public final static ImmutableSet EMPTY = DefaultTrieSet.of();
@@ -385,7 +349,7 @@ class Util_Default_Instrumented {
 
 		ImmutableSet<K> result = first;
 		for (ImmutableSet<K> elem : sets) {
-			result = Util_Default_Instrumented.intersect(result, elem);
+			result = Util_Default_Instrumented2.intersect(result, elem);
 		}
 
 		return result;
@@ -559,8 +523,8 @@ class Util_Default_Instrumented {
 	 * set of keys in old map.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <K, V> ImmutableSetMultimap<K, V> toMultimap(ImmutableSet<ITuple> st) {
-		TransientSetMultimap<K, V> mm = TrieSetMultimap_HHAMT.transientOf();
+	public static <K, V> ImmutableSetMultimap<K, V> toMultimap(SetMultimapFactory setMultimapFactory, ImmutableSet<ITuple> st) {
+		TransientSetMultimap<K, V> mm = setMultimapFactory.transientOf();
 
 		for (ITuple t : st) {
 			K key = (K) t.get(0);
@@ -570,8 +534,8 @@ class Util_Default_Instrumented {
 		}
 
 		return mm.freeze();
-	}	
-
+	}
+	
 	/*
 	 * Convert a set of tuples to a map; value in old map is associated with a
 	 * set of keys in old map.
