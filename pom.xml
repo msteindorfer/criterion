@@ -1,21 +1,4 @@
-<!-- Copyright (c) 2005, 2014, Oracle and/or its affiliates. All rights reserved. 
-	DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER. This code is 
-	free software; you can redistribute it and/or modify it under the terms of 
-	the GNU General Public License version 2 only, as published by the Free Software 
-	Foundation. Oracle designates this particular file as subject to the "Classpath" 
-	exception as provided by Oracle in the LICENSE file that accompanied this 
-	code. This code is distributed in the hope that it will be useful, but WITHOUT 
-	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
-	FOR A PARTICULAR PURPOSE. See the GNU General Public License version 2 for 
-	more details (a copy is included in the LICENSE file that accompanied this 
-	code). You should have received a copy of the GNU General Public License 
-	version 2 along with this work; if not, write to the Free Software Foundation, 
-	Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA. Please contact 
-	Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA or visit www.oracle.com 
-	if you need additional information or have any questions. -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.usethesource</groupId>
@@ -23,108 +6,35 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<prerequisites>
-		<maven>3.2</maven>
-	</prerequisites>
+	<scm>
+		<developerConnection>scm:git:https://github.com/msteindorfer/criterion.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-core</artifactId>
-			<version>${jmh.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-generator-annprocess</artifactId>
-			<version>${jmh.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.openjdk.jol</groupId>
-		    <artifactId>jol-core</artifactId>
-		    <version>0.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google</groupId>
-			<artifactId>memory-measurer</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>19.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.goldmansachs</groupId>
-			<artifactId>gs-collections-api</artifactId>
-			<version>${gs-collections.version}</version>
-		</dependency>		
-		<dependency>
-			<groupId>com.goldmansachs</groupId>
-			<artifactId>gs-collections</artifactId>
-			<version>${gs-collections.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.mahout</groupId>
-		    <artifactId>mahout-math</artifactId>
-		    <version>0.11.1</version>
-		</dependency>
-		<dependency>
-			<groupId>it.unimi.dsi</groupId>
-			<artifactId>fastutil</artifactId>
-			<version>7.0.10</version>
-		</dependency>		
-		<dependency>
-			<groupId>io.usethesource</groupId>
-			<artifactId>capsule</artifactId>
-			<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
-		</dependency>				
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.rascalmpl</groupId> -->
-<!-- 			<artifactId>value</artifactId> -->
-<!-- 			<version>0.5.2</version> -->
-<!-- 		</dependency> -->
-		<dependency>
-			<groupId>org.rascalmpl</groupId>
-			<artifactId>rascal</artifactId>
-			<version>0.8.3-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>2.11.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.clojure</groupId>
-			<artifactId>clojure</artifactId>
-			<version>1.8.0</version>
-		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.github.krukow</groupId> -->
-<!-- 			<artifactId>clj-ds</artifactId> -->
-<!-- 			<version>0.0.4</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>ch.usi.overseer</groupId> -->
-<!-- 			<artifactId>overseer-java-api</artifactId> -->
-<!-- 			<version>1.0-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
-		<dependency>
-			<groupId>net.sf.trove4j</groupId>
-			<artifactId>trove4j</artifactId>
-			<version>3.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>io.javaslang</groupId>
-			<artifactId>javaslang</artifactId>
-			<version>2.0.2</version>
-		</dependency>		
-	</dependencies>
+	<!-- deployment configuration (usethesource) -->
+	<distributionManagement>
+		<repository>
+			<id>usethesource-releases</id>
+			<url>http://nexus.rascal-mpl.org/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>usethesource-snapshots</id>
+			<url>http://nexus.rascal-mpl.org/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<!-- dependency resolution configuration (usethesource) -->
+	<repositories>
+		<repository>
+			<id>usethesource</id>
+			<url>http://nexus.rascal-mpl.org/repository/maven-public/</url>
+		</repository>
+	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jmh.version>1.11-SNAPSHOT</jmh.version>
-		<gs-collections.version>7.0.1</gs-collections.version>
+		<gs-collections.version>7.0.3</gs-collections.version>
 	</properties>
 
 	<build>
@@ -136,7 +46,7 @@
 					<args>
 						<arg>-optimise</arg>
 					</args>
-				</configuration>				
+				</configuration>
 				<executions>
 					<execution>
 						<id>scala-compile-first</id>
@@ -154,8 +64,8 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>			
-		
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -167,10 +77,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- 
-				Executable JAR
-				http://maven.apache.org/plugins/maven-shade-plugin/examples/executable-jar.html
-	 		-->			
+			<!-- Executable JAR http://maven.apache.org/plugins/maven-shade-plugin/examples/executable-jar.html -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -187,14 +94,15 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Main-Class>org.openjdk.jmh.Main</Main-Class>>
-									</manifestEntries>	
+										<Main-Class>org.openjdk.jmh.Main</Main-Class>
+										>
+									</manifestEntries>
 								</transformer>
 							</transformers>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>			
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -233,13 +141,14 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.17</version>
-				</plugin>			
+				</plugin>
 				<plugin>
 					<groupId>net.alchim31.maven</groupId>
 					<artifactId>scala-maven-plugin</artifactId>
 					<version>3.2.2</version>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -274,37 +183,98 @@
 		</pluginManagement>
 	</build>
 
-	<!-- http://stackoverflow.com/questions/2229757/maven-add-a-dependency-to-a-jar-by-relative-path -->
-	<!-- http://stackoverflow.com/questions/6061537/usage-of-maven-basedir-in-multi-module-setup -->
-<!-- 	<repositories> -->
-<!-- 		<repository> -->
-<!-- 			<id>central</id> -->
-<!-- 			<name>Maven Repository Switchboard</name> -->
-<!-- 			<layout>default</layout> -->
-<!-- 			<url>http://repo1.maven.org/maven2</url> -->
-<!-- 			<snapshots> -->
-<!-- 				<enabled>false</enabled> -->
-<!-- 			</snapshots> -->
-<!-- 		</repository> -->
-<!-- 		<repository> -->
-<!-- 			<id>local-maven-repository</id> -->
-<!-- 			<url>file://${basedir}/local-maven-repository</url> -->
-<!-- 		</repository> -->
-<!-- 	</repositories> -->
-
-<!-- 	<pluginRepositories> -->
-<!-- 		<pluginRepository> -->
-<!-- 			<id>central</id> -->
-<!-- 			<name>Maven Plugin Repository</name> -->
-<!-- 			<url>http://repo1.maven.org/maven2</url> -->
-<!-- 			<layout>default</layout> -->
-<!-- 			<snapshots> -->
-<!-- 				<enabled>false</enabled> -->
-<!-- 			</snapshots> -->
-<!-- 			<releases> -->
-<!-- 				<updatePolicy>never</updatePolicy> -->
-<!-- 			</releases> -->
-<!-- 		</pluginRepository> -->
-<!-- 	</pluginRepositories> -->
+	<dependencies>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core</artifactId>
+			<version>${jmh.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<version>${jmh.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jol</groupId>
+			<artifactId>jol-core</artifactId>
+			<version>0.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>memory-measurer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.goldmansachs</groupId>
+			<artifactId>gs-collections-api</artifactId>
+			<version>${gs-collections.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.goldmansachs</groupId>
+			<artifactId>gs-collections</artifactId>
+			<version>${gs-collections.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.mahout</groupId>
+			<artifactId>mahout-math</artifactId>
+			<version>0.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>7.0.10</version>
+		</dependency>
+		<dependency>
+			<groupId>io.usethesource</groupId>
+			<artifactId>capsule</artifactId>
+			<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.rascalmpl</groupId> -->
+		<!-- <artifactId>value</artifactId> -->
+		<!-- <version>0.5.2</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.rascalmpl</groupId>
+			<artifactId>rascal</artifactId>
+			<version>0.8.3-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.11.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.clojure</groupId>
+			<artifactId>clojure</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.github.krukow</groupId> -->
+		<!-- <artifactId>clj-ds</artifactId> -->
+		<!-- <version>0.0.4</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>ch.usi.overseer</groupId> -->
+		<!-- <artifactId>overseer-java-api</artifactId> -->
+		<!-- <version>1.0-SNAPSHOT</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+			<version>3.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>io.javaslang</groupId>
+			<artifactId>javaslang</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+	</dependencies>
 
 </project>
