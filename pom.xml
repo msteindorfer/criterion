@@ -203,9 +203,9 @@
 			<version>0.3.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google</groupId>
+			<groupId>com.github.msteindorfer</groupId>
 			<artifactId>memory-measurer</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
