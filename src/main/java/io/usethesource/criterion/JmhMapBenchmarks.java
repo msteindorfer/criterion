@@ -508,7 +508,7 @@ public class JmhMapBenchmarks {
 		System.out.println(JmhMapBenchmarks.class.getSimpleName());
 		Options opt = new OptionsBuilder()
 						.include(".*" + JmhMapBenchmarks.class.getSimpleName()
-										+ ".(timeInsert)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
+										+ ".(timeInsert|timeRemoveKey)$") // ".(timeContainsKey|timeContainsKeyInt|timeInsert|timeInsertInt)$"
 						.timeUnit(TimeUnit.NANOSECONDS).mode(Mode.AverageTime).warmupIterations(10)
 						.warmupTime(TimeValue.seconds(1)).measurementIterations(10).forks(1)
 						.param("dataType", "MAP").param("run", "0")
@@ -523,9 +523,11 @@ public class JmhMapBenchmarks {
 						.param("valueFactoryFactory", "VF_CHAMP")
 						.param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 						.param("valueFactoryFactory", "VF_SCALA")
+						.param("valueFactoryFactory", "VF_CLOJURE")
 	                    .param("valueFactoryFactory", "VF_JAVASLANG")
 	                    .param("valueFactoryFactory", "VF_UNCLEJIM")
-	                    .param("valueFactoryFactory", "VF_DEXX")	                    
+	                    .param("valueFactoryFactory", "VF_DEXX")
+	                    .param("valueFactoryFactory", "VF_PCOLLECTIONS")
 						// .resultFormat(ResultFormatType.CSV)
 						// .result("latest-results-main.csv")
 						.build();

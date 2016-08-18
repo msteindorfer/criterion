@@ -32,20 +32,22 @@ import io.usethesource.criterion.api.JmhValueFactory;
 public class BenchmarkUtils {
 	public static enum ValueFactoryFactory {
 		VF_CLOJURE {
-			@Override public JmhValueFactory getInstance() {
+			@Override
+			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.clojure.ClojureValueFactory();
 			}
 		},
 		VF_SCALA {
-			@Override public JmhValueFactory getInstance() {
+			@Override
+			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.scala.ScalaValueFactory();
 			}
-		},	
+		},
 		VF_CHAMP {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-								TrieSet_5Bits.class, TrieMap_5Bits.class, TrieSetMultimap_HCHAMP.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(TrieSet_5Bits.class,
+						TrieMap_5Bits.class, TrieSetMultimap_HCHAMP.class);
 			}
 		},
 		VF_JAVASLANG {
@@ -65,118 +67,120 @@ public class BenchmarkUtils {
 			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.dexx.DexxValueFactory();
 			}
-		},		
+		},
+		VF_PCOLLECTIONS {
+			@Override
+			public JmhValueFactory getInstance() {
+				return new io.usethesource.criterion.impl.persistent.pcollections.PcollectionsValueFactory();
+			}
+		},
 		VF_CHAMP_MEMOIZED {
 			@Override
 			public JmhValueFactory getInstance() {
 				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-								TrieSet_5Bits_Memoized_LazyHashCode.class,
-								TrieMap_5Bits_Memoized_LazyHashCode.class,
-								TrieSetMultimap_HCHAMP.class);
+						TrieSet_5Bits_Memoized_LazyHashCode.class, TrieMap_5Bits_Memoized_LazyHashCode.class,
+						TrieSetMultimap_HCHAMP.class);
 			}
 		},
 		VF_CHAMP_HETEROGENEOUS {
 			@Override
 			public JmhValueFactory getInstance() {
-				// TODO: replace set implementation with heterogeneous set implementation
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-								TrieSet_5Bits.class, TrieMap_5Bits_Heterogeneous_BleedingEdge.class,
-								TrieSetMultimap_HCHAMP.class);
+				// TODO: replace set implementation with heterogeneous set
+				// implementation
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(TrieSet_5Bits.class,
+						TrieMap_5Bits_Heterogeneous_BleedingEdge.class, TrieSetMultimap_HCHAMP.class);
 			}
 		},
 		VF_CHAMP_MAP_AS_MULTIMAP {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieMap_5Bits_AsSetMultimap.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieMap_5Bits_AsSetMultimap.class);
 			}
-		},		
+		},
 		VF_CHAMP_MULTIMAP_PROTOTYPE_OLD {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_ChampBasedPrototype.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_ChampBasedPrototype.class);
 			}
 		},
 		VF_CHAMP_MULTIMAP_HCHAMP {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HCHAMP.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HCHAMP.class);
 			}
 		},
 		VF_CHAMP_MULTIMAP_HHAMT {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HHAMT.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HHAMT.class);
 			}
 		},
 		VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HHAMT_Interlinked.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HHAMT_Interlinked.class);
 			}
 		},
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HHAMT_Specialized.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HHAMT_Specialized.class);
 			}
 		},
 		/**
-		 * Option is equal to {@value #VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED}, but used to tag the usage of system property
+		 * Option is equal to {@value #VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED}, but
+		 * used to tag the usage of system property
 		 * {@literal -Dio.usethesource.capsule.RangecopyUtils.dontUseSunMiscUnsafeCopyMemory=true}.
 		 */
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_NO_COPYMEMORY {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HHAMT_Specialized.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HHAMT_Specialized.class);
 			}
 		},
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HHAMT_Specialized_Interlinked.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HHAMT_Specialized_Interlinked.class);
 			}
 		},
 		VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.class);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null,
+						TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.class);
 			}
-		},		
+		},
 		VF_CHAMP_MULTIMAP_HHAMT_NEW {
 			@Override
 			public JmhValueFactory getInstance() {
-				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null,
-								null, null);
+				return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(null, null, null);
 			}
 		};
 
 		public abstract JmhValueFactory getInstance();
 	}
-	
+
 	public static enum DataType {
-		MAP,
-		SET_MULTIMAP,
-		SET
-	}	
-	
+		MAP, SET_MULTIMAP, SET
+	}
+
 	public static enum SampleDataSelection {
-		MATCH,
-		RANDOM
-	}	
-	
+		MATCH, RANDOM
+	}
+
 	public static int seedFromSizeAndRun(int size, int run) {
 		return mix(size) ^ mix(run);
 	}
-	
+
 	private static int mix(int n) {
 		int h = n;
 
@@ -187,7 +191,7 @@ public class BenchmarkUtils {
 
 		return h;
 	}
-	
+
 	public static int[] generateSortedArrayWithRandomData(int size, int run) {
 
 		int[] randomNumbers = new int[size];
@@ -209,17 +213,17 @@ public class BenchmarkUtils {
 
 	static int[] generateTestData(int size, int run) {
 		int[] data = new int[size];
-	
+
 		int seedForThisTrial = seedFromSizeAndRun(size, run);
 		Random rand = new Random(seedForThisTrial);
-	
+
 		// System.out.println(String.format("Seed for this trial: %d.",
 		// seedForThisTrial));
-	
+
 		for (int i = size - 1; i >= 0; i--) {
 			data[i] = rand.nextInt();
 		}
-	
+
 		return data;
 	}
 
