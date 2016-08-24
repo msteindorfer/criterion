@@ -1,6 +1,5 @@
 package dom;
 
-import static dom.AllDominatorsRunner.CURRENT_DATA_SET;
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
 import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
@@ -21,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
+import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
 import org.rascalmpl.value.IMap;
 import org.rascalmpl.value.IMapWriter;
@@ -32,11 +33,6 @@ import org.rascalmpl.value.IValueFactory;
 import org.rascalmpl.value.io.BinaryValueReader;
 import org.rascalmpl.value.io.BinaryValueWriter;
 import org.rascalmpl.value.io.StandardTextWriter;
-import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TransientSet;
-import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
 
 import clojure.set$difference;
 import clojure.set$intersection;

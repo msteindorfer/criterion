@@ -17,12 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import objectexplorer.ObjectGraphMeasurer.Footprint;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import io.usethesource.criterion.api.JmhValue;
+import objectexplorer.ObjectGraphMeasurer.Footprint;
 
 public final class FootprintUtils {
 

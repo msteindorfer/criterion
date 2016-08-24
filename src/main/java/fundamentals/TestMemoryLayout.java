@@ -1,7 +1,7 @@
 package fundamentals;
 
-import org.openjdk.jol.info.GraphLayout;
 import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.info.GraphLayout;
 import org.openjdk.jol.util.VMSupport;
 
 public class TestMemoryLayout {

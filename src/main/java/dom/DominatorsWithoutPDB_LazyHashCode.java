@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
 import org.rascalmpl.value.IMap;
 import org.rascalmpl.value.IMapWriter;
@@ -33,14 +35,13 @@ import org.rascalmpl.value.IValueFactory;
 import org.rascalmpl.value.io.BinaryValueReader;
 import org.rascalmpl.value.io.BinaryValueWriter;
 import org.rascalmpl.value.io.StandardTextWriter;
-import io.usethesource.capsule.TrieMap_5Bits_LazyHashCode;
-import io.usethesource.capsule.TrieSet_5Bits_LazyHashCode;
+
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.capsule.TransientSet;
-import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
+import io.usethesource.capsule.TrieMap_5Bits_LazyHashCode;
+import io.usethesource.capsule.TrieSet_5Bits_LazyHashCode;
 
 @SuppressWarnings("deprecation")
 public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {

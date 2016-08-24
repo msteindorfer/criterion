@@ -2,8 +2,8 @@ package dom;
 
 import java.util.ArrayList;
 
-import org.rascalmpl.value.ISet;
 import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.value.ISet;
 
 public interface DominatorBenchmark {
 

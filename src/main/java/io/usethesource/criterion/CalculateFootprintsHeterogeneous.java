@@ -10,13 +10,10 @@
 package io.usethesource.criterion;
 
 import static io.usethesource.criterion.FootprintUtils.createExponentialRange;
-import static io.usethesource.criterion.FootprintUtils.createLinearRange;
-import static io.usethesource.criterion.FootprintUtils.writeToFile;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.math.BigInteger;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
