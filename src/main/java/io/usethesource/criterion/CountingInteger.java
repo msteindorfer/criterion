@@ -8,56 +8,56 @@ import io.usethesource.criterion.api.JmhValue;
 @CompilerControl(Mode.DONT_INLINE)
 public class CountingInteger implements JmhValue {
 
-	private static long HASHCODE_COUNTER = 0;
-	private static long EQUALS_COUNTER = 0;
+  private static long HASHCODE_COUNTER = 0;
+  private static long EQUALS_COUNTER = 0;
 
-	public static void resetCounters() {
-		HASHCODE_COUNTER = 0;
-		EQUALS_COUNTER = 0;
-	}
-	
-	public static long getHashcodeCounter() {
-		return HASHCODE_COUNTER;
-	}
+  public static void resetCounters() {
+    HASHCODE_COUNTER = 0;
+    EQUALS_COUNTER = 0;
+  }
 
-	public static long getEqualsCounter() {
-		return EQUALS_COUNTER;
-	}	
-	
-	private int value;
+  public static long getHashcodeCounter() {
+    return HASHCODE_COUNTER;
+  }
 
-	CountingInteger(int value) {
-		this.value = value;
-	}
+  public static long getEqualsCounter() {
+    return EQUALS_COUNTER;
+  }
 
-	@Override
-	public int hashCode() {
-		HASHCODE_COUNTER++;
-		return value;
-	}
+  private int value;
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == null) {
-			return false;
-		}
-		if (other == this) {
-			return true;
-		}
+  CountingInteger(int value) {
+    this.value = value;
+  }
 
-		if (other instanceof CountingInteger) {
-			int otherValue = ((CountingInteger) other).value;
+  @Override
+  public int hashCode() {
+    HASHCODE_COUNTER++;
+    return value;
+  }
 
-			EQUALS_COUNTER++;
-			
-			return value == otherValue;
-		}
-		return false;
-	}
+  @Override
+  public boolean equals(Object other) {
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
+    if (other instanceof CountingInteger) {
+      int otherValue = ((CountingInteger) other).value;
+
+      EQUALS_COUNTER++;
+
+      return value == otherValue;
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
 
 }

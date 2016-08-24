@@ -7,8 +7,8 @@ import org.openjdk.jmh.infra.Blackhole;
 
 public interface DominatorBenchmark {
 
-	void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative);
+  void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative);
 
-	ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs);
+  ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs);
 
 }

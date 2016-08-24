@@ -7,38 +7,38 @@ import io.usethesource.criterion.api.JmhValue;
 
 @CompilerControl(Mode.DONT_INLINE)
 public class PureInteger implements JmhValue {
-	
-	private int value;
 
-	PureInteger(int value) {
-		this.value = value;
-	}
+  private int value;
 
-	@Override
-	public int hashCode() {
-		return value;
-	}
+  PureInteger(int value) {
+    this.value = value;
+  }
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == null) {
-			return false;
-		}
-		if (other == this) {
-			return true;
-		}
+  @Override
+  public int hashCode() {
+    return value;
+  }
 
-		if (other instanceof PureInteger) {
-			int otherValue = ((PureInteger) other).value;
-			
-			return value == otherValue;
-		}
-		return false;
-	}
+  @Override
+  public boolean equals(Object other) {
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
+    if (other instanceof PureInteger) {
+      int otherValue = ((PureInteger) other).value;
+
+      return value == otherValue;
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
 
 }

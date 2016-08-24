@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2016 CWI
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2016 CWI All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
+ * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
  *******************************************************************************/
 package io.usethesource.criterion.impl.persistent.javaslang;
 
@@ -20,83 +18,83 @@ import javaslang.collection.HashMap;
 
 public final class JavaslangMap implements JmhMap {
 
-	private final HashMap<JmhValue, JmhValue> content;
+  private final HashMap<JmhValue, JmhValue> content;
 
-	protected JavaslangMap(HashMap<JmhValue, JmhValue> content) {
-		this.content = content;
-	}
+  protected JavaslangMap(HashMap<JmhValue, JmhValue> content) {
+    this.content = content;
+  }
 
-	@Override
-	public boolean isEmpty() {
-		return content.isEmpty();
-	}
+  @Override
+  public boolean isEmpty() {
+    return content.isEmpty();
+  }
 
-	@Override
-	public int size() {
-		return content.size();
-	}
+  @Override
+  public int size() {
+    return content.size();
+  }
 
-	@Override
-	public JmhMap put(JmhValue key, JmhValue value) {
-		return new JavaslangMap(content.put(key, value));
-	}
+  @Override
+  public JmhMap put(JmhValue key, JmhValue value) {
+    return new JavaslangMap(content.put(key, value));
+  }
 
-	public JmhMap removeKey(JmhValue key) {
-		return new JavaslangMap(content.remove(key));
-	}
+  public JmhMap removeKey(JmhValue key) {
+    return new JavaslangMap(content.remove(key));
+  }
 
-	@Override
-	public boolean containsKey(JmhValue key) {
-		return content.containsKey(key);
-	}
+  @Override
+  public boolean containsKey(JmhValue key) {
+    return content.containsKey(key);
+  }
 
-	@Override
-	public boolean containsValue(JmhValue value) {
-		return content.containsValue(value);
-	}
+  @Override
+  public boolean containsValue(JmhValue value) {
+    return content.containsValue(value);
+  }
 
-	@Override
-	public JmhValue get(JmhValue key) {
-		return content.get(key).get();
-	}
+  @Override
+  public JmhValue get(JmhValue key) {
+    return content.get(key).get();
+  }
 
-	@Override
-	public int hashCode() {
-		return content.hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return content.hashCode();
+  }
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == this)
-			return true;
-		if (other == null)
-			return false;
+  @Override
+  public boolean equals(Object other) {
+    if (other == this)
+      return true;
+    if (other == null)
+      return false;
 
-		if (other instanceof JavaslangMap) {
-			JavaslangMap that = (JavaslangMap) other;
+    if (other instanceof JavaslangMap) {
+      JavaslangMap that = (JavaslangMap) other;
 
-			if (this.size() != that.size())
-				return false;
+      if (this.size() != that.size())
+        return false;
 
-			return content.equals(that.content);
-		}
+      return content.equals(that.content);
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-	@Override
-	public Iterator<JmhValue> iterator() {
-		return content.keySet().iterator();
-	}
+  @Override
+  public Iterator<JmhValue> iterator() {
+    return content.keySet().iterator();
+  }
 
-	@Override
-	public Iterator<JmhValue> valueIterator() {
-		return content.values().iterator();
-	}
+  @Override
+  public Iterator<JmhValue> valueIterator() {
+    return content.values().iterator();
+  }
 
-	@Override
-	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
-		return content.toJavaMap().entrySet().iterator();
-	}
+  @Override
+  public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
+    return content.toJavaMap().entrySet().iterator();
+  }
 
 }

@@ -50,551 +50,559 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 @SuppressWarnings("deprecation")
 public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenchmark {
 
-	private ImmutableSet setofdomsets(ImmutableSetMultimap dom, ImmutableSet preds) {
-		TransientSet result = DefaultTrieSet.transientOf();
+  private ImmutableSet setofdomsets(ImmutableSetMultimap dom, ImmutableSet preds) {
+    TransientSet result = DefaultTrieSet.transientOf();
 
-		for (Object p : preds) {
-			ImmutableSet ps = dom.get(p);
+    for (Object p : preds) {
+      ImmutableSet ps = dom.get(p);
 
-			result.__insert(ps == null ? EMPTY : ps);
-		}
+      result.__insert(ps == null ? EMPTY : ps);
+    }
 
-		return result.freeze();
-	}
+    return result.freeze();
+  }
 
-	public ImmutableSet<IConstructor> top(ImmutableSet<ITuple> graph) {
-		return subtract(project(graph, 0), project(graph, 1));
-	}
+  public ImmutableSet<IConstructor> top(ImmutableSet<ITuple> graph) {
+    return subtract(project(graph, 0), project(graph, 1));
+  }
 
-	public IConstructor getTop(ImmutableSet<ITuple> graph) {
-		for (IConstructor candidate : top(graph)) {
-			switch (candidate.getName()) {
-			case "methodEntry":
-			case "functionEntry":
-			case "scriptEntry":
-				return candidate;
-			}
-		}
+  public IConstructor getTop(ImmutableSet<ITuple> graph) {
+    for (IConstructor candidate : top(graph)) {
+      switch (candidate.getName()) {
+        case "methodEntry":
+        case "functionEntry":
+        case "scriptEntry":
+          return candidate;
+      }
+    }
 
-		throw new NoSuchElementException("No candidate found.");
-	}
+    throw new NoSuchElementException("No candidate found.");
+  }
 
-	public ImmutableSetMultimap<IConstructor, IConstructor> calculateDominators(ImmutableSet<ITuple> graph) {
-		
-//		long totalNrOfUniqueKeys = 0;
-//		long totalNrOfTuple = 0; 
+  public ImmutableSetMultimap<IConstructor, IConstructor> calculateDominators(
+      ImmutableSet<ITuple> graph) {
 
-//		long unique = 0;
-//		long tuples = 0; 
-//		long one2one = 0;
-		
-		IConstructor n0 = getTop(graph);
-		ImmutableSet<IConstructor> nodes = carrier(graph);
-		
-		ImmutableSetMultimap<IConstructor, IConstructor> preds = toMultimap(project(graph, 1, 0));
-		
-		{
-		
-			Predicate<Object> predicate = Predicates.not(Predicates.instanceOf(IValue.class));
-						
-			JmhCfgDominatorBenchmarks.memoryInBytes_multimap += objectexplorer.MemoryMeasurer.measureBytes(preds, predicate);
-			// Footprint memoryFootprint_multimap = objectexplorer.ObjectGraphMeasurer.measure(preds, predicate);
-						
-			Object mapWithNestedSets = toMap(project(graph, 1, 0));
-			
-			JmhCfgDominatorBenchmarks.memoryInBytes_mapWithNestedSets += objectexplorer.MemoryMeasurer.measureBytes(mapWithNestedSets, predicate);
-			// Footprint memoryFootprint_mapWithNestedSets = objectexplorer.ObjectGraphMeasurer.measure(mapWithNestedSets, predicate);
-		}
-		
-		
-		Iterator<Entry<IConstructor, Object>> it = preds.nativeEntryIterator();
-		
-		while (it.hasNext()) {
-			Entry<IConstructor, Object> tuple = it.next();
-			
-			Object singletonOrSet = tuple.getValue();
-			
-			if (singletonOrSet instanceof ImmutableSet) {
-				JmhCfgDominatorBenchmarks.unique++;
-				JmhCfgDominatorBenchmarks.tuples+=((ImmutableSet) singletonOrSet).size();				
-			} else {
-				JmhCfgDominatorBenchmarks.unique++;
-				JmhCfgDominatorBenchmarks.tuples++;
-				JmhCfgDominatorBenchmarks.tuples_one2one++;
-			}
-		}
-		
-		TransientSetMultimap<IConstructor, IConstructor> w = TrieSetMultimap_HHAMT.transientOf();
-		w.__insert(n0, n0);
-//		JmhCfgDominatorBenchmarks.unique++;
-//		JmhCfgDominatorBenchmarks.tuples++;
-//		JmhCfgDominatorBenchmarks.one2one++;
-		for (IConstructor n : nodes.__remove(n0)) {
-			w.__put(n, nodes); // TODO: implement method to put a whole set at once!
-//			JmhCfgDominatorBenchmarks.unique++;
-//			JmhCfgDominatorBenchmarks.tuples+=nodes.size();
-		}
-		ImmutableSetMultimap<IConstructor, IConstructor> dom = w.freeze();
-		
-		ImmutableSetMultimap<IConstructor, IConstructor> prev = TrieSetMultimap_HHAMT.of();
-		
-		/*
-		 * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <-
-		 * preds[n]?{}});
-		 */
-		while (!prev.equals(dom)) {
-			prev = dom;
-//			System.out.println(prev.size());
-			
-			TransientSetMultimap<IConstructor, IConstructor> newDom = TrieSetMultimap_HHAMT.transientOf();
+    // long totalNrOfUniqueKeys = 0;
+    // long totalNrOfTuple = 0;
 
-			for (IConstructor n : nodes) {
-				ImmutableSet ps = (ImmutableSet) preds.get(n);
-				if (ps == null) {
-					ps = EMPTY;
-				}
-//				System.out.println(" ps: " + ps.size());
-				ImmutableSet<ImmutableSet<IConstructor>> sos = setofdomsets(dom, ps);
-//				System.out.println(" sos: " + sos.size());				
-				ImmutableSet<IConstructor> intersected = intersect(sos);
-//				System.out.println(" intersected: " + intersected.size());
-				
-				if (!intersected.isEmpty()) {
-					ImmutableSet<IConstructor> newValue = union(intersected, DefaultTrieSet.of(n));
-					newDom.__put(n, newValue); // TODO: implement method to put a whole set at once!
-//					JmhCfgDominatorBenchmarks.unique++;
-//					JmhCfgDominatorBenchmarks.tuples+=newValue.size();					
-				} else {
-					newDom.__insert(n, n); // TODO: implement method to put a
-											// whole set at once!
-//					JmhCfgDominatorBenchmarks.unique++;
-//					JmhCfgDominatorBenchmarks.tuples++;
-//					JmhCfgDominatorBenchmarks.one2one++;
-				}
-			}
+    // long unique = 0;
+    // long tuples = 0;
+    // long one2one = 0;
 
-			dom = newDom.freeze();
-//			return dom; // TODO: remove
-		}
+    IConstructor n0 = getTop(graph);
+    ImmutableSet<IConstructor> nodes = carrier(graph);
 
-//		System.out.println("unique:" + unique);
-//		System.out.println("tuples:" + tuples);
-//		System.out.println("one2one:" + one2one);
-//
-//		System.out.println("ratio:" + tuples / unique);
-		
-		return dom;
-	}
+    ImmutableSetMultimap<IConstructor, IConstructor> preds = toMultimap(project(graph, 1, 0));
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		testOne();
-		// assertDominatorsEqual();
-	}
+    {
 
-	public static IMap testOne() throws IOException, FileNotFoundException {
-		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+      Predicate<Object> predicate = Predicates.not(Predicates.instanceOf(IValue.class));
 
-		ISet data = (ISet) new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME));
+      JmhCfgDominatorBenchmarks.memoryInBytes_multimap +=
+          objectexplorer.MemoryMeasurer.measureBytes(preds, predicate);
+      // Footprint memoryFootprint_multimap = objectexplorer.ObjectGraphMeasurer.measure(preds,
+      // predicate);
 
-		// convert data to remove PDB dependency
-		ImmutableSet<ITuple> graph = pdbSetToImmutableSet(data);
+      Object mapWithNestedSets = toMap(project(graph, 1, 0));
 
-		long before = Timing.getCpuTime();
-		ImmutableSetMultimap<IConstructor, IConstructor> results = new DominatorsSetMultimap_Default_Instrumented()
-				.calculateDominators(graph);
-		System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: " + ((Timing.getCpuTime() - before) / 1000000000)
-				+ " seconds\n");
+      JmhCfgDominatorBenchmarks.memoryInBytes_mapWithNestedSets +=
+          objectexplorer.MemoryMeasurer.measureBytes(mapWithNestedSets, predicate);
+      // Footprint memoryFootprint_mapWithNestedSets =
+      // objectexplorer.ObjectGraphMeasurer.measure(mapWithNestedSets, predicate);
+    }
 
-//		IMap pdbResults = immutableMapToPdbMap(results);
-//
-//		if (LOG_BINARY_RESULTS)
-//			new BinaryValueWriter().write(pdbResults,
-//					new FileOutputStream("data/dominators-java-without-pdb-single.bin"));
-//
-//		if (LOG_TEXTUAL_RESULTS)
-//			new StandardTextWriter().write(pdbResults, new FileWriter("data/dominators-java-without-pdb-single.txt"));
-//
-//		return pdbResults;
-		
-		return null;
-	}
+    Iterator<Entry<IConstructor, Object>> it = preds.nativeEntryIterator();
 
-	public static ISet testAll(IMap sampledGraphs) throws IOException, FileNotFoundException {
-		// convert data to remove PDB dependency
-		ArrayList<ImmutableSet<ITuple>> graphs = pdbMapToArrayListOfValues(sampledGraphs);
+    while (it.hasNext()) {
+      Entry<IConstructor, Object> tuple = it.next();
 
-		TransientSet<ImmutableSetMultimap<IConstructor, IConstructor>> result = DefaultTrieSet.transientOf();
-		long before = Timing.getCpuTime();
-		for (ImmutableSet<ITuple> graph : graphs) {
-			try {
-				result.__insert(new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph));
-			} catch (RuntimeException e) {
-				System.err.println(e.getMessage());
-			}
-		}
-		System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: " + ((Timing.getCpuTime() - before) / 1000000000)
-				+ " seconds\n");
+      Object singletonOrSet = tuple.getValue();
 
-//		// convert back to PDB for serialization
-//		ISet pdbResults = immutableSetOfMapsToSetOfMapValues(result.freeze());
-//
-//		if (LOG_BINARY_RESULTS)
-//			new BinaryValueWriter().write(pdbResults, new FileOutputStream("data/dominators-java.bin"));
-//
-//		if (LOG_TEXTUAL_RESULTS)
-//			new StandardTextWriter().write(pdbResults, new FileWriter("data/dominators-java-without-pdb.txt"));
-//
-//		return pdbResults;
-		
-		return null;
-	}
+      if (singletonOrSet instanceof ImmutableSet) {
+        JmhCfgDominatorBenchmarks.unique++;
+        JmhCfgDominatorBenchmarks.tuples += ((ImmutableSet) singletonOrSet).size();
+      } else {
+        JmhCfgDominatorBenchmarks.unique++;
+        JmhCfgDominatorBenchmarks.tuples++;
+        JmhCfgDominatorBenchmarks.tuples_one2one++;
+      }
+    }
 
-	private static ArrayList<ImmutableSet<ITuple>> pdbMapToArrayListOfValues(IMap data) {
-		// convert data to remove PDB dependency
-		ArrayList<ImmutableSet<ITuple>> graphs = new ArrayList<>(data.size());
-		for (IValue key : data) {
-			ISet value = (ISet) data.get(key);
+    TransientSetMultimap<IConstructor, IConstructor> w = TrieSetMultimap_HHAMT.transientOf();
+    w.__insert(n0, n0);
+    // JmhCfgDominatorBenchmarks.unique++;
+    // JmhCfgDominatorBenchmarks.tuples++;
+    // JmhCfgDominatorBenchmarks.one2one++;
+    for (IConstructor n : nodes.__remove(n0)) {
+      w.__put(n, nodes); // TODO: implement method to put a whole set at once!
+      // JmhCfgDominatorBenchmarks.unique++;
+      // JmhCfgDominatorBenchmarks.tuples+=nodes.size();
+    }
+    ImmutableSetMultimap<IConstructor, IConstructor> dom = w.freeze();
 
-			TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
-			for (IValue tuple : value) {
-				convertedValue.__insert((ITuple) tuple);
-			}
+    ImmutableSetMultimap<IConstructor, IConstructor> prev = TrieSetMultimap_HHAMT.of();
 
-			graphs.add(convertedValue.freeze());
-		}
+    /*
+     * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <- preds[n]?{}});
+     */
+    while (!prev.equals(dom)) {
+      prev = dom;
+      // System.out.println(prev.size());
 
-		return graphs;
-	}
+      TransientSetMultimap<IConstructor, IConstructor> newDom = TrieSetMultimap_HHAMT.transientOf();
 
-	private static ISet immutableSetOfMapsToSetOfMapValues(
-			ImmutableSet<ImmutableMap<IConstructor, ImmutableSet<IConstructor>>> result) {
-		// convert back to PDB for serialization
-		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+      for (IConstructor n : nodes) {
+        ImmutableSet ps = (ImmutableSet) preds.get(n);
+        if (ps == null) {
+          ps = EMPTY;
+        }
+        // System.out.println(" ps: " + ps.size());
+        ImmutableSet<ImmutableSet<IConstructor>> sos = setofdomsets(dom, ps);
+        // System.out.println(" sos: " + sos.size());
+        ImmutableSet<IConstructor> intersected = intersect(sos);
+        // System.out.println(" intersected: " + intersected.size());
 
-		ISetWriter resultBuilder = vf.setWriter();
+        if (!intersected.isEmpty()) {
+          ImmutableSet<IConstructor> newValue = union(intersected, DefaultTrieSet.of(n));
+          newDom.__put(n, newValue); // TODO: implement method to put a whole set at once!
+          // JmhCfgDominatorBenchmarks.unique++;
+          // JmhCfgDominatorBenchmarks.tuples+=newValue.size();
+        } else {
+          newDom.__insert(n, n); // TODO: implement method to put a
+                                 // whole set at once!
+          // JmhCfgDominatorBenchmarks.unique++;
+          // JmhCfgDominatorBenchmarks.tuples++;
+          // JmhCfgDominatorBenchmarks.one2one++;
+        }
+      }
 
-		for (ImmutableMap<IConstructor, ImmutableSet<IConstructor>> dominatorResult : result) {
-			IMapWriter builder = vf.mapWriter();
+      dom = newDom.freeze();
+      // return dom; // TODO: remove
+    }
 
-			for (Map.Entry<IConstructor, ImmutableSet<IConstructor>> entry : dominatorResult.entrySet()) {
-				builder.put(entry.getKey(), immutableSetToPdbSet(entry.getValue()));
-			}
+    // System.out.println("unique:" + unique);
+    // System.out.println("tuples:" + tuples);
+    // System.out.println("one2one:" + one2one);
+    //
+    // System.out.println("ratio:" + tuples / unique);
 
-			resultBuilder.insert(builder.done());
-		}
+    return dom;
+  }
 
-		return resultBuilder.done();
-	}
+  public static void main(String[] args) throws FileNotFoundException, IOException {
+    testOne();
+    // assertDominatorsEqual();
+  }
 
-	private static IMap immutableMapToPdbMap(ImmutableMap<IConstructor, ImmutableSet<IConstructor>> result) {
-		// convert back to PDB for serialization
-		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+  public static IMap testOne() throws IOException, FileNotFoundException {
+    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
-		IMapWriter builder = vf.mapWriter();
+    ISet data =
+        (ISet) new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME));
 
-		for (Map.Entry<IConstructor, ImmutableSet<IConstructor>> entry : result.entrySet()) {
-			builder.put(entry.getKey(), immutableSetToPdbSet(entry.getValue()));
-		}
+    // convert data to remove PDB dependency
+    ImmutableSet<ITuple> graph = pdbSetToImmutableSet(data);
 
-		return builder.done();
-	}
+    long before = Timing.getCpuTime();
+    ImmutableSetMultimap<IConstructor, IConstructor> results =
+        new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph);
+    System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: "
+        + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
 
-	private static <K extends IValue> ISet immutableSetToPdbSet(ImmutableSet<K> set) {
-		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    // IMap pdbResults = immutableMapToPdbMap(results);
+    //
+    // if (LOG_BINARY_RESULTS)
+    // new BinaryValueWriter().write(pdbResults,
+    // new FileOutputStream("data/dominators-java-without-pdb-single.bin"));
+    //
+    // if (LOG_TEXTUAL_RESULTS)
+    // new StandardTextWriter().write(pdbResults, new
+    // FileWriter("data/dominators-java-without-pdb-single.txt"));
+    //
+    // return pdbResults;
 
-		ISetWriter builder = vf.setWriter();
+    return null;
+  }
 
-		for (K key : set) {
-			builder.insert(key);
-		}
+  public static ISet testAll(IMap sampledGraphs) throws IOException, FileNotFoundException {
+    // convert data to remove PDB dependency
+    ArrayList<ImmutableSet<ITuple>> graphs = pdbMapToArrayListOfValues(sampledGraphs);
 
-		return builder.done();
-	}
+    TransientSet<ImmutableSetMultimap<IConstructor, IConstructor>> result =
+        DefaultTrieSet.transientOf();
+    long before = Timing.getCpuTime();
+    for (ImmutableSet<ITuple> graph : graphs) {
+      try {
+        result
+            .__insert(new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph));
+      } catch (RuntimeException e) {
+        System.err.println(e.getMessage());
+      }
+    }
+    System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: "
+        + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
 
-	private static ImmutableSet<ITuple> pdbSetToImmutableSet(ISet set) {
-		TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
+    // // convert back to PDB for serialization
+    // ISet pdbResults = immutableSetOfMapsToSetOfMapValues(result.freeze());
+    //
+    // if (LOG_BINARY_RESULTS)
+    // new BinaryValueWriter().write(pdbResults, new FileOutputStream("data/dominators-java.bin"));
+    //
+    // if (LOG_TEXTUAL_RESULTS)
+    // new StandardTextWriter().write(pdbResults, new
+    // FileWriter("data/dominators-java-without-pdb.txt"));
+    //
+    // return pdbResults;
 
-		for (IValue tuple : set) {
-			builder.__insert((ITuple) tuple);
-		}
+    return null;
+  }
 
-		return builder.freeze();
-	}
+  private static ArrayList<ImmutableSet<ITuple>> pdbMapToArrayListOfValues(IMap data) {
+    // convert data to remove PDB dependency
+    ArrayList<ImmutableSet<ITuple>> graphs = new ArrayList<>(data.size());
+    for (IValue key : data) {
+      ISet value = (ISet) data.get(key);
 
-	public static void assertDominatorsEqual() throws FileNotFoundException, IOException {
-		IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+      TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
+      for (IValue tuple : value) {
+        convertedValue.__insert((ITuple) tuple);
+      }
 
-		ISet dominatorsRascal = (ISet) new BinaryValueReader().read(vf,
-				new FileInputStream("data/dominators-rascal.bin"));
-		ISet dominatorsJava = (ISet) new BinaryValueReader().read(vf, new FileInputStream("data/dominators-java.bin"));
+      graphs.add(convertedValue.freeze());
+    }
 
-		if (!dominatorsRascal.equals(dominatorsJava)) {
-			throw new Error("Dominator calculations do differ!");
-		}
-	}
+    return graphs;
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
-		for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
-			try {
-				bh.consume(new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph));
-			} catch (NoSuchElementException e) {
-				System.err.println(e.getMessage());
-			}
-		}
-	}
+  private static ISet immutableSetOfMapsToSetOfMapValues(
+      ImmutableSet<ImmutableMap<IConstructor, ImmutableSet<IConstructor>>> result) {
+    // convert back to PDB for serialization
+    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
-	@Override
-	public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
-		// convert data to remove PDB dependency
-		ArrayList<ImmutableSet<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
+    ISetWriter resultBuilder = vf.setWriter();
 
-		for (ISet graph : sampledGraphs) {
-			TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
+    for (ImmutableMap<IConstructor, ImmutableSet<IConstructor>> dominatorResult : result) {
+      IMapWriter builder = vf.mapWriter();
 
-			for (IValue tuple : graph) {
-				convertedValue.__insert((ITuple) tuple);
-			}
+      for (Map.Entry<IConstructor, ImmutableSet<IConstructor>> entry : dominatorResult.entrySet()) {
+        builder.put(entry.getKey(), immutableSetToPdbSet(entry.getValue()));
+      }
 
-			sampledGraphsNative.add(convertedValue.freeze());
-		}
+      resultBuilder.insert(builder.done());
+    }
 
-		return sampledGraphsNative;
-	}
+    return resultBuilder.done();
+  }
+
+  private static IMap immutableMapToPdbMap(
+      ImmutableMap<IConstructor, ImmutableSet<IConstructor>> result) {
+    // convert back to PDB for serialization
+    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+
+    IMapWriter builder = vf.mapWriter();
+
+    for (Map.Entry<IConstructor, ImmutableSet<IConstructor>> entry : result.entrySet()) {
+      builder.put(entry.getKey(), immutableSetToPdbSet(entry.getValue()));
+    }
+
+    return builder.done();
+  }
+
+  private static <K extends IValue> ISet immutableSetToPdbSet(ImmutableSet<K> set) {
+    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+
+    ISetWriter builder = vf.setWriter();
+
+    for (K key : set) {
+      builder.insert(key);
+    }
+
+    return builder.done();
+  }
+
+  private static ImmutableSet<ITuple> pdbSetToImmutableSet(ISet set) {
+    TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
+
+    for (IValue tuple : set) {
+      builder.__insert((ITuple) tuple);
+    }
+
+    return builder.freeze();
+  }
+
+  public static void assertDominatorsEqual() throws FileNotFoundException, IOException {
+    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+
+    ISet dominatorsRascal =
+        (ISet) new BinaryValueReader().read(vf, new FileInputStream("data/dominators-rascal.bin"));
+    ISet dominatorsJava =
+        (ISet) new BinaryValueReader().read(vf, new FileInputStream("data/dominators-java.bin"));
+
+    if (!dominatorsRascal.equals(dominatorsJava)) {
+      throw new Error("Dominator calculations do differ!");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
+    for (ImmutableSet<ITuple> graph : (ArrayList<ImmutableSet<ITuple>>) sampledGraphsNative) {
+      try {
+        bh.consume(new DominatorsSetMultimap_Default_Instrumented().calculateDominators(graph));
+      } catch (NoSuchElementException e) {
+        System.err.println(e.getMessage());
+      }
+    }
+  }
+
+  @Override
+  public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
+    // convert data to remove PDB dependency
+    ArrayList<ImmutableSet<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
+
+    for (ISet graph : sampledGraphs) {
+      TransientSet<ITuple> convertedValue = DefaultTrieSet.transientOf();
+
+      for (IValue tuple : graph) {
+        convertedValue.__insert((ITuple) tuple);
+      }
+
+      sampledGraphsNative.add(convertedValue.freeze());
+    }
+
+    return sampledGraphsNative;
+  }
 
 }
 
+
 class Util_Default_Instrumented {
 
-	@SuppressWarnings("rawtypes")
-	public final static ImmutableSet EMPTY = DefaultTrieSet.of();
+  @SuppressWarnings("rawtypes")
+  public final static ImmutableSet EMPTY = DefaultTrieSet.of();
 
-	/*
-	 * Intersect many sets.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <K> ImmutableSet<K> intersect(ImmutableSet<ImmutableSet<K>> sets) {
-		if (sets == null || sets.isEmpty() || sets.contains(EMPTY)) {
-			return EMPTY;
-		}
+  /*
+   * Intersect many sets.
+   */
+  @SuppressWarnings("unchecked")
+  public static <K> ImmutableSet<K> intersect(ImmutableSet<ImmutableSet<K>> sets) {
+    if (sets == null || sets.isEmpty() || sets.contains(EMPTY)) {
+      return EMPTY;
+    }
 
-		ImmutableSet<K> first = sets.iterator().next();
-		sets = sets.__remove(first);
+    ImmutableSet<K> first = sets.iterator().next();
+    sets = sets.__remove(first);
 
-		ImmutableSet<K> result = first;
-		for (ImmutableSet<K> elem : sets) {
-			result = Util_Default_Instrumented.intersect(result, elem);
-		}
+    ImmutableSet<K> result = first;
+    for (ImmutableSet<K> elem : sets) {
+      result = Util_Default_Instrumented.intersect(result, elem);
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	/*
-	 * Intersect two sets.
-	 */
-	public static <K> ImmutableSet<K> intersect(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-		if (set1 == set2)
-			return set1;
-		if (set1 == null)
-			return DefaultTrieSet.of();
-		if (set2 == null)
-			return DefaultTrieSet.of();
+  /*
+   * Intersect two sets.
+   */
+  public static <K> ImmutableSet<K> intersect(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+    if (set1 == set2)
+      return set1;
+    if (set1 == null)
+      return DefaultTrieSet.of();
+    if (set2 == null)
+      return DefaultTrieSet.of();
 
-		final ImmutableSet<K> smaller;
-		final ImmutableSet<K> bigger;
+    final ImmutableSet<K> smaller;
+    final ImmutableSet<K> bigger;
 
-		final ImmutableSet<K> unmodified;
+    final ImmutableSet<K> unmodified;
 
-		if (set2.size() >= set1.size()) {
-			unmodified = set1;
-			smaller = set1;
-			bigger = set2;
-		} else {
-			unmodified = set2;
-			smaller = set2;
-			bigger = set1;
-		}
+    if (set2.size() >= set1.size()) {
+      unmodified = set1;
+      smaller = set1;
+      bigger = set2;
+    } else {
+      unmodified = set2;
+      smaller = set2;
+      bigger = set1;
+    }
 
-		final TransientSet<K> tmp = smaller.asTransient();
-		boolean modified = false;
+    final TransientSet<K> tmp = smaller.asTransient();
+    boolean modified = false;
 
-		for (Iterator<K> it = tmp.iterator(); it.hasNext();) {
-			final K key = it.next();
-			if (!bigger.contains(key)) {
-				it.remove();
-				modified = true;
-			}
-		}
+    for (Iterator<K> it = tmp.iterator(); it.hasNext();) {
+      final K key = it.next();
+      if (!bigger.contains(key)) {
+        it.remove();
+        modified = true;
+      }
+    }
 
-		if (modified) {
-			return tmp.freeze();
-		} else {
-			return unmodified;
-		}
-	}
+    if (modified) {
+      return tmp.freeze();
+    } else {
+      return unmodified;
+    }
+  }
 
-	/*
-	 * Subtract one set from another.
-	 */
-	public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-		if (set1 == null && set2 == null)
-			return DefaultTrieSet.of();
-		if (set1 == set2)
-			return DefaultTrieSet.of();
-		if (set1 == null)
-			return DefaultTrieSet.of();
-		if (set2 == null)
-			return set1;
+  /*
+   * Subtract one set from another.
+   */
+  public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+    if (set1 == null && set2 == null)
+      return DefaultTrieSet.of();
+    if (set1 == set2)
+      return DefaultTrieSet.of();
+    if (set1 == null)
+      return DefaultTrieSet.of();
+    if (set2 == null)
+      return set1;
 
-		final TransientSet<K> tmp = set1.asTransient();
-		boolean modified = false;
+    final TransientSet<K> tmp = set1.asTransient();
+    boolean modified = false;
 
-		for (K key : set2) {
-			if (tmp.__remove(key)) {
-				modified = true;
-			}
-		}
+    for (K key : set2) {
+      if (tmp.__remove(key)) {
+        modified = true;
+      }
+    }
 
-		if (modified) {
-			return tmp.freeze();
-		} else {
-			return set1;
-		}
-	}
+    if (modified) {
+      return tmp.freeze();
+    } else {
+      return set1;
+    }
+  }
 
-	/*
-	 * Union two sets.
-	 */
-	public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-		if (set1 == null && set2 == null)
-			return DefaultTrieSet.of();
-		if (set1 == null)
-			return set2;
-		if (set2 == null)
-			return set1;
+  /*
+   * Union two sets.
+   */
+  public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+    if (set1 == null && set2 == null)
+      return DefaultTrieSet.of();
+    if (set1 == null)
+      return set2;
+    if (set2 == null)
+      return set1;
 
-		if (set1 == set2)
-			return set1;
+    if (set1 == set2)
+      return set1;
 
-		final ImmutableSet<K> smaller;
-		final ImmutableSet<K> bigger;
+    final ImmutableSet<K> smaller;
+    final ImmutableSet<K> bigger;
 
-		final ImmutableSet<K> unmodified;
+    final ImmutableSet<K> unmodified;
 
-		if (set2.size() >= set1.size()) {
-			unmodified = set2;
-			smaller = set1;
-			bigger = set2;
-		} else {
-			unmodified = set1;
-			smaller = set2;
-			bigger = set1;
-		}
+    if (set2.size() >= set1.size()) {
+      unmodified = set2;
+      smaller = set1;
+      bigger = set2;
+    } else {
+      unmodified = set1;
+      smaller = set2;
+      bigger = set1;
+    }
 
-		final TransientSet<K> tmp = bigger.asTransient();
-		boolean modified = false;
+    final TransientSet<K> tmp = bigger.asTransient();
+    boolean modified = false;
 
-		for (K key : smaller) {
-			if (tmp.__insert(key)) {
-				modified = true;
-			}
-		}
+    for (K key : smaller) {
+      if (tmp.__insert(key)) {
+        modified = true;
+      }
+    }
 
-		if (modified) {
-			return tmp.freeze();
-		} else {
-			return unmodified;
-		}
-	}
+    if (modified) {
+      return tmp.freeze();
+    } else {
+      return unmodified;
+    }
+  }
 
-	/*
-	 * Flattening of a set (of ITuple elements). Because of the untyped nature
-	 * of ITuple, the implementation is not strongly typed.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <K extends Iterable<?>, T> ImmutableSet<T> carrier(ImmutableSet<K> set1) {
-		TransientSet<Object> builder = DefaultTrieSet.transientOf();
+  /*
+   * Flattening of a set (of ITuple elements). Because of the untyped nature of ITuple, the
+   * implementation is not strongly typed.
+   */
+  @SuppressWarnings("unchecked")
+  public static <K extends Iterable<?>, T> ImmutableSet<T> carrier(ImmutableSet<K> set1) {
+    TransientSet<Object> builder = DefaultTrieSet.transientOf();
 
-		for (K iterable : set1) {
-			for (Object nested : iterable) {
-				builder.__insert(nested);
-			}
-		}
+    for (K iterable : set1) {
+      for (Object nested : iterable) {
+        builder.__insert(nested);
+      }
+    }
 
-		return (ImmutableSet<T>) builder.freeze();
-	}
+    return (ImmutableSet<T>) builder.freeze();
+  }
 
-	/*
-	 * Projection from a tuple to single field.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <K extends IValue> ImmutableSet<K> project(ImmutableSet<ITuple> set1, int field) {
-		TransientSet<K> builder = DefaultTrieSet.transientOf();
+  /*
+   * Projection from a tuple to single field.
+   */
+  @SuppressWarnings("unchecked")
+  public static <K extends IValue> ImmutableSet<K> project(ImmutableSet<ITuple> set1, int field) {
+    TransientSet<K> builder = DefaultTrieSet.transientOf();
 
-		for (ITuple tuple : set1) {
-			builder.__insert((K) tuple.select(field));
-		}
+    for (ITuple tuple : set1) {
+      builder.__insert((K) tuple.select(field));
+    }
 
-		return builder.freeze();
-	}
+    return builder.freeze();
+  }
 
-	/*
-	 * Projection from a tuple to another tuple with (possible reordered) subset
-	 * of fields.
-	 */
-	public static ImmutableSet<ITuple> project(ImmutableSet<ITuple> set1, int field1, int field2) {
-		TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
+  /*
+   * Projection from a tuple to another tuple with (possible reordered) subset of fields.
+   */
+  public static ImmutableSet<ITuple> project(ImmutableSet<ITuple> set1, int field1, int field2) {
+    TransientSet<ITuple> builder = DefaultTrieSet.transientOf();
 
-		for (ITuple tuple : set1) {
-			builder.__insert((ITuple) tuple.select(field1, field2));
-		}
+    for (ITuple tuple : set1) {
+      builder.__insert((ITuple) tuple.select(field1, field2));
+    }
 
-		return builder.freeze();
-	}
+    return builder.freeze();
+  }
 
-	/*
-	 * Convert a set of tuples to a map; value in old map is associated with a
-	 * set of keys in old map.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <K, V> ImmutableSetMultimap<K, V> toMultimap(ImmutableSet<ITuple> st) {
-		TransientSetMultimap<K, V> mm = TrieSetMultimap_HHAMT.transientOf();
+  /*
+   * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
+   */
+  @SuppressWarnings("unchecked")
+  public static <K, V> ImmutableSetMultimap<K, V> toMultimap(ImmutableSet<ITuple> st) {
+    TransientSetMultimap<K, V> mm = TrieSetMultimap_HHAMT.transientOf();
 
-		for (ITuple t : st) {
-			K key = (K) t.get(0);
-			V val = (V) t.get(1);
+    for (ITuple t : st) {
+      K key = (K) t.get(0);
+      V val = (V) t.get(1);
 
-			mm.__insert(key, val);
-		}
+      mm.__insert(key, val);
+    }
 
-		return mm.freeze();
-	}	
+    return mm.freeze();
+  }
 
-	/*
-	 * Convert a set of tuples to a map; value in old map is associated with a
-	 * set of keys in old map.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <K, V> ImmutableMap<K, ImmutableSet<V>> toMap(ImmutableSet<ITuple> st) {
-		Map<K, TransientSet<V>> hm = new HashMap<>();
+  /*
+   * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
+   */
+  @SuppressWarnings("unchecked")
+  public static <K, V> ImmutableMap<K, ImmutableSet<V>> toMap(ImmutableSet<ITuple> st) {
+    Map<K, TransientSet<V>> hm = new HashMap<>();
 
-		for (ITuple t : st) {
-			K key = (K) t.get(0);
-			V val = (V) t.get(1);
-			TransientSet<V> wValSet = hm.get(key);
-			if (wValSet == null) {
-				wValSet = DefaultTrieSet.transientOf();
-				hm.put(key, wValSet);
-			}
-			wValSet.__insert(val);
-		}
+    for (ITuple t : st) {
+      K key = (K) t.get(0);
+      V val = (V) t.get(1);
+      TransientSet<V> wValSet = hm.get(key);
+      if (wValSet == null) {
+        wValSet = DefaultTrieSet.transientOf();
+        hm.put(key, wValSet);
+      }
+      wValSet.__insert(val);
+    }
 
-		TransientMap<K, ImmutableSet<V>> w = DefaultTrieMap.transientOf();
-		for (K k : hm.keySet()) {
-			w.__put(k, hm.get(k).freeze());
-		}
-		return w.freeze();
-	}
-	
+    TransientMap<K, ImmutableSet<V>> w = DefaultTrieMap.transientOf();
+    for (K k : hm.keySet()) {
+      w.__put(k, hm.get(k).freeze());
+    }
+    return w.freeze();
+  }
+
 }

@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2012-2013 CWI
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2012-2013 CWI All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI  
+ * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
  *******************************************************************************/
 package io.usethesource.criterion.impl.persistent.clojure;
 
@@ -27,267 +25,266 @@ import io.usethesource.criterion.api.JmhValue;
 
 public class ClojureSetMultimap implements JmhSetMultimap {
 
-	protected final IPersistentMap xs;
+  protected final IPersistentMap xs;
 
-	protected ClojureSetMultimap(IPersistentMap xs) {
-		this.xs = xs;
-	}
+  protected ClojureSetMultimap(IPersistentMap xs) {
+    this.xs = xs;
+  }
 
-	 @Override
-	 public boolean isEmpty() {
-	 return size() == 0;
-	 }
-	
-	 @Override
-	 public int size() {
-		 return xs.count(); // TODO: is unique keySet size instead of entrySet size 
-	 }
+  @Override
+  public boolean isEmpty() {
+    return size() == 0;
+  }
 
-	@Override
-	public JmhSetMultimap insert(JmhValue key, JmhValue value) {
-		Object singletonOrSet = xs.valAt(key);
+  @Override
+  public int size() {
+    return xs.count(); // TODO: is unique keySet size instead of entrySet size
+  }
 
-		if (singletonOrSet == null) {
-			return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
-		} else if (singletonOrSet instanceof IPersistentSet) {
-			IPersistentSet set = (IPersistentSet) singletonOrSet;
-			return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, set.cons(value)));
-		} else if (singletonOrSet.equals(value)) {
-			return this;
-		} else {
-			IPersistentSet set = PersistentHashSet.create(singletonOrSet, value);
-			return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, set));
-		}
-	}
+  @Override
+  public JmhSetMultimap insert(JmhValue key, JmhValue value) {
+    Object singletonOrSet = xs.valAt(key);
 
-	@Override
-	public JmhSetMultimap put(JmhValue key, JmhValue value) {
-		return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
-	}
-	
-	@Override
-	public JmhSetMultimap remove(JmhValue key) {
-		return new ClojureSetMultimap((IPersistentMap) xs.without(key));
-	}
-	
-	@Override
-	public JmhSetMultimap remove(JmhValue key, JmhValue value) {
-		Object singletonOrSet = xs.valAt(key);
+    if (singletonOrSet == null) {
+      return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
+    } else if (singletonOrSet instanceof IPersistentSet) {
+      IPersistentSet set = (IPersistentSet) singletonOrSet;
+      return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, set.cons(value)));
+    } else if (singletonOrSet.equals(value)) {
+      return this;
+    } else {
+      IPersistentSet set = PersistentHashSet.create(singletonOrSet, value);
+      return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, set));
+    }
+  }
 
-		if (singletonOrSet == null) {
-			return this;
-		} else if (singletonOrSet instanceof IPersistentSet) {
-			IPersistentSet oldSet = (IPersistentSet) singletonOrSet;
-			IPersistentSet newSet = oldSet.disjoin(value);
+  @Override
+  public JmhSetMultimap put(JmhValue key, JmhValue value) {
+    return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
+  }
 
-			switch (newSet.count()) {
-			case 0:
-				return new ClojureSetMultimap((IPersistentMap) xs.without(key));
-			case 1:
-				return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, newSet.seq().first()));
-			default:
-				return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, newSet));
-			}
-		} else {
-			if (singletonOrSet.equals(value)) {
-				return new ClojureSetMultimap((IPersistentMap) xs.without(key));
-			} else {
-				return this;
-			}
-		}
-	}
+  @Override
+  public JmhSetMultimap remove(JmhValue key) {
+    return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+  }
 
+  @Override
+  public JmhSetMultimap remove(JmhValue key, JmhValue value) {
+    Object singletonOrSet = xs.valAt(key);
 
-	// @Override
-	// public JmhMap removeKey(JmhValue key) {
-	// return new ClojureSetMultimap((IPersistentMap) xs.without(key));
-	// }
+    if (singletonOrSet == null) {
+      return this;
+    } else if (singletonOrSet instanceof IPersistentSet) {
+      IPersistentSet oldSet = (IPersistentSet) singletonOrSet;
+      IPersistentSet newSet = oldSet.disjoin(value);
 
-	// @Override
-	// public JmhValue get(JmhValue key) {
-	// return (JmhValue) xs.valAt(key);
-	// }
+      switch (newSet.count()) {
+        case 0:
+          return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+        case 1:
+          return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, newSet.seq().first()));
+        default:
+          return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, newSet));
+      }
+    } else {
+      if (singletonOrSet.equals(value)) {
+        return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+      } else {
+        return this;
+      }
+    }
+  }
 
-	@Override
-	public boolean containsKey(JmhValue key) {
-		return xs.containsKey(key);
-	}
+  // @Override
+  // public JmhMap removeKey(JmhValue key) {
+  // return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+  // }
 
-	@Override
-	public boolean contains(JmhValue key, JmhValue value) {
-		Object singletonOrSet = xs.valAt(key);
-		
-		if (singletonOrSet == null) {
-			return false;
-		} else if (singletonOrSet instanceof IPersistentSet) {
-			IPersistentSet set = (IPersistentSet) singletonOrSet;
-			return set.contains(value);
-		} else {
-			return singletonOrSet.equals(value);
-		}
-	}
+  // @Override
+  // public JmhValue get(JmhValue key) {
+  // return (JmhValue) xs.valAt(key);
+  // }
 
-//	@Override
-//	public boolean containsValue(JmhValue value) {
-//		return ((APersistentMap) xs).containsValue(value);
-//	}
+  @Override
+  public boolean containsKey(JmhValue key) {
+    return xs.containsKey(key);
+  }
 
-	@Override
-	public int hashCode() {
-		return xs.hashCode();
-	}
+  @Override
+  public boolean contains(JmhValue key, JmhValue value) {
+    Object singletonOrSet = xs.valAt(key);
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == this)
-			return true;
-		if (other == null)
-			return false;
+    if (singletonOrSet == null) {
+      return false;
+    } else if (singletonOrSet instanceof IPersistentSet) {
+      IPersistentSet set = (IPersistentSet) singletonOrSet;
+      return set.contains(value);
+    } else {
+      return singletonOrSet.equals(value);
+    }
+  }
 
-		if (other instanceof ClojureSetMultimap) {
-			ClojureSetMultimap that = (ClojureSetMultimap) other;
+  // @Override
+  // public boolean containsValue(JmhValue value) {
+  // return ((APersistentMap) xs).containsValue(value);
+  // }
 
-			if (this.size() != that.size())
-				return false;
-			
-			return xs.equals(that.xs);
-		}
+  @Override
+  public int hashCode() {
+    return xs.hashCode();
+  }
 
-		return false;
-	}
+  @Override
+  public boolean equals(Object other) {
+    if (other == this)
+      return true;
+    if (other == null)
+      return false;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterator<JmhValue> iterator() {
-		return ((APersistentMap) xs).keySet().iterator();
-	}
+    if (other instanceof ClojureSetMultimap) {
+      ClojureSetMultimap that = (ClojureSetMultimap) other;
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public Iterator<JmhValue> valueIterator() {
-//		return ((APersistentMap) xs).values().iterator();
-//	}
+      if (this.size() != that.size())
+        return false;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterator<Entry<JmhValue, Object>> nativeEntryIterator() {
-		return ((APersistentMap) xs).entrySet().iterator(); 
-	}	
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
-		Iterator<Entry<JmhValue, Object>> it = ((APersistentMap) xs).entrySet().iterator();
-		return new FlatteningIterator(it);
-	}
-	
-	private static class FlatteningIterator implements Iterator<Map.Entry<JmhValue, JmhValue>> {
+      return xs.equals(that.xs);
+    }
 
-		final Iterator<Entry<JmhValue, Object>> entryIterator;
+    return false;
+  }
 
-		JmhValue lastKey = null;
-		Iterator<JmhValue> lastIterator = Collections.emptyIterator();
+  @SuppressWarnings("unchecked")
+  @Override
+  public Iterator<JmhValue> iterator() {
+    return ((APersistentMap) xs).keySet().iterator();
+  }
 
-		public FlatteningIterator(Iterator<Entry<JmhValue, Object>> entryIterator) {
-			this.entryIterator = entryIterator;
-		}
+  // @SuppressWarnings("unchecked")
+  // @Override
+  // public Iterator<JmhValue> valueIterator() {
+  // return ((APersistentMap) xs).values().iterator();
+  // }
 
-		@Override
-		public boolean hasNext() {
-			if (lastIterator.hasNext()) {
-				return true;
-			} else { 
-				return entryIterator.hasNext();
-			}
-		}
+  @SuppressWarnings("unchecked")
+  @Override
+  public Iterator<Entry<JmhValue, Object>> nativeEntryIterator() {
+    return ((APersistentMap) xs).entrySet().iterator();
+  }
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public Entry<JmhValue, JmhValue> next() {
-			assert hasNext();
-			
-			if (lastIterator.hasNext()) {
-				return entryOf(lastKey, lastIterator.next());
-			} else {
-				lastKey = null;
-				
-				Entry<JmhValue, Object> nextEntry = entryIterator.next();
-								
-				Object singletonOrSet = nextEntry.getValue(); 
-				
-				if (singletonOrSet instanceof IPersistentSet) {
-					IPersistentSet set = (IPersistentSet) singletonOrSet;
-					
-					lastKey = nextEntry.getKey();
-					lastIterator = ((Iterable<JmhValue>) set).iterator();
-					
-					return entryOf(lastKey, lastIterator.next());
-				} else {
-					return (Map.Entry<JmhValue, JmhValue>) (Object) nextEntry;
-				}
-			}
-		}
+  @SuppressWarnings("unchecked")
+  @Override
+  public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
+    Iterator<Entry<JmhValue, Object>> it = ((APersistentMap) xs).entrySet().iterator();
+    return new FlatteningIterator(it);
+  }
 
-	}
-	
-//	@Override
-//	public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
-//		return untypedEntryStream().flatMap(ClojureSetMultimap::dispatchOnTypeAndFlatten)
-//						.iterator();
-//	}
-//	
-//	@SuppressWarnings("unchecked")
-//	private Stream<Entry<JmhValue, Object>> untypedEntryStream() {
-//		int size = xs.count();
-//		Iterator<Entry<JmhValue, Object>> it = ((APersistentMap) xs).entrySet().iterator();
-//
-//		Spliterator<Entry<JmhValue, Object>> split = Spliterators.spliterator(it, size,
-//						Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED);
-//
-//		return StreamSupport.stream(split, false);
-//	}
-//	
-//	@SuppressWarnings("unchecked")
-//	private static Stream<Entry<JmhValue, JmhValue>> dispatchOnTypeAndFlatten(
-//					Entry<JmhValue, Object> tuple) {
-//		Object singletonOrSet = tuple.getValue();
-//
-//		if (singletonOrSet instanceof IPersistentSet) {
-//			IPersistentSet set = (IPersistentSet) singletonOrSet;
-//
-//			Iterator<Entry<JmhValue, JmhValue>> it = new MultimapEntryToMapEntriesIterator(
-//							tuple.getKey(), ((Iterable<JmhValue>) set).iterator());
-//
-//			Spliterator<Entry<JmhValue, JmhValue>> split = Spliterators.spliterator(it, set.count(),
-//							Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED);
-//
-//			return StreamSupport.stream(split, false);
-//		} else {
-//			return Stream.of((Map.Entry<JmhValue, JmhValue>) (Object) tuple);
-//		}
-//	}
-//	
-//	private static class MultimapEntryToMapEntriesIterator
-//					implements Iterator<Map.Entry<JmhValue, JmhValue>> {
-//
-//		final JmhValue key;
-//		final Iterator<JmhValue> valueIterator;
-//
-//		public MultimapEntryToMapEntriesIterator(JmhValue key, Iterator<JmhValue> valueIterator) {
-//			this.key = key;
-//			this.valueIterator = valueIterator;
-//		}
-//
-//		@Override
-//		public boolean hasNext() {
-//			return valueIterator.hasNext();
-//		}
-//
-//		@Override
-//		public Entry<JmhValue, JmhValue> next() {
-//			return entryOf(key, valueIterator.next());
-//		}
-//
-//	}
-	
+  private static class FlatteningIterator implements Iterator<Map.Entry<JmhValue, JmhValue>> {
+
+    final Iterator<Entry<JmhValue, Object>> entryIterator;
+
+    JmhValue lastKey = null;
+    Iterator<JmhValue> lastIterator = Collections.emptyIterator();
+
+    public FlatteningIterator(Iterator<Entry<JmhValue, Object>> entryIterator) {
+      this.entryIterator = entryIterator;
+    }
+
+    @Override
+    public boolean hasNext() {
+      if (lastIterator.hasNext()) {
+        return true;
+      } else {
+        return entryIterator.hasNext();
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Entry<JmhValue, JmhValue> next() {
+      assert hasNext();
+
+      if (lastIterator.hasNext()) {
+        return entryOf(lastKey, lastIterator.next());
+      } else {
+        lastKey = null;
+
+        Entry<JmhValue, Object> nextEntry = entryIterator.next();
+
+        Object singletonOrSet = nextEntry.getValue();
+
+        if (singletonOrSet instanceof IPersistentSet) {
+          IPersistentSet set = (IPersistentSet) singletonOrSet;
+
+          lastKey = nextEntry.getKey();
+          lastIterator = ((Iterable<JmhValue>) set).iterator();
+
+          return entryOf(lastKey, lastIterator.next());
+        } else {
+          return (Map.Entry<JmhValue, JmhValue>) (Object) nextEntry;
+        }
+      }
+    }
+
+  }
+
+  // @Override
+  // public Iterator<Entry<JmhValue, JmhValue>> entryIterator() {
+  // return untypedEntryStream().flatMap(ClojureSetMultimap::dispatchOnTypeAndFlatten)
+  // .iterator();
+  // }
+  //
+  // @SuppressWarnings("unchecked")
+  // private Stream<Entry<JmhValue, Object>> untypedEntryStream() {
+  // int size = xs.count();
+  // Iterator<Entry<JmhValue, Object>> it = ((APersistentMap) xs).entrySet().iterator();
+  //
+  // Spliterator<Entry<JmhValue, Object>> split = Spliterators.spliterator(it, size,
+  // Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED);
+  //
+  // return StreamSupport.stream(split, false);
+  // }
+  //
+  // @SuppressWarnings("unchecked")
+  // private static Stream<Entry<JmhValue, JmhValue>> dispatchOnTypeAndFlatten(
+  // Entry<JmhValue, Object> tuple) {
+  // Object singletonOrSet = tuple.getValue();
+  //
+  // if (singletonOrSet instanceof IPersistentSet) {
+  // IPersistentSet set = (IPersistentSet) singletonOrSet;
+  //
+  // Iterator<Entry<JmhValue, JmhValue>> it = new MultimapEntryToMapEntriesIterator(
+  // tuple.getKey(), ((Iterable<JmhValue>) set).iterator());
+  //
+  // Spliterator<Entry<JmhValue, JmhValue>> split = Spliterators.spliterator(it, set.count(),
+  // Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED);
+  //
+  // return StreamSupport.stream(split, false);
+  // } else {
+  // return Stream.of((Map.Entry<JmhValue, JmhValue>) (Object) tuple);
+  // }
+  // }
+  //
+  // private static class MultimapEntryToMapEntriesIterator
+  // implements Iterator<Map.Entry<JmhValue, JmhValue>> {
+  //
+  // final JmhValue key;
+  // final Iterator<JmhValue> valueIterator;
+  //
+  // public MultimapEntryToMapEntriesIterator(JmhValue key, Iterator<JmhValue> valueIterator) {
+  // this.key = key;
+  // this.valueIterator = valueIterator;
+  // }
+  //
+  // @Override
+  // public boolean hasNext() {
+  // return valueIterator.hasNext();
+  // }
+  //
+  // @Override
+  // public Entry<JmhValue, JmhValue> next() {
+  // return entryOf(key, valueIterator.next());
+  // }
+  //
+  // }
+
 }

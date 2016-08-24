@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2016 CWI
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2016 CWI All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI  
+ * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
  *******************************************************************************/
 package io.usethesource.criterion.impl.persistent.unclejim;
 
@@ -21,40 +19,39 @@ import io.usethesource.criterion.api.JmhValueFactory;
 
 public class UnclejimValueFactory implements JmhValueFactory {
 
-	public UnclejimValueFactory() {
-	}
+  public UnclejimValueFactory() {}
 
-	public JmhSet set() {
-		throw new UnsupportedOperationException();
-	}
+  public JmhSet set() {
+    throw new UnsupportedOperationException();
+  }
 
-	public JmhSetBuilder setBuilder() {
-		throw new UnsupportedOperationException();
-	}
+  public JmhSetBuilder setBuilder() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public JmhMap map() {
-		return mapBuilder().done();
-	}
+  @Override
+  public JmhMap map() {
+    return mapBuilder().done();
+  }
 
-	@Override
-	public JmhMapBuilder mapBuilder() {
-		return new UnclejimMapWriter();
-	}
+  @Override
+  public JmhMapBuilder mapBuilder() {
+    return new UnclejimMapWriter();
+  }
 
-	@Override
-	public JmhSetMultimap setMultimap() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public JmhSetMultimap setMultimap() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public JmhSetMultimapBuilder setMultimapBuilder() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public JmhSetMultimapBuilder setMultimapBuilder() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public String toString() {
-		return "VF_UNCLEJIM";
-	}
+  @Override
+  public String toString() {
+    return "VF_UNCLEJIM";
+  }
 
 }

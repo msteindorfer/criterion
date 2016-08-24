@@ -15,37 +15,37 @@ import io.usethesource.criterion.CountingInteger;
 
 public class CountingIntegerProfiler implements InternalProfiler {
 
-	@Override
-	public String getDescription() {
-		return "Counts the number of hashCode() and equals() invocations on class 'CountingInteger'";
-	}
+  @Override
+  public String getDescription() {
+    return "Counts the number of hashCode() and equals() invocations on class 'CountingInteger'";
+  }
 
-	@Override
-	public void beforeIteration(BenchmarkParams benchmarkParams, IterationParams iterationParams) {
-		CountingInteger.resetCounters();
-	}
+  @Override
+  public void beforeIteration(BenchmarkParams benchmarkParams, IterationParams iterationParams) {
+    CountingInteger.resetCounters();
+  }
 
-    /**
-     * Run this code after a benchmark iteration finished
-     *
-     * @param benchmarkParams benchmark parameters used for current launch
-     * @param iterationParams iteration parameters used for current launch
-     * @param result iteration result
-     * @return profiler results
-     */
-	@Override
-	public Collection<? extends Result<ProfilerResult>> afterIteration(
-			BenchmarkParams benchmarkParams, IterationParams iterationParams, IterationResult result) {
-		String unit = "invocations";
-		AggregationPolicy policy = AggregationPolicy.AVG;
-		
-		final ProfilerResult hashCodeResult = new ProfilerResult("hashCode",
-				CountingInteger.getHashcodeCounter(), unit, policy);
+  /**
+   * Run this code after a benchmark iteration finished
+   *
+   * @param benchmarkParams benchmark parameters used for current launch
+   * @param iterationParams iteration parameters used for current launch
+   * @param result iteration result
+   * @return profiler results
+   */
+  @Override
+  public Collection<? extends Result<ProfilerResult>> afterIteration(
+      BenchmarkParams benchmarkParams, IterationParams iterationParams, IterationResult result) {
+    String unit = "invocations";
+    AggregationPolicy policy = AggregationPolicy.AVG;
 
-		final ProfilerResult equalsResult = new ProfilerResult("equals",
-				CountingInteger.getEqualsCounter(), unit, policy);
-		
-		return Arrays.asList(hashCodeResult, equalsResult);
-	}
+    final ProfilerResult hashCodeResult =
+        new ProfilerResult("hashCode", CountingInteger.getHashcodeCounter(), unit, policy);
+
+    final ProfilerResult equalsResult =
+        new ProfilerResult("equals", CountingInteger.getEqualsCounter(), unit, policy);
+
+    return Arrays.asList(hashCodeResult, equalsResult);
+  }
 
 }

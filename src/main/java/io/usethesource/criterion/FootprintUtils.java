@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 CWI
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2014-2015 CWI All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
+ * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
  *******************************************************************************/
 package io.usethesource.criterion;
 
@@ -27,89 +25,90 @@ import com.google.common.base.Predicates;
 import io.usethesource.criterion.api.JmhValue;
 
 public final class FootprintUtils {
-	
-	final static String CSV_HEADER = "elementCount,run,className,dataType,archetype,supportsStagedMutability,footprintInBytes,footprintInObjects,footprintInReferences"; // ,footprintInPrimitives
-	
-	public enum Archetype {
-		MUTABLE, IMMUTABLE, PERSISTENT
-	}
 
-	public enum DataType {
-		MAP, SET
-	}
-	
-	public enum MemoryFootprintPreset {
-		RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD
-	}
+  final static String CSV_HEADER =
+      "elementCount,run,className,dataType,archetype,supportsStagedMutability,footprintInBytes,footprintInObjects,footprintInReferences"; // ,footprintInPrimitives
 
-	public static String measureAndReport(final Object objectToMeasure, final String className,
-			DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size,
-			int run, MemoryFootprintPreset preset) {
-		final Predicate<Object> predicate;
+  public enum Archetype {
+    MUTABLE, IMMUTABLE, PERSISTENT
+  }
 
-		switch (preset) {
-		case DATA_STRUCTURE_OVERHEAD:
-			predicate = Predicates.not(Predicates.instanceOf(JmhValue.class));
-			break;
-		case RETAINED_SIZE:
-			predicate = Predicates.alwaysTrue();
-			break;
-		default:
-			throw new IllegalStateException();
-		}
+  public enum DataType {
+    MAP, SET
+  }
 
-		// System.out.println(GraphLayout.parseInstance(objectToMeasure).totalSize());
+  public enum MemoryFootprintPreset {
+    RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD
+  }
 
-		long memoryInBytes = objectexplorer.MemoryMeasurer.measureBytes(objectToMeasure, predicate);
+  public static String measureAndReport(final Object objectToMeasure, final String className,
+      DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run,
+      MemoryFootprintPreset preset) {
+    final Predicate<Object> predicate;
 
-		Footprint memoryFootprint = objectexplorer.ObjectGraphMeasurer.measure(objectToMeasure,
-				predicate);
+    switch (preset) {
+      case DATA_STRUCTURE_OVERHEAD:
+        predicate = Predicates.not(Predicates.instanceOf(JmhValue.class));
+        break;
+      case RETAINED_SIZE:
+        predicate = Predicates.alwaysTrue();
+        break;
+      default:
+        throw new IllegalStateException();
+    }
 
-		final String statString = String.format("%d\t %60s\t[%s]\t %s", memoryInBytes, className,
-				dataType, memoryFootprint);
-		System.out.println(statString);
+    // System.out.println(GraphLayout.parseInstance(objectToMeasure).totalSize());
 
-		final String statFileString = String.format("%d,%d,%s,%s,%s,%b,%d,%d,%d", size, run,
-				className, dataType, archetype, supportsStagedMutability, memoryInBytes,
-				memoryFootprint.getObjects(), memoryFootprint.getReferences());
+    long memoryInBytes = objectexplorer.MemoryMeasurer.measureBytes(objectToMeasure, predicate);
 
-		return statFileString;
-	}
+    Footprint memoryFootprint =
+        objectexplorer.ObjectGraphMeasurer.measure(objectToMeasure, predicate);
 
-	static List<Integer> createLinearRange(int start, int end, int stride) {
-		int count = (end - start) / stride;
-		ArrayList<Integer> samples = new ArrayList<>(count);
-		
-		for (int i = 0; i < count; i++) {
-			samples.add(start);
-			start += stride;
-		}
-		
-		return samples;
-	}
+    final String statString =
+        String.format("%d\t %60s\t[%s]\t %s", memoryInBytes, className, dataType, memoryFootprint);
+    System.out.println(statString);
 
-	static List<Integer> createExponentialRange(int start, int end) {
-		ArrayList<Integer> samples = new ArrayList<>(end - start);
-		
-		for (int exp = start; exp < end; exp++) {
-			samples.add((int) Math.pow(2, exp));
-		}
-		
-		return samples;
-	}
+    final String statFileString = String.format("%d,%d,%s,%s,%s,%b,%d,%d,%d", size, run, className,
+        dataType, archetype, supportsStagedMutability, memoryInBytes, memoryFootprint.getObjects(),
+        memoryFootprint.getReferences());
 
-	static void writeToFile(Path file, boolean isAppendingToFile, List<String> lines) {
-		// write stats to file
-		try {
-			if (isAppendingToFile) {
-				Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
-			} else {
-				Files.write(file, Arrays.asList(CSV_HEADER), StandardCharsets.UTF_8);
-				Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    return statFileString;
+  }
+
+  static List<Integer> createLinearRange(int start, int end, int stride) {
+    int count = (end - start) / stride;
+    ArrayList<Integer> samples = new ArrayList<>(count);
+
+    for (int i = 0; i < count; i++) {
+      samples.add(start);
+      start += stride;
+    }
+
+    return samples;
+  }
+
+  static List<Integer> createExponentialRange(int start, int end) {
+    ArrayList<Integer> samples = new ArrayList<>(end - start);
+
+    for (int exp = start; exp < end; exp++) {
+      samples.add((int) Math.pow(2, exp));
+    }
+
+    return samples;
+  }
+
+  static void writeToFile(Path file, boolean isAppendingToFile, List<String> lines) {
+    // write stats to file
+    try {
+      if (isAppendingToFile) {
+        Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+      } else {
+        Files.write(file, Arrays.asList(CSV_HEADER), StandardCharsets.UTF_8);
+        Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
 }

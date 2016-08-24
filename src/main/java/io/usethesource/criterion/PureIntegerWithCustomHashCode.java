@@ -7,49 +7,49 @@ import io.usethesource.criterion.api.JmhValue;
 
 @CompilerControl(Mode.DONT_INLINE)
 public class PureIntegerWithCustomHashCode implements JmhValue {
-	
-	private int value;
 
-	PureIntegerWithCustomHashCode(int value) {
-		this.value = value;
-	}
+  private int value;
 
-	public static final PureIntegerWithCustomHashCode valueOf(int value) { 
-		return new PureIntegerWithCustomHashCode(value);
-	}
-	
-	@Override
-	public int hashCode() {
-		int h = value ^ 0x85ebca6b;
-		// based on the final Avalanching phase of MurmurHash2
-		// providing a nice mix of bits even for small numbers.
-		h ^= h >>> 13;
-		h *= 0x5bd1e995;
-		h ^= h >>> 15;
+  PureIntegerWithCustomHashCode(int value) {
+    this.value = value;
+  }
 
-		return h;
-	}
+  public static final PureIntegerWithCustomHashCode valueOf(int value) {
+    return new PureIntegerWithCustomHashCode(value);
+  }
 
-	@Override
-	public boolean equals(Object other) {
-		if (other == null) {
-			return false;
-		}
-		if (other == this) {
-			return true;
-		}
+  @Override
+  public int hashCode() {
+    int h = value ^ 0x85ebca6b;
+    // based on the final Avalanching phase of MurmurHash2
+    // providing a nice mix of bits even for small numbers.
+    h ^= h >>> 13;
+    h *= 0x5bd1e995;
+    h ^= h >>> 15;
 
-		if (other instanceof PureIntegerWithCustomHashCode) {
-			int otherValue = ((PureIntegerWithCustomHashCode) other).value;
-			
-			return value == otherValue;
-		}
-		return false;
-	}
+    return h;
+  }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
+  @Override
+  public boolean equals(Object other) {
+    if (other == null) {
+      return false;
+    }
+    if (other == this) {
+      return true;
+    }
+
+    if (other instanceof PureIntegerWithCustomHashCode) {
+      int otherValue = ((PureIntegerWithCustomHashCode) other).value;
+
+      return value == otherValue;
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
 
 }

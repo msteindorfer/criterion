@@ -1,13 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 CWI
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2013-2014 CWI All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *
- *   * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
+ * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
  *******************************************************************************/
 package io.usethesource.criterion.impl.persistent.champ;
 
@@ -19,55 +17,55 @@ import io.usethesource.criterion.api.JmhValue;
 
 class ChampSetWriter implements JmhSetBuilder {
 
-	protected final TransientSet<JmhValue> setContent;
-	protected JmhSet constructedSet;
+  protected final TransientSet<JmhValue> setContent;
+  protected JmhSet constructedSet;
 
-	ChampSetWriter(SetFactory setFactory) {
-		setContent = setFactory.transientOf();
-		constructedSet = null;
-	}
+  ChampSetWriter(SetFactory setFactory) {
+    setContent = setFactory.transientOf();
+    constructedSet = null;
+  }
 
-	private void put(JmhValue element) {
-		@SuppressWarnings("unused")
-		boolean result = setContent.__insert(element);
-	}
+  private void put(JmhValue element) {
+    @SuppressWarnings("unused")
+    boolean result = setContent.__insert(element);
+  }
 
-	@Override
-	public void insert(JmhValue... values) {
-		checkMutation();
+  @Override
+  public void insert(JmhValue... values) {
+    checkMutation();
 
-		for (JmhValue item : values) {
-			put(item);
-		}
-	}
+    for (JmhValue item : values) {
+      put(item);
+    }
+  }
 
-	@Override
-	public void insertAll(Iterable<? extends JmhValue> collection) {
-		checkMutation();
+  @Override
+  public void insertAll(Iterable<? extends JmhValue> collection) {
+    checkMutation();
 
-		for (JmhValue item : collection) {
-			put(item);
-		}
-	}
+    for (JmhValue item : collection) {
+      put(item);
+    }
+  }
 
-	@Override
-	public JmhSet done() {
-		if (constructedSet == null) {
-			constructedSet = new ChampSet(setContent.freeze());
-		}
+  @Override
+  public JmhSet done() {
+    if (constructedSet == null) {
+      constructedSet = new ChampSet(setContent.freeze());
+    }
 
-		return constructedSet;
-	}
+    return constructedSet;
+  }
 
-	private void checkMutation() {
-		if (constructedSet != null) {
-			throw new UnsupportedOperationException("Mutation of a finalized set is not supported.");
-		}
-	}
+  private void checkMutation() {
+    if (constructedSet != null) {
+      throw new UnsupportedOperationException("Mutation of a finalized set is not supported.");
+    }
+  }
 
-	@Override
-	public String toString() {
-		return setContent.toString();
-	}
+  @Override
+  public String toString() {
+    return setContent.toString();
+  }
 
 }
