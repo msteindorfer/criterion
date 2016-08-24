@@ -102,14 +102,4 @@ public final class ChampMap implements JmhMap {
     return content.entryIterator();
   }
 
-  @Override
-  public boolean containsKey(int key) {
-    return content.containsKey(key);
-  }
-
-  @Override
-  public JmhMap put(int key, int value) {
-    return new ChampMap(content.__put(key, value));
-  }
-
 }
