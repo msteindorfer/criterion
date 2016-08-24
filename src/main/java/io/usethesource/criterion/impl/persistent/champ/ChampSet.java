@@ -63,16 +63,19 @@ public final class ChampSet implements JmhSet {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof ChampSet) {
       ChampSet that = (ChampSet) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return content.equals(that.content);
     }

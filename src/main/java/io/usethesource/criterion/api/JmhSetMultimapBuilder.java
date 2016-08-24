@@ -4,7 +4,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: Robert Fuhrer (rfuhrer@watson.ibm.com) - initial API and implementation
- * 
+ *
  *******************************************************************************/
 
 package io.usethesource.criterion.api;
@@ -21,6 +21,7 @@ public interface JmhSetMultimapBuilder extends JmhBuilder {
   //
   // void putAll(Map<JmhValue, JmhValue> map);
 
+  @Override
   JmhSetMultimap done();
 
 }

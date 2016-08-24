@@ -26,8 +26,7 @@ class ChampSetWriter implements JmhSetBuilder {
   }
 
   private void put(JmhValue element) {
-    @SuppressWarnings("unused")
-    boolean result = setContent.__insert(element);
+    setContent.__insert(element);
   }
 
   @Override

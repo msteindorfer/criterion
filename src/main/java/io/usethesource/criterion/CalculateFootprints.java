@@ -120,7 +120,7 @@ public final class CalculateFootprints {
       int elementCount, int run, Optional<String> shortName) {
     final Class<?> clazz = clojure.lang.PersistentHashSet.class;
 
-    IPersistentSet set = (IPersistentSet) PersistentHashSet.EMPTY;
+    IPersistentSet set = PersistentHashSet.EMPTY;
 
     for (JmhValue v : testSet) {
       set = (IPersistentSet) set.cons(v);
@@ -135,11 +135,11 @@ public final class CalculateFootprints {
       int elementCount, int run, Optional<String> shortName) {
     final Class<?> clazz = clojure.lang.PersistentHashMap.class;
 
-    IPersistentMap map = (IPersistentMap) PersistentHashMap.EMPTY;
+    IPersistentMap map = PersistentHashMap.EMPTY;
 
     for (JmhValue v : testSet) {
 
-      map = (IPersistentMap) map.assoc(v, v);
+      map = map.assoc(v, v);
     }
 
     return FootprintUtils.measureAndReport(map, shortName.orElse(classToName(clazz)), DataType.MAP,

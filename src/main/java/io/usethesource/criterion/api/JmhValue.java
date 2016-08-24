@@ -4,7 +4,7 @@
  * this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: Robert Fuhrer (rfuhrer@watson.ibm.com) - initial API and implementation
- * 
+ *
  *******************************************************************************/
 
 package io.usethesource.criterion.api;

@@ -42,6 +42,7 @@ public final class ChampMap implements JmhMap {
     return new ChampMap(content.__put(key, value));
   }
 
+  @Override
   public JmhMap removeKey(JmhValue key) {
     return new ChampMap(content.__remove(key));
   }
@@ -68,16 +69,19 @@ public final class ChampMap implements JmhMap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof ChampMap) {
       ChampMap that = (ChampMap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return content.equals(that.content);
     }

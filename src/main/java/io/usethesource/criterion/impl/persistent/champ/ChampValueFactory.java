@@ -38,10 +38,12 @@ public class ChampValueFactory implements JmhValueFactory {
     }
   }
 
+  @Override
   public JmhSet set() {
     return setBuilder().done();
   }
 
+  @Override
   public JmhSetBuilder setBuilder() {
     return new ChampSetWriter(setFactory);
   }

@@ -4,7 +4,7 @@
  * this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: Robert Fuhrer (rfuhrer@watson.ibm.com) - initial API and implementation
- * 
+ *
  *******************************************************************************/
 
 package io.usethesource.criterion.api;
@@ -31,7 +31,7 @@ public interface JmhSet extends JmhValue, Iterable<JmhValue> {
 
   /**
    * Add an element to the set.
-   * 
+   *
    * @param <SetOrRel> ISet when the result will be a set, IRelation when it will be a relation.
    * @param element
    * @return a relation if the element type is a tuple type, a set otherwise
@@ -40,13 +40,14 @@ public interface JmhSet extends JmhValue, Iterable<JmhValue> {
 
   /**
    * Delete one element from the set.
-   * 
+   *
    * @param <SetOrRel>
    * @param set
    * @return a relation if the element type is a tuple type, a set otherwise
    */
   public JmhSet delete(JmhValue elem);
 
+  @Override
   public Iterator<JmhValue> iterator();
 
 }

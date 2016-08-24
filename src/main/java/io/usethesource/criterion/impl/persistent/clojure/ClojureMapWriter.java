@@ -27,20 +27,20 @@ class ClojureMapWriter implements JmhMapBuilder {
 
   @Override
   public void put(JmhValue key, JmhValue value) {
-    xs = (ITransientMap) xs.assoc(key, value);
+    xs = xs.assoc(key, value);
   }
 
   @Override
   public void putAll(JmhMap map) {
     for (JmhValue k : map) {
-      xs = (ITransientMap) xs.assoc(k, map.get(k));
+      xs = xs.assoc(k, map.get(k));
     }
   }
 
   @Override
   public void putAll(java.util.Map<JmhValue, JmhValue> map) {
     for (JmhValue k : map.keySet()) {
-      xs = (ITransientMap) xs.assoc(k, map.get(k));
+      xs = xs.assoc(k, map.get(k));
     }
   }
 

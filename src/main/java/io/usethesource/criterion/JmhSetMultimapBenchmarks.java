@@ -68,7 +68,7 @@ public class JmhSetMultimapBenchmarks {
    * val l = (for (i <- 0 to 23) yield s"'${Math.pow(2, i).toInt}'") val r = (for (i <- 0 to 23)
    * yield s"'${Math.pow(2, i-1).toInt + Math.pow(2, i).toInt}'") val zipped = l zip r flatMap {
    * case (x,y) => List(x,y) }
-   * 
+   *
    * val all = zipped.drop(1).take(zipped.size - 2) all.mkString(", ").replace("'", "\"")
    */
   @Param({"1", "2", "3", "4", "6", "8", "12", "16", "24", "32", "48", "64", "96", "128", "192",

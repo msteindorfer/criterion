@@ -104,7 +104,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
           TrieMap_5Bits_LazyHashCode.transientOf();
 
       for (IConstructor n : nodes) {
-        ImmutableSet ps = (ImmutableSet) preds.get(n);
+        ImmutableSet ps = preds.get(n);
         if (ps == null) {
           ps = EMPTY;
         }
@@ -163,13 +163,15 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
 
     IMap pdbResults = immutableMapToPdbMap(results);
 
-    if (LOG_BINARY_RESULTS)
+    if (LOG_BINARY_RESULTS) {
       new BinaryValueWriter().write(pdbResults,
           new FileOutputStream("data/dominators-java-without-pdb-single.bin"));
+    }
 
-    if (LOG_TEXTUAL_RESULTS)
+    if (LOG_TEXTUAL_RESULTS) {
       new StandardTextWriter().write(pdbResults,
           new FileWriter("data/dominators-java-without-pdb-single.txt"));
+    }
 
     return pdbResults;
   }
@@ -194,12 +196,14 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     // convert back to PDB for serialization
     ISet pdbResults = immutableSetOfMapsToSetOfMapValues(result.freeze());
 
-    if (LOG_BINARY_RESULTS)
+    if (LOG_BINARY_RESULTS) {
       new BinaryValueWriter().write(pdbResults, new FileOutputStream("data/dominators-java.bin"));
+    }
 
-    if (LOG_TEXTUAL_RESULTS)
+    if (LOG_TEXTUAL_RESULTS) {
       new StandardTextWriter().write(pdbResults,
           new FileWriter("data/dominators-java-without-pdb.txt"));
+    }
 
     return pdbResults;
   }
@@ -367,12 +371,15 @@ class Util_LazyHashCode {
    * Intersect two sets.
    */
   public static <K> ImmutableSet<K> intersect(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return TrieSet_5Bits_LazyHashCode.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return TrieSet_5Bits_LazyHashCode.of();
+    }
 
     final ImmutableSet<K> smaller;
     final ImmutableSet<K> bigger;
@@ -411,14 +418,18 @@ class Util_LazyHashCode {
    * Subtract one set from another.
    */
   public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return TrieSet_5Bits_LazyHashCode.of();
-    if (set1 == set2)
+    }
+    if (set1 == set2) {
       return TrieSet_5Bits_LazyHashCode.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return TrieSet_5Bits_LazyHashCode.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
     final TransientSet<K> tmp = set1.asTransient();
     boolean modified = false;
@@ -440,15 +451,19 @@ class Util_LazyHashCode {
    * Union two sets.
    */
   public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return TrieSet_5Bits_LazyHashCode.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return set2;
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
+    }
 
     final ImmutableSet<K> smaller;
     final ImmutableSet<K> bigger;

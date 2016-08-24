@@ -39,6 +39,7 @@ public final class JavaslangMap implements JmhMap {
     return new JavaslangMap(content.put(key, value));
   }
 
+  @Override
   public JmhMap removeKey(JmhValue key) {
     return new JavaslangMap(content.remove(key));
   }
@@ -65,16 +66,19 @@ public final class JavaslangMap implements JmhMap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof JavaslangMap) {
       JavaslangMap that = (JavaslangMap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return content.equals(that.content);
     }

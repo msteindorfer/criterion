@@ -374,12 +374,15 @@ class Util_Default_Instrumented2 {
    * Intersect two sets.
    */
   public static <K> ImmutableSet<K> intersect(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return DefaultTrieSet.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return DefaultTrieSet.of();
+    }
 
     final ImmutableSet<K> smaller;
     final ImmutableSet<K> bigger;
@@ -418,14 +421,18 @@ class Util_Default_Instrumented2 {
    * Subtract one set from another.
    */
   public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return DefaultTrieSet.of();
-    if (set1 == set2)
+    }
+    if (set1 == set2) {
       return DefaultTrieSet.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return DefaultTrieSet.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
     final TransientSet<K> tmp = set1.asTransient();
     boolean modified = false;
@@ -447,15 +454,19 @@ class Util_Default_Instrumented2 {
    * Union two sets.
    */
   public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return DefaultTrieSet.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return set2;
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
+    }
 
     final ImmutableSet<K> smaller;
     final ImmutableSet<K> bigger;

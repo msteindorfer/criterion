@@ -21,10 +21,12 @@ public class DexxValueFactory implements JmhValueFactory {
 
   public DexxValueFactory() {}
 
+  @Override
   public JmhSet set() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public JmhSetBuilder setBuilder() {
     throw new UnsupportedOperationException();
   }

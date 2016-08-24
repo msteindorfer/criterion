@@ -116,17 +116,11 @@ public class BitmapIndexingBenchmark {
 
       arrayOffsetsOffset = unsafe.staticFieldOffset(dstClass.getDeclaredField("arrayOffsets"));
 
-      @SuppressWarnings("unused")
-      long nodeMapOffsetOffsetAlt =
-          unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("nodeMapOffset"));
+      unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("nodeMapOffset"));
 
-      @SuppressWarnings("unused")
-      long dataMapOffsetOffsetAlt =
-          unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("dataMapOffset"));
+      unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("dataMapOffset"));
 
-      @SuppressWarnings("unused")
-      long arrayOffsetsOffsetAlt =
-          unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("arrayOffsets"));
+      unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("arrayOffsets"));
 
       /**************************************************************************/
 
@@ -149,19 +143,25 @@ public class BitmapIndexingBenchmark {
   boolean ensure(Object o) {
     Map2To0Node that = (Map2To0Node) o;
 
-    if (that.nodeMap != this.nodeMap)
+    if (that.nodeMap != this.nodeMap) {
       return false;
-    if (that.dataMap != this.dataMap)
+    }
+    if (that.dataMap != this.dataMap) {
       return false;
+    }
 
-    if (!that.key1.equals(this.key1))
+    if (!that.key1.equals(this.key1)) {
       return false;
-    if (!that.val1.equals(this.val1))
+    }
+    if (!that.val1.equals(this.val1)) {
       return false;
-    if (!that.key2.equals(this.key2))
+    }
+    if (!that.key2.equals(this.key2)) {
       return false;
-    if (!that.val2.equals(this.val2))
+    }
+    if (!that.val2.equals(this.val2)) {
       return false;
+    }
 
     return true;
   }
@@ -184,39 +184,44 @@ public class BitmapIndexingBenchmark {
 
   @Benchmark
   public void timeCaseDistinctionBase_CHAMP(Blackhole bh) {
-    for (int shift = 0; shift < shiftBound; shift += shiftIncrease)
+    for (int shift = 0; shift < shiftBound; shift += shiftIncrease) {
       bh.consume(mapNode.exerciseCaseDistinctionChamp(keyHash, shift));
+    }
   }
 
   @Benchmark
   public void timeCaseDistinctionBase_HETEROGENEOUS_CHAMP_1(Blackhole bh) {
-    for (int shift = 0; shift < shiftBound; shift += shiftIncrease)
+    for (int shift = 0; shift < shiftBound; shift += shiftIncrease) {
       bh.consume(mapNode.exerciseCaseDistinction(keyHash, shift));
+    }
   }
 
   @Benchmark
   public void timeCaseDistinctionBase_HETEROGENEOUS_CHAMP_2(Blackhole bh) {
-    for (int shift = 0; shift < shiftBound; shift += shiftIncrease)
+    for (int shift = 0; shift < shiftBound; shift += shiftIncrease) {
       bh.consume(mapNode.exerciseCaseDistinction2(keyHash, shift));
+    }
   }
 
   @Benchmark
   public void timeCaseDistinctionBase_HETEROGENEOUS_CHAMP_3(Blackhole bh) {
-    for (int shift = 0; shift < shiftBound; shift += shiftIncrease)
+    for (int shift = 0; shift < shiftBound; shift += shiftIncrease) {
       bh.consume(mapNode.exerciseCaseDistinction3(keyHash, shift));
+    }
   }
 
   @Benchmark
   public void timeCaseDistinctionBase_HETEROGENEOUS_IDEA(Blackhole bh) {
-    for (int shift = 0; shift < shiftBound; shift += shiftIncrease)
+    for (int shift = 0; shift < shiftBound; shift += shiftIncrease) {
       bh.consume(mapNodeBase2.exerciseCaseDistinction(keyHash, shift));
+    }
   }
 
   static class Base {
 
     Base(final int nodeMap, final int dataMap) {
-      this.nodeMap = (int) nodeMap;
-      this.dataMap = (int) dataMap;
+      this.nodeMap = nodeMap;
+      this.dataMap = dataMap;
     }
 
     protected int nodeMap = 0;
@@ -265,15 +270,15 @@ public class BitmapIndexingBenchmark {
     }
 
     public int nodeMap() {
-      return (int) (rawMap1() ^ rareMap());
+      return rawMap1() ^ rareMap();
     }
 
     public int dataMap() {
-      return (int) (rawMap2() ^ rareMap());
+      return rawMap2() ^ rareMap();
     }
 
     public int rareMap() {
-      return (int) (rawMap1() & rawMap2());
+      return rawMap1() & rawMap2();
     }
 
     public int rawMap1() {
@@ -293,11 +298,11 @@ public class BitmapIndexingBenchmark {
     }
 
     static final int index(final int bitmap, final int bitpos) {
-      return java.lang.Integer.bitCount((int) (bitmap) & (bitpos - 1));
+      return java.lang.Integer.bitCount((bitmap) & (bitpos - 1));
     }
 
     static final int index(final int bitmap, final int mask, final int bitpos) {
-      return ((int) (bitmap) == -1) ? mask : index(bitmap, bitpos);
+      return ((bitmap) == -1) ? mask : index(bitmap, bitpos);
     }
 
     public boolean exerciseCaseDistinctionChamp(int keyHash, int shift) {
@@ -355,23 +360,23 @@ public class BitmapIndexingBenchmark {
       boolean inMap2 = (rawMap2 != 0 && (rawMap2 == -1 || (rawMap2 & bitpos) != 0));
 
       if (inMap1 && !inMap2) {
-        final int rareMap = (int) (rawMap1 & rawMap2);
-        final int dataMap = (int) (rawMap2 ^ rareMap);
+        final int rareMap = rawMap1 & rawMap2;
+        final int dataMap = rawMap2 ^ rareMap;
 
         final int index = index(dataMap, mask, bitpos);
         return index != 0;
       }
 
       if (inMap1 && inMap2) {
-        final int rareMap = (int) (rawMap1 & rawMap2);
+        final int rareMap = rawMap1 & rawMap2;
 
         final int index = index(rareMap, mask, bitpos);
         return index != 0;
       }
 
       if (!inMap1 && inMap2) {
-        final int rareMap = (int) (rawMap1 & rawMap2);
-        final int nodeMap = (int) (rawMap1 ^ rareMap);
+        final int rareMap = rawMap1 & rawMap2;
+        final int nodeMap = rawMap1 ^ rareMap;
 
         final int index = index(nodeMap, mask, bitpos);
         return index != 0;
@@ -490,19 +495,12 @@ public class BitmapIndexingBenchmark {
       // this.nodeMap = nodeMap;
       // this.dataMap = dataMap;
 
-      this.key1 = key1;
-      this.val1 = val1;
-      this.key2 = key2;
-      this.val2 = val2;
     }
 
     // private int nodeMap = 0;
     // private int dataMap = 0;
 
-    private Object key1 = null;
-    private Object val1 = null;
-    private Object key2 = null;
-    private Object val2 = null;
+    
 
     // private long testReorderLong0 = 0;
     // private byte testReorderByte0 = 0;
@@ -620,8 +618,6 @@ public class BitmapIndexingBenchmark {
     //
     // return java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
     // }
-
-    private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT = false;
 
     static final int index01(final long bitmap, final long bitpos) {
       // if (USE_SELF_WRITTEN_POPULATION_COUNT) {
@@ -754,19 +750,12 @@ public class BitmapIndexingBenchmark {
       // this.nodeMap = nodeMap;
       // this.dataMap = dataMap;
 
-      this.key1 = key1;
-      this.val1 = val1;
-      this.key2 = key2;
-      this.val2 = val2;
     }
 
     // private int nodeMap = 0;
     // private int dataMap = 0;
 
-    private Object key1 = null;
-    private Object val1 = null;
-    private Object key2 = null;
-    private Object val2 = null;
+    
 
     // private long testReorderLong0 = 0;
     // private byte testReorderByte0 = 0;

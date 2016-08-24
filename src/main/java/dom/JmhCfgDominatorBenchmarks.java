@@ -52,7 +52,7 @@ public class JmhCfgDominatorBenchmarks {
 
   /*
    * (for (i <- 0 to 23) yield s"'${Math.pow(2, i).toInt}'").mkString(", ").replace("'", "\"")
-   * 
+   *
    * Note: total entries in DATA_SET_FULL_FILE_NAME: 5018
    */
   @Param({"4096", "2048", "1024", "512", "256", "128"})

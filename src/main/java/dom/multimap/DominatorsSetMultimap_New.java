@@ -333,12 +333,15 @@ class Util_New {
    * Intersect two sets.
    */
   public static <K> Set.Immutable<K> intersect(Set.Immutable<K> set1, Set.Immutable<K> set2) {
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return TrieSet.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return TrieSet.of();
+    }
 
     final Set.Immutable<K> smaller;
     final Set.Immutable<K> bigger;
@@ -377,14 +380,18 @@ class Util_New {
    * Subtract one set from another.
    */
   public static <K> Set.Immutable<K> subtract(Set.Immutable<K> set1, Set.Immutable<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return TrieSet.of();
-    if (set1 == set2)
+    }
+    if (set1 == set2) {
       return TrieSet.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return TrieSet.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
     final Set.Transient<K> tmp = set1.asTransient();
     boolean modified = false;
@@ -406,15 +413,19 @@ class Util_New {
    * Union two sets.
    */
   public static <K> Set.Immutable<K> union(Set.Immutable<K> set1, Set.Immutable<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return TrieSet.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return set2;
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
+    }
 
     final Set.Immutable<K> smaller;
     final Set.Immutable<K> bigger;

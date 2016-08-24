@@ -152,7 +152,7 @@ public class DominatorsSetMultimap_Default_Instrumented implements DominatorBenc
       TransientSetMultimap<IConstructor, IConstructor> newDom = TrieSetMultimap_HHAMT.transientOf();
 
       for (IConstructor n : nodes) {
-        ImmutableSet ps = (ImmutableSet) preds.get(n);
+        ImmutableSet ps = preds.get(n);
         if (ps == null) {
           ps = EMPTY;
         }
@@ -405,12 +405,15 @@ class Util_Default_Instrumented {
    * Intersect two sets.
    */
   public static <K> ImmutableSet<K> intersect(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return DefaultTrieSet.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return DefaultTrieSet.of();
+    }
 
     final ImmutableSet<K> smaller;
     final ImmutableSet<K> bigger;
@@ -449,14 +452,18 @@ class Util_Default_Instrumented {
    * Subtract one set from another.
    */
   public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return DefaultTrieSet.of();
-    if (set1 == set2)
+    }
+    if (set1 == set2) {
       return DefaultTrieSet.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return DefaultTrieSet.of();
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
     final TransientSet<K> tmp = set1.asTransient();
     boolean modified = false;
@@ -478,15 +485,19 @@ class Util_Default_Instrumented {
    * Union two sets.
    */
   public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
-    if (set1 == null && set2 == null)
+    if (set1 == null && set2 == null) {
       return DefaultTrieSet.of();
-    if (set1 == null)
+    }
+    if (set1 == null) {
       return set2;
-    if (set2 == null)
+    }
+    if (set2 == null) {
       return set1;
+    }
 
-    if (set1 == set2)
+    if (set1 == set2) {
       return set1;
+    }
 
     final ImmutableSet<K> smaller;
     final ImmutableSet<K> bigger;

@@ -168,24 +168,24 @@ public final class CalculateFootprintsHeterogeneous {
   public static List<String> testOneConfiguration(int size, int run) {
     /*
      * // int size = 32; double percentageOfPrimitives = 1.00;
-     * 
+     *
      * Object[] data = new Object[size];
-     * 
+     *
      * int countForPrimitives = (int) ((percentageOfPrimitives) * size); int smallCount = 0; int
      * bigCount = 0;
-     * 
+     *
      * Random rand = new Random(13); for (int i = 0; i < size; i++) { final int j = rand.nextInt();
      * final BigInteger bigJ = BigInteger.valueOf(j).multiply(BigInteger.valueOf(j));
-     * 
+     *
      * if (i < countForPrimitives) { // System.out.println("SMALL"); smallCount++; data[i] = j; }
      * else { // System.out.println("BIG"); bigCount++; data[i] = bigJ; } }
-     * 
+     *
      * System.out.println(); System.out.println(String.format("PRIMITIVE:   %10d (%.2f percent)",
      * smallCount, 100. * smallCount / (smallCount + bigCount))); System.out.println(
      * String.format("BIG_INTEGER: %10d (%.2f percent)", bigCount, 100. * bigCount / (smallCount +
      * bigCount))); // System.out.println(String.format("UNIQUE: %10d (%.2f percent)", //
      * map.size(), 100. * map.size() / (smallCount + bigCount))); System.out.println();
-     * 
+     *
      */
 
     EnumSet<MemoryFootprintPreset> presets =
@@ -451,7 +451,7 @@ public final class CalculateFootprintsHeterogeneous {
         ysBldr.put(box((Integer) o), box((Integer) o));
       } else {
         for (int i = 0; i < multimapValueSize; i++) {
-          ysBldr.put(box((Integer) o), box((Integer) i));
+          ysBldr.put(box((Integer) o), box(i));
         }
       }
     }
@@ -653,7 +653,7 @@ public final class CalculateFootprintsHeterogeneous {
 
     String shortName = String.format("HashMap");
 
-    String longName = String.format("java.util.HashMap");
+    String.format("java.util.HashMap");
 
     return measureAndReport(ys, shortName, DataType.MAP, Archetype.MUTABLE, false, elementCount,
         run, preset);

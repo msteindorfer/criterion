@@ -40,6 +40,7 @@ public final class DexxMap implements JmhMap {
     return new DexxMap(content.put(key, value));
   }
 
+  @Override
   public JmhMap removeKey(JmhValue key) {
     return new DexxMap(content.remove(key));
   }
@@ -68,16 +69,19 @@ public final class DexxMap implements JmhMap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof DexxMap) {
       DexxMap that = (DexxMap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return content.equals(that.content);
     }

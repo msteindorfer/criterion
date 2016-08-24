@@ -98,17 +98,11 @@ public class ClassInitializationBenchmark {
 
       arrayOffsetsOffset = unsafe.staticFieldOffset(dstClass.getDeclaredField("arrayOffsets"));
 
-      @SuppressWarnings("unused")
-      long nodeMapOffsetOffsetAlt =
-          unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("nodeMapOffset"));
+      unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("nodeMapOffset"));
 
-      @SuppressWarnings("unused")
-      long dataMapOffsetOffsetAlt =
-          unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("dataMapOffset"));
+      unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("dataMapOffset"));
 
-      @SuppressWarnings("unused")
-      long arrayOffsetsOffsetAlt =
-          unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("arrayOffsets"));
+      unsafe.staticFieldOffset(dstClassAlt.getDeclaredField("arrayOffsets"));
 
       /**************************************************************************/
 
@@ -131,19 +125,25 @@ public class ClassInitializationBenchmark {
   boolean ensure(Object o) {
     Map2To0Node that = (Map2To0Node) o;
 
-    if (that.nodeMap != this.nodeMap)
+    if (that.nodeMap != this.nodeMap) {
       return false;
-    if (that.dataMap != this.dataMap)
+    }
+    if (that.dataMap != this.dataMap) {
       return false;
+    }
 
-    if (!that.key1.equals(this.key1))
+    if (!that.key1.equals(this.key1)) {
       return false;
-    if (!that.val1.equals(this.val1))
+    }
+    if (!that.val1.equals(this.val1)) {
       return false;
-    if (!that.key2.equals(this.key2))
+    }
+    if (!that.key2.equals(this.key2)) {
       return false;
-    if (!that.val2.equals(this.val2))
+    }
+    if (!that.val2.equals(this.val2)) {
       return false;
+    }
 
     return true;
   }
@@ -404,8 +404,9 @@ public class ClassInitializationBenchmark {
   public Object timeRangecopy_Array_SystemArraycopy() {
     Object dst = new Object[RANGECOPY_SIZE];
 
-    for (int i = 0; i < RANGECOPY_COUNT; i++)
+    for (int i = 0; i < RANGECOPY_COUNT; i++) {
       System.arraycopy(src, 0, dst, 0, RANGECOPY_SIZE);
+    }
 
     return dst;
   }
@@ -426,8 +427,9 @@ public class ClassInitializationBenchmark {
     Object src = srcClassInstance;
     Object dst = unsafe.allocateInstance(src.getClass());
 
-    for (int i = 0; i < RANGECOPY_COUNT; i++)
+    for (int i = 0; i < RANGECOPY_COUNT; i++) {
       RangecopyUtils.rangecopyObjectRegion(src, 20L, dst, 20L, RANGECOPY_SIZE);
+    }
 
     return dst;
   }
@@ -456,8 +458,8 @@ public class ClassInitializationBenchmark {
   static class Base {
 
     Base(final int nodeMap, final int dataMap) {
-      this.nodeMap = (int) nodeMap;
-      this.dataMap = (int) dataMap;
+      this.nodeMap = nodeMap;
+      this.dataMap = dataMap;
     }
 
     protected int nodeMap = 0;
@@ -558,19 +560,12 @@ public class ClassInitializationBenchmark {
       // this.nodeMap = nodeMap;
       // this.dataMap = dataMap;
 
-      this.key1 = key1;
-      this.val1 = val1;
-      this.key2 = key2;
-      this.val2 = val2;
     }
 
     // private int nodeMap = 0;
     // private int dataMap = 0;
 
-    private Object key1 = null;
-    private Object val1 = null;
-    private Object key2 = null;
-    private Object val2 = null;
+    
 
     // private long testReorderLong0 = 0;
     // private byte testReorderByte0 = 0;

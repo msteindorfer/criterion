@@ -462,8 +462,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements ImmutableMap<K, V> {
     } else if (other instanceof Map) {
       Map that = (Map) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       for (@SuppressWarnings("unchecked")
       Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
@@ -762,8 +763,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements ImmutableMap<K, V> {
 
         @Override
         public AbstractMapNode<K, V> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractMapNode.this.getNode(nextIndex++);
         }
 
@@ -793,7 +795,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements ImmutableMap<K, V> {
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -840,7 +842,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements ImmutableMap<K, V> {
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -2230,22 +2232,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements ImmutableMap<K, V> {
       this.cachedSize = trieMap_5Bits.cachedSize;
     }
 
-    private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
-      int hash = 0;
-      int size = 0;
-
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
-        final Map.Entry<K, V> entry = it.next();
-        final K key = entry.getKey();
-        final V val = entry.getValue();
-
-        hash += key.hashCode() ^ val.hashCode();
-        size += 1;
-      }
-
-      return hash == targetHash && size == targetSize;
-    }
-
     @Override
     public V put(final K key, final V val) {
       throw new UnsupportedOperationException();
@@ -2707,8 +2693,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements ImmutableMap<K, V> {
       } else if (other instanceof Map) {
         Map that = (Map) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
         for (@SuppressWarnings("unchecked")
         Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {

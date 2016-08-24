@@ -40,6 +40,7 @@ public final class UnclejimMap implements JmhMap {
     return new UnclejimMap(content.assoc(key, value));
   }
 
+  @Override
   public JmhMap removeKey(JmhValue key) {
     return new UnclejimMap(content.without(key));
   }
@@ -66,16 +67,19 @@ public final class UnclejimMap implements JmhMap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof UnclejimMap) {
       UnclejimMap that = (UnclejimMap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return content.equals(that.content);
     }

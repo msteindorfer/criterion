@@ -40,6 +40,7 @@ public final class PcollectionsMap implements JmhMap {
     return new PcollectionsMap(content.plus(key, value));
   }
 
+  @Override
   public JmhMap removeKey(JmhValue key) {
     return new PcollectionsMap(content.minus(key));
   }
@@ -66,16 +67,19 @@ public final class PcollectionsMap implements JmhMap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof PcollectionsMap) {
       PcollectionsMap that = (PcollectionsMap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return content.equals(that.content);
     }

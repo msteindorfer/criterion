@@ -157,13 +157,15 @@ public class DominatorsPDB {
     System.err.println(vf.toString() + "\nDuration: "
         + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
 
-    if (LOG_BINARY_RESULTS)
+    if (LOG_BINARY_RESULTS) {
       new BinaryValueWriter().write(pdbResults,
           new FileOutputStream("data/dominators-java-" + vf.toString() + "-single.bin"));
+    }
 
-    if (LOG_TEXTUAL_RESULTS)
+    if (LOG_TEXTUAL_RESULTS) {
       new StandardTextWriter().write(pdbResults,
           new FileWriter("data/dominators-java-" + vf.toString() + "-single.txt"));
+    }
 
     return pdbResults;
   }
@@ -186,12 +188,14 @@ public class DominatorsPDB {
 
     ISet pdbResults = result.done();
 
-    if (LOG_BINARY_RESULTS)
+    if (LOG_BINARY_RESULTS) {
       new BinaryValueWriter().write(pdbResults, new FileOutputStream("data/dominators-java.bin"));
+    }
 
-    if (LOG_TEXTUAL_RESULTS)
+    if (LOG_TEXTUAL_RESULTS) {
       new StandardTextWriter().write(pdbResults,
           new FileWriter("data/dominators-java-" + vf.toString() + ".txt"));
+    }
 
     return pdbResults;
   }

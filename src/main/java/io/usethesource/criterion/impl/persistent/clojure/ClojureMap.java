@@ -40,12 +40,12 @@ public class ClojureMap implements JmhMap {
 
   @Override
   public JmhMap put(JmhValue key, JmhValue value) {
-    return new ClojureMap((IPersistentMap) xs.assoc(key, value));
+    return new ClojureMap(xs.assoc(key, value));
   }
 
   @Override
   public JmhMap removeKey(JmhValue key) {
-    return new ClojureMap((IPersistentMap) xs.without(key));
+    return new ClojureMap(xs.without(key));
   }
 
   @Override
@@ -70,10 +70,12 @@ public class ClojureMap implements JmhMap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof ClojureMap) {
       ClojureMap that = (ClojureMap) other;

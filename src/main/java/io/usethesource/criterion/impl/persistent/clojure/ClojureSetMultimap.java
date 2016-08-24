@@ -46,26 +46,26 @@ public class ClojureSetMultimap implements JmhSetMultimap {
     Object singletonOrSet = xs.valAt(key);
 
     if (singletonOrSet == null) {
-      return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
+      return new ClojureSetMultimap(xs.assoc(key, value));
     } else if (singletonOrSet instanceof IPersistentSet) {
       IPersistentSet set = (IPersistentSet) singletonOrSet;
-      return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, set.cons(value)));
+      return new ClojureSetMultimap(xs.assoc(key, set.cons(value)));
     } else if (singletonOrSet.equals(value)) {
       return this;
     } else {
       IPersistentSet set = PersistentHashSet.create(singletonOrSet, value);
-      return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, set));
+      return new ClojureSetMultimap(xs.assoc(key, set));
     }
   }
 
   @Override
   public JmhSetMultimap put(JmhValue key, JmhValue value) {
-    return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, value));
+    return new ClojureSetMultimap(xs.assoc(key, value));
   }
 
   @Override
   public JmhSetMultimap remove(JmhValue key) {
-    return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+    return new ClojureSetMultimap(xs.without(key));
   }
 
   @Override
@@ -80,15 +80,15 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 
       switch (newSet.count()) {
         case 0:
-          return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+          return new ClojureSetMultimap(xs.without(key));
         case 1:
-          return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, newSet.seq().first()));
+          return new ClojureSetMultimap(xs.assoc(key, newSet.seq().first()));
         default:
-          return new ClojureSetMultimap((IPersistentMap) xs.assoc(key, newSet));
+          return new ClojureSetMultimap(xs.assoc(key, newSet));
       }
     } else {
       if (singletonOrSet.equals(value)) {
-        return new ClojureSetMultimap((IPersistentMap) xs.without(key));
+        return new ClojureSetMultimap(xs.without(key));
       } else {
         return this;
       }
@@ -136,16 +136,19 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof ClojureSetMultimap) {
       ClojureSetMultimap that = (ClojureSetMultimap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return xs.equals(that.xs);
     }

@@ -21,10 +21,12 @@ public class JavaslangValueFactory implements JmhValueFactory {
 
   public JavaslangValueFactory() {}
 
+  @Override
   public JmhSet set() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public JmhSetBuilder setBuilder() {
     throw new UnsupportedOperationException();
   }

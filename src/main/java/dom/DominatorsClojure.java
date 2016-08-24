@@ -164,13 +164,15 @@ public class DominatorsClojure implements DominatorBenchmark {
 
     IMap pdbResults = persistentHashMapToPdbMap(results);
 
-    if (LOG_BINARY_RESULTS)
+    if (LOG_BINARY_RESULTS) {
       new BinaryValueWriter().write(pdbResults,
           new FileOutputStream("data/dominators-java-without-pdb-single.bin"));
+    }
 
-    if (LOG_TEXTUAL_RESULTS)
+    if (LOG_TEXTUAL_RESULTS) {
       new StandardTextWriter().write(pdbResults,
           new FileWriter("data/dominators-java-without-pdb-single.txt"));
+    }
 
     return pdbResults;
   }
@@ -195,12 +197,14 @@ public class DominatorsClojure implements DominatorBenchmark {
     ISet pdbResults =
         persistentHashSetOfMapsToSetOfMapValues((PersistentHashSet) result.persistent());
 
-    if (LOG_BINARY_RESULTS)
+    if (LOG_BINARY_RESULTS) {
       new BinaryValueWriter().write(pdbResults, new FileOutputStream("data/dominators-java.bin"));
+    }
 
-    if (LOG_TEXTUAL_RESULTS)
+    if (LOG_TEXTUAL_RESULTS) {
       new StandardTextWriter().write(pdbResults,
           new FileWriter("data/dominators-java-without-pdb.txt"));
+    }
 
     return pdbResults;
   }
@@ -213,7 +217,7 @@ public class DominatorsClojure implements DominatorBenchmark {
 
       ITransientSet convertedValue = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
       for (IValue tuple : value) {
-        convertedValue.conj((ITuple) tuple);
+        convertedValue.conj(tuple);
       }
 
       graphs.add((PersistentHashSet) convertedValue.persistent());
@@ -290,7 +294,7 @@ public class DominatorsClojure implements DominatorBenchmark {
     ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 
     for (IValue tuple : set) {
-      builder.conj((ITuple) tuple);
+      builder.conj(tuple);
     }
 
     return (PersistentHashSet) builder.persistent();
@@ -330,7 +334,7 @@ public class DominatorsClojure implements DominatorBenchmark {
       ITransientSet convertedValue = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 
       for (IValue tuple : graph) {
-        convertedValue.conj((ITuple) tuple);
+        convertedValue.conj(tuple);
       }
 
       sampledGraphsNative.add((PersistentHashSet) convertedValue.persistent());
@@ -530,7 +534,7 @@ class UtilClojure {
     ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 
     for (ITuple tuple : (Iterable<ITuple>) set1) {
-      builder.conj((K) tuple.select(field));
+      builder.conj(tuple.select(field));
     }
 
     return (PersistentHashSet) builder.persistent();
@@ -543,7 +547,7 @@ class UtilClojure {
     ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 
     for (ITuple tuple : (Iterable<ITuple>) set1) {
-      builder.conj((ITuple) tuple.select(field1, field2));
+      builder.conj(tuple.select(field1, field2));
     }
 
     return (PersistentHashSet) builder.persistent();

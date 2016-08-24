@@ -27,7 +27,7 @@ public interface JmhMap extends Iterable<JmhValue>, JmhValue {
   /**
    * Adds a new entry to the map, mapping the key to value. If the key existed before, the old value
    * will be lost.
-   * 
+   *
    * @param key
    * @param value
    * @return a copy of the map with the new key/value mapping
@@ -44,7 +44,7 @@ public interface JmhMap extends Iterable<JmhValue>, JmhValue {
 
   /**
    * Determine whether a certain key exists in this map.
-   * 
+   *
    * @param key
    * @return true iff there is a value mapped to this key
    */
@@ -52,7 +52,7 @@ public interface JmhMap extends Iterable<JmhValue>, JmhValue {
 
   /**
    * Determine whether a certain value exists in this map.
-   * 
+   *
    * @param value
    * @return true iff there is at least one key that maps to the given value.
    */
@@ -61,6 +61,7 @@ public interface JmhMap extends Iterable<JmhValue>, JmhValue {
   /**
    * @return an iterator over the keys of the map
    */
+  @Override
   public Iterator<JmhValue> iterator();
 
   /**

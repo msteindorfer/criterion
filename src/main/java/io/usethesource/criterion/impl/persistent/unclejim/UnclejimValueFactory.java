@@ -21,10 +21,12 @@ public class UnclejimValueFactory implements JmhValueFactory {
 
   public UnclejimValueFactory() {}
 
+  @Override
   public JmhSet set() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public JmhSetBuilder setBuilder() {
     throw new UnsupportedOperationException();
   }

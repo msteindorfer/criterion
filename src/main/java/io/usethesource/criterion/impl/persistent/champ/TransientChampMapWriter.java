@@ -35,8 +35,7 @@ final class TransientChampMapWriter implements JmhMapBuilder {
   public void put(JmhValue key, JmhValue value) {
     checkMutation();
 
-    @SuppressWarnings("unused")
-    final JmhValue replaced = mapContent.__put(key, value);
+    mapContent.__put(key, value);
   }
 
   @Override
@@ -57,8 +56,7 @@ final class TransientChampMapWriter implements JmhMapBuilder {
       final JmhValue key = entry.getKey();
       final JmhValue value = entry.getValue();
 
-      @SuppressWarnings("unused")
-      final JmhValue replaced = mapContent.__put(key, value);
+      mapContent.__put(key, value);
     }
   }
 
@@ -81,8 +79,7 @@ final class TransientChampMapWriter implements JmhMapBuilder {
   public void put(int key, int value) {
     checkMutation();
 
-    @SuppressWarnings("unused")
-    final Object replaced = mapContent.__put(key, value);
+    mapContent.__put(key, value);
   }
 
 }

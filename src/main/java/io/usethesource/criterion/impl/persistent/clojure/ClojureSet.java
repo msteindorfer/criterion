@@ -65,10 +65,12 @@ class ClojureSet implements JmhSet {
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof ClojureSet) {
       ClojureSet that = (ClojureSet) other;
