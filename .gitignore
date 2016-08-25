@@ -2,6 +2,7 @@
 
 .classpath
 .project
+bin/
 target/
 
 git.commit.*.txt
