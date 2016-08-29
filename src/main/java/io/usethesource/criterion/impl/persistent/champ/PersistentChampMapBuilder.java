@@ -5,32 +5,34 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.pcollections;
+package io.usethesource.criterion.impl.persistent.champ;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.pcollections.HashPMap;
-import org.pcollections.HashTreePMap;
-
+import io.usethesource.capsule.ImmutableMap;
+import io.usethesource.capsule.MapFactory;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class PcollectionsMapWriter implements JmhMapBuilder {
+/*
+ * Operates: * without types * with equals() instead of isEqual()
+ */
+final class PersistentChampMapBuilder implements JmhMapBuilder {
 
-  protected HashPMap<JmhValue, JmhValue> mapContent;
+  protected ImmutableMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;
 
-  PcollectionsMapWriter() {
-    mapContent = HashTreePMap.empty();
+  PersistentChampMapBuilder(MapFactory mapFactory) {
+    mapContent = mapFactory.of();
     constructedMap = null;
   }
 
   @Override
   public void put(JmhValue key, JmhValue value) {
     checkMutation();
-    mapContent = mapContent.plus(key, value);
+    mapContent = mapContent.__put(key, value);
   }
 
   @Override
@@ -51,7 +53,7 @@ final class PcollectionsMapWriter implements JmhMapBuilder {
       final JmhValue key = entry.getKey();
       final JmhValue value = entry.getValue();
 
-      mapContent = mapContent.plus(key, value);
+      mapContent = mapContent.__put(key, value);
     }
   }
 
@@ -64,7 +66,7 @@ final class PcollectionsMapWriter implements JmhMapBuilder {
   @Override
   public JmhMap done() {
     if (constructedMap == null) {
-      constructedMap = new PcollectionsMap(mapContent);
+      constructedMap = new ChampMap(mapContent);
     }
 
     return constructedMap;

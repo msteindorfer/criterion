@@ -13,12 +13,12 @@ import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhSetBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-class ChampSetWriter implements JmhSetBuilder {
+class ChampSetBuilder implements JmhSetBuilder {
 
   protected final TransientSet<JmhValue> setContent;
   protected JmhSet constructedSet;
 
-  ChampSetWriter(SetFactory setFactory) {
+  ChampSetBuilder(SetFactory setFactory) {
     setContent = setFactory.transientOf();
     constructedSet = null;
   }

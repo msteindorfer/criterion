@@ -7,61 +7,33 @@
  */
 package io.usethesource.criterion.api;
 
-/**
- * An IValueFactory is an AbstractFactory for values. Implementations of this class should guarantee
- * that the values returned are immutable. For batch construction of container classes there should
- * be implementations of the I{List,Set,Relation,Map}Writer interfaces.
- *
- * @author jurgen@vinju.org
- * @author rfuhrer@watson.ibm.com
- *
- */
 public interface JmhValueFactory {
 
-  /**
-   * Creates an empty unmodifiable set.
-   *
-   * @return an empty set
-   */
-  public JmhSet set();
+  static RuntimeException FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION =
+      new UnsupportedOperationException("Not yet implemented.");
 
-  /**
-   * Create a set builder.
-   *
-   * @return a set builder
-   */
-  public JmhSetBuilder setBuilder();
+  // default JmhSet set() {
+  // return setBuilder().done();
+  // }
 
-  /**
-   * Creates an empty unmodifiable map.
-   *
-   * @return an empty map
-   */
-  public JmhMap map();
-
-  /**
-   * Create a map builder.
-   *
-   * @return a map builder
-   */
-  public JmhMapBuilder mapBuilder();
-
-  /**
-   * Creates an empty unmodifiable set-multimap.
-   *
-   * @return an empty set-multimap
-   */
-  default JmhSetMultimap setMultimap() {
-    throw new RuntimeException("Not supported.");
+  default JmhSetBuilder setBuilder() {
+    throw FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION;
   }
 
-  /**
-   * Create a map builder.
-   *
-   * @return a map builder
-   */
+  // default JmhMap map() {
+  // return mapBuilder().done();
+  // }
+
+  default JmhMapBuilder mapBuilder() {
+    throw FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION;
+  }
+
+  // default JmhSetMultimap setMulimap() {
+  // return setMultimapBuilder().done();
+  // }
+
   default JmhSetMultimapBuilder setMultimapBuilder() {
-    throw new RuntimeException("Not supported.");
+    throw FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION;
   }
 
 }

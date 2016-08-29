@@ -5,35 +5,30 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.champ;
+package io.usethesource.criterion.impl.persistent.javaslang;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.TransientMap;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
+import javaslang.collection.HashMap;
 
-/*
- * Operates: * without types * with equals() instead of isEqual()
- */
-final class TransientChampMapWriter implements JmhMapBuilder {
+final class JavaslangMapBuilder implements JmhMapBuilder {
 
-  protected final TransientMap<JmhValue, JmhValue> mapContent;
+  protected HashMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;
 
-  TransientChampMapWriter(MapFactory mapFactory) {
-    mapContent = mapFactory.transientOf();
+  JavaslangMapBuilder() {
+    mapContent = HashMap.empty();
     constructedMap = null;
   }
 
   @Override
   public void put(JmhValue key, JmhValue value) {
     checkMutation();
-
-    mapContent.__put(key, value);
+    mapContent = mapContent.put(key, value);
   }
 
   @Override
@@ -54,7 +49,7 @@ final class TransientChampMapWriter implements JmhMapBuilder {
       final JmhValue key = entry.getKey();
       final JmhValue value = entry.getValue();
 
-      mapContent.__put(key, value);
+      mapContent = mapContent.put(key, value);
     }
   }
 
@@ -67,7 +62,7 @@ final class TransientChampMapWriter implements JmhMapBuilder {
   @Override
   public JmhMap done() {
     if (constructedMap == null) {
-      constructedMap = new ChampMap(mapContent.freeze());
+      constructedMap = new JavaslangMap(mapContent);
     }
 
     return constructedMap;

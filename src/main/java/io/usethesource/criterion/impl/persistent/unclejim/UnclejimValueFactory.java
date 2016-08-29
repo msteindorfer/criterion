@@ -7,46 +7,14 @@
  */
 package io.usethesource.criterion.impl.persistent.unclejim;
 
-import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
-import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhSetBuilder;
-import io.usethesource.criterion.api.JmhSetMultimap;
-import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class UnclejimValueFactory implements JmhValueFactory {
 
-  public UnclejimValueFactory() {}
-
-  @Override
-  public JmhSet set() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public JmhSetBuilder setBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public JmhMap map() {
-    return mapBuilder().done();
-  }
-
   @Override
   public JmhMapBuilder mapBuilder() {
-    return new UnclejimMapWriter();
-  }
-
-  @Override
-  public JmhSetMultimap setMultimap() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public JmhSetMultimapBuilder setMultimapBuilder() {
-    throw new UnsupportedOperationException();
+    return new UnclejimMapBuilder();
   }
 
   @Override

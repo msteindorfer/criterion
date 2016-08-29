@@ -5,31 +5,35 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.unclejim;
+package io.usethesource.criterion.impl.persistent.champ;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.organicdesign.fp.collections.PersistentHashMap;
-
+import io.usethesource.capsule.MapFactory;
+import io.usethesource.capsule.TransientMap;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class UnclejimMapWriter implements JmhMapBuilder {
+/*
+ * Operates: * without types * with equals() instead of isEqual()
+ */
+final class TransientChampMapBuilder implements JmhMapBuilder {
 
-  protected PersistentHashMap<JmhValue, JmhValue> mapContent;
+  protected final TransientMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;
 
-  UnclejimMapWriter() {
-    mapContent = PersistentHashMap.empty();
+  TransientChampMapBuilder(MapFactory mapFactory) {
+    mapContent = mapFactory.transientOf();
     constructedMap = null;
   }
 
   @Override
   public void put(JmhValue key, JmhValue value) {
     checkMutation();
-    mapContent = mapContent.assoc(key, value);
+
+    mapContent.__put(key, value);
   }
 
   @Override
@@ -50,7 +54,7 @@ final class UnclejimMapWriter implements JmhMapBuilder {
       final JmhValue key = entry.getKey();
       final JmhValue value = entry.getValue();
 
-      mapContent = mapContent.assoc(key, value);
+      mapContent.__put(key, value);
     }
   }
 
@@ -63,7 +67,7 @@ final class UnclejimMapWriter implements JmhMapBuilder {
   @Override
   public JmhMap done() {
     if (constructedMap == null) {
-      constructedMap = new UnclejimMap(mapContent);
+      constructedMap = new ChampMap(mapContent.freeze());
     }
 
     return constructedMap;

@@ -13,12 +13,12 @@ import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class PersistentChampSetMultimapWriterNew implements JmhSetMultimapBuilder {
+final class PersistentChampSetMultimapBuilderNew implements JmhSetMultimapBuilder {
 
   protected SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
   protected JmhSetMultimap constructedMap;
 
-  PersistentChampSetMultimapWriterNew() {
+  PersistentChampSetMultimapBuilderNew() {
     mapContent = TrieSetMultimap.of();
     constructedMap = null;
   }

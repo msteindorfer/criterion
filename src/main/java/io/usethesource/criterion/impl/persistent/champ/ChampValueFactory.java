@@ -10,11 +10,8 @@ package io.usethesource.criterion.impl.persistent.champ;
 import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.SetFactory;
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
-import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhSetBuilder;
-import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValueFactory;
 
@@ -37,34 +34,19 @@ public class ChampValueFactory implements JmhValueFactory {
   }
 
   @Override
-  public JmhSet set() {
-    return setBuilder().done();
-  }
-
-  @Override
   public JmhSetBuilder setBuilder() {
-    return new ChampSetWriter(setFactory);
-  }
-
-  @Override
-  public JmhMap map() {
-    return mapBuilder().done();
+    return new ChampSetBuilder(setFactory);
   }
 
   @Override
   public JmhMapBuilder mapBuilder() {
-    return new PersistentChampMapWriter(mapFactory);
-  }
-
-  @Override
-  public JmhSetMultimap setMultimap() {
-    return setMultimapBuilder().done();
+    return new PersistentChampMapBuilder(mapFactory);
   }
 
   @Override
   public JmhSetMultimapBuilder setMultimapBuilder() {
     if (setMultimapFactory == null) {
-      return new PersistentChampSetMultimapWriterNew();
+      return new PersistentChampSetMultimapBuilderNew();
     } else {
       return new PersistentChampSetMultimapWriter(setMultimapFactory);
     }

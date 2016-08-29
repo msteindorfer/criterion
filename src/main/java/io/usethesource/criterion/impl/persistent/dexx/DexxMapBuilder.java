@@ -5,22 +5,23 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.javaslang;
+package io.usethesource.criterion.impl.persistent.dexx;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.github.andrewoma.dexx.collection.HashMap;
+
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
-import javaslang.collection.HashMap;
 
-final class JavaslangMapWriter implements JmhMapBuilder {
+final class DexxMapBuilder implements JmhMapBuilder {
 
   protected HashMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;
 
-  JavaslangMapWriter() {
+  DexxMapBuilder() {
     mapContent = HashMap.empty();
     constructedMap = null;
   }
@@ -62,7 +63,7 @@ final class JavaslangMapWriter implements JmhMapBuilder {
   @Override
   public JmhMap done() {
     if (constructedMap == null) {
-      constructedMap = new JavaslangMap(mapContent);
+      constructedMap = new DexxMap(mapContent);
     }
 
     return constructedMap;
