@@ -73,11 +73,4 @@ final class TransientChampMapWriter implements JmhMapBuilder {
     return constructedMap;
   }
 
-  @Override
-  public void put(int key, int value) {
-    checkMutation();
-
-    mapContent.__put(key, value);
-  }
-
 }

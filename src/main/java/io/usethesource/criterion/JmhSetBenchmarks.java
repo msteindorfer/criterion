@@ -26,6 +26,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
@@ -309,13 +310,30 @@ public class JmhSetBenchmarks {
 
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhSetBenchmarks.class.getSimpleName());
+
+    // @formatter:off
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".(timeIteration)").forks(0)
-        .warmupIterations(5).measurementIterations(5).mode(Mode.AverageTime)
-        .param("dataType", "SET").param("producer", "PDB_INTEGER")
-        .param("sampleDataSelection", "MATCH").param("size", "1048576").param("run", "0")
-        // .param("valueFactoryFactory", "VF_PDB_PERSISTENT_CURRENT")
+        .include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".(.*)")
+        .timeUnit(TimeUnit.NANOSECONDS)
+        .mode(Mode.AverageTime)
+        .warmupIterations(10)
+        .warmupTime(TimeValue.seconds(1))
+        .measurementIterations(10)
+        .forks(1)
+        .param("dataType", "SET")
+        .param("run", "0")
+//        .param("run", "1")
+//        .param("run", "2")
+//        .param("run", "3")
+//        .param("run", "4")
+        .param("producer", "PURE_INTEGER")
+        .param("sampleDataSelection", "MATCH")
+        .param("size", "16")
+        .param("size", "2048")
+        .param("size", "1048576")
+        .param("valueFactoryFactory", "VF_CHAMP")
         .build();
+    // @formatter:on
 
     new Runner(opt).run();
   }

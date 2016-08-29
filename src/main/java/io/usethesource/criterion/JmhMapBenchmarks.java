@@ -29,6 +29,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
@@ -486,22 +487,17 @@ public class JmhMapBenchmarks {
     bh.consume(testMap.hashCode());
   }
 
-  // @Benchmark
-  // public void timeJoin(Blackhole bh) {
-  // bh.consume(testMap.join(singletonMapWithNotExistingValue));
-  // }
-
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhMapBenchmarks.class.getSimpleName());
 
     // @formatter:off
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(timeHashCode)")
+        .include(".*" + JmhMapBenchmarks.class.getSimpleName() + ".(.*)")
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
-//        .warmupIterations(10)
-//        .warmupTime(TimeValue.seconds(1))
-//        .measurementIterations(10)
+        .warmupIterations(10)
+        .warmupTime(TimeValue.seconds(1))
+        .measurementIterations(10)
         .forks(1)
         .param("dataType", "MAP")
         .param("run", "0")
@@ -511,17 +507,17 @@ public class JmhMapBenchmarks {
 //        .param("run", "4")
         .param("producer", "PURE_INTEGER")
         .param("sampleDataSelection", "MATCH")
-//        .param("size", "16")
-//        .param("size", "2048")
+        .param("size", "16")
+        .param("size", "2048")
         .param("size", "1048576")
         .param("valueFactoryFactory", "VF_CHAMP")
-        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
-        .param("valueFactoryFactory", "VF_SCALA")
-        .param("valueFactoryFactory", "VF_CLOJURE")
-        .param("valueFactoryFactory", "VF_JAVASLANG")
-        .param("valueFactoryFactory", "VF_UNCLEJIM")
-        .param("valueFactoryFactory", "VF_DEXX")
-        .param("valueFactoryFactory", "VF_PCOLLECTIONS")
+//        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
+//        .param("valueFactoryFactory", "VF_SCALA")
+//        .param("valueFactoryFactory", "VF_CLOJURE")
+//        .param("valueFactoryFactory", "VF_JAVASLANG")
+//        .param("valueFactoryFactory", "VF_UNCLEJIM")
+//        .param("valueFactoryFactory", "VF_DEXX")
+//        .param("valueFactoryFactory", "VF_PCOLLECTIONS")
         .build();
     // @formatter:on
 
