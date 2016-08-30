@@ -35,6 +35,7 @@ import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
+import scala.util.control.Exception;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -632,13 +633,13 @@ public class JmhSetMultimapBenchmarks {
 
     // @formatter:off
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName() + ".(timeMultimapLike.*)$")
+        .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName() + ".timeMultimapLike(Insert|Remove)Tuple$")
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
         .warmupIterations(10)
         .warmupTime(TimeValue.seconds(1))
         .measurementIterations(10)
-        .forks(0)
+        .forks(1)
         .param("dataType", "SET_MULTIMAP")
         .param("run", "0")
 //        .param("run", "1")
@@ -647,8 +648,8 @@ public class JmhSetMultimapBenchmarks {
 //        .param("run", "4")
         .param("producer", "PURE_INTEGER")
         .param("sampleDataSelection", "MATCH")
-        .param("size", "16")
-        .param("size", "2048")
+//        .param("size", "16")
+//        .param("size", "2048")
         .param("size", "1048576")
         .param("multimapValueSize", "2")
         .param("stepSizeOneToOneSelector", "2")
@@ -657,9 +658,11 @@ public class JmhSetMultimapBenchmarks {
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
 //        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
         .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();
