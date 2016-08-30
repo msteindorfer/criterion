@@ -7,13 +7,13 @@
  */
 package io.usethesource.criterion.impl.persistent.dexx;
 
-import io.usethesource.criterion.api.JmhMapBuilder;
+import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class DexxValueFactory implements JmhValueFactory {
 
   @Override
-  public JmhMapBuilder mapBuilder() {
+  public JmhMap.Builder mapBuilder() {
     return new DexxMapBuilder();
   }
 

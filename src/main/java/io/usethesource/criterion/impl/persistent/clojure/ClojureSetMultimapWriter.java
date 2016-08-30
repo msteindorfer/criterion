@@ -15,10 +15,9 @@ import clojure.lang.ITransientSet;
 import clojure.lang.PersistentHashMap;
 import clojure.lang.PersistentHashSet;
 import io.usethesource.criterion.api.JmhSetMultimap;
-import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-class ClojureSetMultimapWriter implements JmhSetMultimapBuilder {
+class ClojureSetMultimapWriter implements JmhSetMultimap.Builder {
 
   Map<JmhValue, Object> builderMap = new HashMap<>();
 
@@ -43,20 +42,6 @@ class ClojureSetMultimapWriter implements JmhSetMultimapBuilder {
       builderMap.put(key, set);
     }
   }
-
-  // @Override
-  // public void putAll(JmhMap map) {
-  // for (JmhValue k : map) {
-  // xs = (ITransientMap) xs.assoc(k, map.get(k));
-  // }
-  // }
-  //
-  // @Override
-  // public void putAll(java.util.Map<JmhValue, JmhValue> map) {
-  // for (JmhValue k : map.keySet()) {
-  // xs = (ITransientMap) xs.assoc(k, map.get(k));
-  // }
-  // }
 
   @Override
   public JmhSetMultimap done() {

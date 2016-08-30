@@ -13,10 +13,9 @@ import java.util.Map.Entry;
 import com.github.andrewoma.dexx.collection.HashMap;
 
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class DexxMapBuilder implements JmhMapBuilder {
+final class DexxMapBuilder implements JmhMap.Builder {
 
   protected HashMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;

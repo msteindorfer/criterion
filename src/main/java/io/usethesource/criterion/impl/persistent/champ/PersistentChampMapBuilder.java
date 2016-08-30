@@ -13,13 +13,9 @@ import java.util.Map.Entry;
 import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.MapFactory;
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-/*
- * Operates: * without types * with equals() instead of isEqual()
- */
-final class PersistentChampMapBuilder implements JmhMapBuilder {
+final class PersistentChampMapBuilder implements JmhMap.Builder {
 
   protected ImmutableMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;

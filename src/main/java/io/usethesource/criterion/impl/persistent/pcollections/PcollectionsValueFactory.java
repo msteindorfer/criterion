@@ -7,13 +7,13 @@
  */
 package io.usethesource.criterion.impl.persistent.pcollections;
 
-import io.usethesource.criterion.api.JmhMapBuilder;
+import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class PcollectionsValueFactory implements JmhValueFactory {
 
   @Override
-  public JmhMapBuilder mapBuilder() {
+  public JmhMap.Builder mapBuilder() {
     return new PcollectionsMapBuilder();
   }
 

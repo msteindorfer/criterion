@@ -11,10 +11,9 @@ import clojure.lang.IPersistentSet;
 import clojure.lang.ITransientSet;
 import clojure.lang.PersistentHashSet;
 import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhSetBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-class ClojureSetWriter implements JmhSetBuilder {
+class ClojureSetWriter implements JmhSet.Builder {
 
   protected ITransientSet xs;
 

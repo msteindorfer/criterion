@@ -24,4 +24,15 @@ public interface JmhSet extends JmhValue, Iterable<JmhValue> {
   @Override
   public Iterator<JmhValue> iterator();
 
+  public static interface Builder extends JmhBuilder {
+
+    void insert(JmhValue... v);
+
+    void insertAll(Iterable<? extends JmhValue> collection);
+
+    @Override
+    JmhSet done();
+
+  }
+
 }

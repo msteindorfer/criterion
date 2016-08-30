@@ -11,10 +11,9 @@ import scala.collection.JavaConversions.iterableAsScalaIterable
 import scala.collection.mutable.SetBuilder
 
 import io.usethesource.criterion.api.JmhSet
-import io.usethesource.criterion.api.JmhSetBuilder
 import io.usethesource.criterion.api.JmhValue
 
-sealed class ScalaSetBuilder extends JmhSetBuilder {
+sealed class ScalaSetBuilder extends JmhSet.Builder {
 
 	val xs: SetBuilder[JmhValue, ScalaSet.Coll] = new SetBuilder(ScalaSet.empty)
 

@@ -10,9 +10,9 @@ package io.usethesource.criterion.impl.persistent.champ;
 import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.SetFactory;
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.criterion.api.JmhMapBuilder;
-import io.usethesource.criterion.api.JmhSetBuilder;
-import io.usethesource.criterion.api.JmhSetMultimapBuilder;
+import io.usethesource.criterion.api.JmhMap;
+import io.usethesource.criterion.api.JmhSet;
+import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class ChampValueFactory implements JmhValueFactory {
@@ -34,17 +34,17 @@ public class ChampValueFactory implements JmhValueFactory {
   }
 
   @Override
-  public JmhSetBuilder setBuilder() {
+  public JmhSet.Builder setBuilder() {
     return new ChampSetBuilder(setFactory);
   }
 
   @Override
-  public JmhMapBuilder mapBuilder() {
+  public JmhMap.Builder mapBuilder() {
     return new PersistentChampMapBuilder(mapFactory);
   }
 
   @Override
-  public JmhSetMultimapBuilder setMultimapBuilder() {
+  public JmhSetMultimap.Builder setMultimapBuilder() {
     if (setMultimapFactory == null) {
       return new PersistentChampSetMultimapBuilderNew();
     } else {

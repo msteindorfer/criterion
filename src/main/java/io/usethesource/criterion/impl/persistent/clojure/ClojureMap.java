@@ -15,9 +15,6 @@ import clojure.lang.IPersistentMap;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 
-/*
- * Operates: * without types * with equals() instead of isEqual()
- */
 public class ClojureMap implements JmhMap {
 
   protected final IPersistentMap xs;

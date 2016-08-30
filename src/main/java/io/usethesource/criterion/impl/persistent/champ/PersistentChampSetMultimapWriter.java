@@ -10,10 +10,9 @@ package io.usethesource.criterion.impl.persistent.champ;
 import io.usethesource.capsule.ImmutableSetMultimap;
 import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.criterion.api.JmhSetMultimap;
-import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class PersistentChampSetMultimapWriter implements JmhSetMultimapBuilder {
+final class PersistentChampSetMultimapWriter implements JmhSetMultimap.Builder {
 
   protected ImmutableSetMultimap<JmhValue, JmhValue> mapContent;
   protected JmhSetMultimap constructedMap;
@@ -28,12 +27,6 @@ final class PersistentChampSetMultimapWriter implements JmhSetMultimapBuilder {
     checkMutation();
     mapContent = mapContent.__insert(key, value);
   }
-
-  // @Override
-  // public void put(int key, int value) {
-  // checkMutation();
-  // mapContent = mapContent.__put(key, value);
-  // }
 
   protected void checkMutation() {
     if (constructedMap != null) {

@@ -10,10 +10,9 @@ package io.usethesource.criterion.impl.persistent.champ;
 import io.usethesource.capsule.SetFactory;
 import io.usethesource.capsule.TransientSet;
 import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhSetBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-class ChampSetBuilder implements JmhSetBuilder {
+class ChampSetBuilder implements JmhSet.Builder {
 
   protected final TransientSet<JmhValue> setContent;
   protected JmhSet constructedSet;

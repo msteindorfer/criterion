@@ -9,6 +9,7 @@ package io.usethesource.criterion.impl.persistent.scala
 
 import scala.collection.JavaConversions.asJavaIterator
 import scala.collection.JavaConversions.mapAsJavaMap
+
 import io.usethesource.criterion.api.JmhMap
 import io.usethesource.criterion.api.JmhValue
 

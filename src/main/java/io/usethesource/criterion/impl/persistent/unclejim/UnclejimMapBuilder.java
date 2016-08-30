@@ -13,10 +13,9 @@ import java.util.Map.Entry;
 import org.organicdesign.fp.collections.PersistentHashMap;
 
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class UnclejimMapBuilder implements JmhMapBuilder {
+final class UnclejimMapBuilder implements JmhMap.Builder {
 
   protected PersistentHashMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;

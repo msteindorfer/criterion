@@ -40,4 +40,17 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 
   Iterator<Entry<JmhValue, Object>> nativeEntryIterator();
 
+  public static interface Builder extends JmhBuilder {
+
+    void insert(JmhValue key, JmhValue value);
+
+    // void putAll(JmhMap map);
+    //
+    // void putAll(Map<JmhValue, JmhValue> map);
+
+    @Override
+    JmhSetMultimap done();
+
+  }
+
 }

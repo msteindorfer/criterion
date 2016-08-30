@@ -8,6 +8,7 @@
 package io.usethesource.criterion.api;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public interface JmhMap extends Iterable<JmhValue>, JmhValue {
@@ -44,5 +45,18 @@ public interface JmhMap extends Iterable<JmhValue>, JmhValue {
    * @return an iterator over the keys-value pairs of the map
    */
   public Iterator<Entry<JmhValue, JmhValue>> entryIterator();
+
+  public static interface Builder extends JmhBuilder {
+
+    void put(JmhValue key, JmhValue value);
+
+    void putAll(JmhMap map);
+
+    void putAll(Map<JmhValue, JmhValue> map);
+
+    @Override
+    JmhMap done();
+
+  }
 
 }

@@ -7,25 +7,25 @@
  */
 package io.usethesource.criterion.impl.persistent.clojure;
 
-import io.usethesource.criterion.api.JmhMapBuilder;
-import io.usethesource.criterion.api.JmhSetBuilder;
-import io.usethesource.criterion.api.JmhSetMultimapBuilder;
+import io.usethesource.criterion.api.JmhMap;
+import io.usethesource.criterion.api.JmhSet;
+import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class ClojureValueFactory implements JmhValueFactory {
 
   @Override
-  public JmhMapBuilder mapBuilder() {
+  public JmhMap.Builder mapBuilder() {
     return new ClojureMapWriter();
   }
 
   @Override
-  public JmhSetBuilder setBuilder() {
+  public JmhSet.Builder setBuilder() {
     return new ClojureSetWriter();
   }
 
   @Override
-  public JmhSetMultimapBuilder setMultimapBuilder() {
+  public JmhSetMultimap.Builder setMultimapBuilder() {
     return new ClojureSetMultimapWriter();
   }
 

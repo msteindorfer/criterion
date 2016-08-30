@@ -16,7 +16,7 @@ public interface JmhValueFactory {
   // return setBuilder().done();
   // }
 
-  default JmhSetBuilder setBuilder() {
+  default JmhSet.Builder setBuilder() {
     throw FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION;
   }
 
@@ -24,7 +24,7 @@ public interface JmhValueFactory {
   // return mapBuilder().done();
   // }
 
-  default JmhMapBuilder mapBuilder() {
+  default JmhMap.Builder mapBuilder() {
     throw FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION;
   }
 
@@ -32,7 +32,7 @@ public interface JmhValueFactory {
   // return setMultimapBuilder().done();
   // }
 
-  default JmhSetMultimapBuilder setMultimapBuilder() {
+  default JmhSetMultimap.Builder setMultimapBuilder() {
     throw FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION;
   }
 

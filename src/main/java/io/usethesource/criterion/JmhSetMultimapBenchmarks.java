@@ -33,7 +33,6 @@ import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.api.JmhSetMultimap;
-import io.usethesource.criterion.api.JmhSetMultimapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
 
@@ -236,11 +235,11 @@ public class JmhSetMultimapBenchmarks {
       }
     }
 
-    final JmhSetMultimapBuilder mapWriter1 = valueFactory.setMultimapBuilder();
+    final JmhSetMultimap.Builder mapWriter1 = valueFactory.setMultimapBuilder();
     mapWriter1.insert(VALUE_EXISTING, VALUE_EXISTING);
     singletonMapWithExistingValue = mapWriter1.done();
 
-    final JmhSetMultimapBuilder mapWriter2 = valueFactory.setMultimapBuilder();
+    final JmhSetMultimap.Builder mapWriter2 = valueFactory.setMultimapBuilder();
     mapWriter2.insert(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
     singletonMapWithNotExistingValue = mapWriter2.done();
 
@@ -261,8 +260,8 @@ public class JmhSetMultimapBenchmarks {
 
     valueFactory = valueFactoryFactory.getInstance();
 
-    JmhSetMultimapBuilder writer1 = valueFactory.setMultimapBuilder();
-    JmhSetMultimapBuilder writer2 = valueFactory.setMultimapBuilder();
+    JmhSetMultimap.Builder writer1 = valueFactory.setMultimapBuilder();
+    JmhSetMultimap.Builder writer2 = valueFactory.setMultimapBuilder();
 
     int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
     Random rand = new Random(seedForThisTrial + 13);
@@ -326,7 +325,7 @@ public class JmhSetMultimapBenchmarks {
       int stepSizeOneToOneSelector, int run) throws Exception {
 
     final int[] data = BenchmarkUtils.generateTestData(size, run);
-    final JmhSetMultimapBuilder writer = valueFactory.setMultimapBuilder();
+    final JmhSetMultimap.Builder writer = valueFactory.setMultimapBuilder();
 
     /*
      * TODO: update algorithm for selection data contained/not-contained to use idx %

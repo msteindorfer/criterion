@@ -32,7 +32,6 @@ import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhSetBuilder;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
 
@@ -162,8 +161,8 @@ public class JmhSetBenchmarks {
   protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
     valueFactory = valueFactoryFactory.getInstance();
 
-    JmhSetBuilder writer1 = valueFactory.setBuilder();
-    JmhSetBuilder writer2 = valueFactory.setBuilder();
+    JmhSet.Builder writer1 = valueFactory.setBuilder();
+    JmhSet.Builder writer2 = valueFactory.setBuilder();
 
     int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
     Random rand = new Random(seedForThisTrial + 13);

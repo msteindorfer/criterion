@@ -7,15 +7,13 @@
  */
 package io.usethesource.criterion.impl.persistent.scala
 
-import scala.collection.immutable.Map.empty
 import scala.collection.JavaConversions.mapAsScalaMap
-import scala.collection.JavaConversions.iterableAsScalaIterable
 import scala.collection.mutable.MapBuilder
-import io.usethesource.criterion.api.JmhValue
-import io.usethesource.criterion.api.JmhMap
-import io.usethesource.criterion.api.JmhMapBuilder
 
-sealed class ScalaMapBuilder extends JmhMapBuilder {
+import io.usethesource.criterion.api.JmhMap
+import io.usethesource.criterion.api.JmhValue
+
+sealed class ScalaMapBuilder extends JmhMap.Builder {
 
   val xs: MapBuilder[JmhValue, JmhValue, ScalaMap.Coll] = new MapBuilder(ScalaMap.empty)
 

@@ -10,10 +10,9 @@ package io.usethesource.criterion.impl.persistent.clojure;
 import clojure.lang.ITransientMap;
 import clojure.lang.PersistentHashMap;
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-class ClojureMapWriter implements JmhMapBuilder {
+class ClojureMapWriter implements JmhMap.Builder {
 
   protected ITransientMap xs;
 

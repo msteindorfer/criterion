@@ -8,6 +8,7 @@
 package io.usethesource.criterion.impl.persistent.scala
 
 import scala.collection.JavaConversions.asJavaIterator
+
 import io.usethesource.criterion.api.JmhSet
 import io.usethesource.criterion.api.JmhValue
 

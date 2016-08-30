@@ -7,11 +7,8 @@
  */
 package io.usethesource.criterion.impl.persistent.scala
 
-import scala.collection.JavaConversions.mapAsScalaMap
-
 import io.usethesource.criterion.api.JmhValue
 import io.usethesource.criterion.api.JmhValueFactory
-import io.usethesource.criterion.api.JmhSetMultimap
 
 class ScalaValueFactory extends JmhValueFactory {
 	

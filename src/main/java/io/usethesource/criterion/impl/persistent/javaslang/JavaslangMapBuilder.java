@@ -11,11 +11,10 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 import javaslang.collection.HashMap;
 
-final class JavaslangMapBuilder implements JmhMapBuilder {
+final class JavaslangMapBuilder implements JmhMap.Builder {
 
   protected HashMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;

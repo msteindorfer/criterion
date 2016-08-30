@@ -7,13 +7,13 @@
  */
 package io.usethesource.criterion.impl.persistent.unclejim;
 
-import io.usethesource.criterion.api.JmhMapBuilder;
+import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class UnclejimValueFactory implements JmhValueFactory {
 
   @Override
-  public JmhMapBuilder mapBuilder() {
+  public JmhMap.Builder mapBuilder() {
     return new UnclejimMapBuilder();
   }
 

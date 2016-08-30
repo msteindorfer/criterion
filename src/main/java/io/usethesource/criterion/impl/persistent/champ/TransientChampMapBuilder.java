@@ -13,13 +13,9 @@ import java.util.Map.Entry;
 import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-/*
- * Operates: * without types * with equals() instead of isEqual()
- */
-final class TransientChampMapBuilder implements JmhMapBuilder {
+final class TransientChampMapBuilder implements JmhMap.Builder {
 
   protected final TransientMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;

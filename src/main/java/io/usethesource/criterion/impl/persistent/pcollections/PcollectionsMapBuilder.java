@@ -14,10 +14,9 @@ import org.pcollections.HashPMap;
 import org.pcollections.HashTreePMap;
 
 import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhMapBuilder;
 import io.usethesource.criterion.api.JmhValue;
 
-final class PcollectionsMapBuilder implements JmhMapBuilder {
+final class PcollectionsMapBuilder implements JmhMap.Builder {
 
   protected HashPMap<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;

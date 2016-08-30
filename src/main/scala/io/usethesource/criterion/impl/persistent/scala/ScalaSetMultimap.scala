@@ -7,16 +7,16 @@
  */
 package io.usethesource.criterion.impl.persistent.scala
 
-import java.util.Collections
-import java.util.Map.Entry 
-import scala.collection.immutable
+import java.util.Map.Entry
+
 import scala.collection.JavaConversions.asJavaIterator
 import scala.collection.JavaConversions.mapAsJavaMap
-import scala.collection.JavaConversions._
-import io.usethesource.criterion.api.JmhValue
-import io.usethesource.criterion.api.JmhSetMultimap
+import scala.collection.JavaConversions.setAsJavaSet
+import scala.collection.immutable
 
 import io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf
+import io.usethesource.criterion.api.JmhSetMultimap
+import io.usethesource.criterion.api.JmhValue
 
 case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
