@@ -35,7 +35,6 @@ import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
-import scala.util.control.Exception;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
