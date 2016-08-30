@@ -194,7 +194,7 @@ public class JmhSetMultimapBenchmarks {
             final JmhValue candidate = producer.createFromInt(nextInt);
             final int candidateInt = nextInt;
 
-            if (testMap.containsKey(candidate) || testMap.containsKey(candidateInt)) {
+            if (testMap.containsKey(candidate)) { // || testMap.containsKey(candidateInt)
               continue;
             } else {
               cachedNumbersNotContained[i] = candidate;
@@ -204,20 +204,20 @@ public class JmhSetMultimapBenchmarks {
           }
         }
 
-        if (USE_PRIMITIVE_DATA) {
-          // assert (contained)
-          for (int sample : cachedNumbersInt) {
-            if (!testMapInt.containsKey(sample)) {
-              throw new IllegalStateException();
-            }
-          }
-
-          // assert (not contained)
-          for (int sample : cachedNumbersIntNotContained) {
-            if (testMapInt.containsKey(sample)) {
-              throw new IllegalStateException();
-            }
-          }
+        if (false) { // USE_PRIMITIVE_DATA
+          // // assert (contained)
+          // for (int sample : cachedNumbersInt) {
+          // if (!testMapInt.containsKey(sample)) {
+          // throw new IllegalStateException();
+          // }
+          // }
+          //
+          // // assert (not contained)
+          // for (int sample : cachedNumbersIntNotContained) {
+          // if (testMapInt.containsKey(sample)) {
+          // throw new IllegalStateException();
+          // }
+          // }
         } else {
           // assert (contained)
           for (JmhValue sample : cachedNumbers) {
@@ -273,9 +273,9 @@ public class JmhSetMultimapBenchmarks {
     for (int i = size - 1; i >= 0; i--) {
       // final IValue current = producer.createFromInt(data[i]);
 
-      if (USE_PRIMITIVE_DATA) {
-        writer1.insert(data[i], data[i]);
-        writer2.insert(data[i], data[i]);
+      if (false) { // USE_PRIMITIVE_DATA
+        // writer1.insert(data[i], data[i]);
+        // writer2.insert(data[i], data[i]);
       } else {
         writer1.insert(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
         writer2.insert(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
@@ -296,7 +296,7 @@ public class JmhSetMultimapBenchmarks {
       final int candidateInt = rand.nextInt();
       final JmhValue candidate = producer.createFromInt(candidateInt);
 
-      if (!testMap.containsKey(candidateInt) && !testMap.containsKey(candidate)) {
+      if (!testMap.containsKey(candidate)) { // !testMap.containsKey(candidateInt) &&
         VALUE_NOT_EXISTING_INT = candidateInt;
         VALUE_NOT_EXISTING = candidate;
       }
@@ -343,8 +343,8 @@ public class JmhSetMultimapBenchmarks {
         for (int j = multimapValueSize - 1; j >= 0 && i >= 0; j--) {
           int valIdx = (i + j) % size;
 
-          if (usePrimitiveData) {
-            writer.insert(data[keyIdx], data[valIdx]);
+          if (false && usePrimitiveData) {
+            // writer.insert(data[keyIdx], data[valIdx]);
           } else {
             writer.insert(producer.createFromInt(data[keyIdx]),
                 producer.createFromInt(data[valIdx]));

@@ -40,13 +40,4 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 
   Iterator<Entry<JmhValue, Object>> nativeEntryIterator();
 
-  default boolean containsKey(int key) {
-    // throw new UnsupportedOperationException("Not implemented.");
-    return false;
-  }
-
-  default JmhSetMultimap put(int key, int value) {
-    throw new UnsupportedOperationException("Not implemented.");
-  }
-
 }

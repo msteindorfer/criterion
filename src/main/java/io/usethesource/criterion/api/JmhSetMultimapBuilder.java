@@ -9,10 +9,6 @@ package io.usethesource.criterion.api;
 
 public interface JmhSetMultimapBuilder extends JmhBuilder {
 
-  default void insert(int key, int value) {
-    throw new UnsupportedOperationException("Not implemented.");
-  }
-
   void insert(JmhValue key, JmhValue value);
 
   // void putAll(JmhMap map);

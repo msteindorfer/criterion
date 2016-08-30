@@ -251,9 +251,9 @@ public class JmhMapBenchmarks {
     for (int i = size - 1; i >= 0; i--) {
       // final IValue current = producer.createFromInt(data[i]);
 
-      if (USE_PRIMITIVE_DATA) {
-        writer1.put(data[i], data[i]);
-        writer2.put(data[i], data[i]);
+      if (false && USE_PRIMITIVE_DATA) {
+        // writer1.put(data[i], data[i]);
+        // writer2.put(data[i], data[i]);
       } else {
         writer1.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
         writer2.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
@@ -294,8 +294,8 @@ public class JmhMapBenchmarks {
     final JmhMapBuilder writer = valueFactory.mapBuilder();
 
     for (int i = size - 1; i >= 0; i--) {
-      if (usePrimitiveData) {
-        writer.put(data[i], data[i]);
+      if (false && usePrimitiveData) {
+        // writer.put(data[i], data[i]);
       } else {
         writer.put(producer.createFromInt(data[i]), producer.createFromInt(data[i]));
       }

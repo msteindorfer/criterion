@@ -11,10 +11,6 @@ import java.util.Map;
 
 public interface JmhMapBuilder extends JmhBuilder {
 
-  default void put(int key, int value) {
-    throw new UnsupportedOperationException("Not implemented.");
-  }
-
   void put(JmhValue key, JmhValue value);
 
   void putAll(JmhMap map);
