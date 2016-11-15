@@ -30,14 +30,15 @@ import com.google.common.base.Predicates;
 import com.gs.collections.impl.map.mutable.primitive.IntIntHashMap;
 
 import gnu.trove.map.hash.TIntIntHashMap;
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TrieMap_5Bits;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8_IntKey;
+import io.usethesource.criterion.BenchmarkUtils.Archetype;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
-import io.usethesource.criterion.FootprintUtils.Archetype;
+import io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset;
 import io.usethesource.criterion.api.JmhValue;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
@@ -685,10 +686,6 @@ public final class CalculateFootprintsHeterogeneous {
 
     return measureAndReport(ys, "gnu.trove.map.hash.TIntIntHashMap", DataType.MAP,
         Archetype.MUTABLE, false, elementCount, run, preset);
-  }
-
-  enum MemoryFootprintPreset {
-    RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD, RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER
   }
 
   @SuppressWarnings("unchecked")

@@ -30,7 +30,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jol.info.ClassLayout;
 import org.openjdk.jol.util.VMSupport;
 
-import io.usethesource.capsule.RangecopyUtils;
+import io.usethesource.capsule.util.RangecopyUtils;
 
 @SuppressWarnings("restriction")
 @BenchmarkMode(Mode.AverageTime)

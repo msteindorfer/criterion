@@ -18,6 +18,8 @@ import java.util.List;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
+import io.usethesource.criterion.BenchmarkUtils.Archetype;
+import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.api.JmhValue;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
 
@@ -26,16 +28,11 @@ public final class FootprintUtils {
   final static String CSV_HEADER =
       "elementCount,run,className,dataType,archetype,supportsStagedMutability,footprintInBytes,footprintInObjects,footprintInReferences"; // ,footprintInPrimitives
 
-  public enum Archetype {
-    MUTABLE, IMMUTABLE, PERSISTENT
-  }
-
-  public enum DataType {
-    MAP, SET
-  }
-
+  /*
+   * NOTE: with extensions for heterogeneous data
+   */
   public enum MemoryFootprintPreset {
-    RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD
+    RETAINED_SIZE, DATA_STRUCTURE_OVERHEAD, RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER
   }
 
   public static String measureAndReport(final Object objectToMeasure, final String className,

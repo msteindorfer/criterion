@@ -7,8 +7,8 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import io.usethesource.capsule.ImmutableSetMultimap;
 import io.usethesource.capsule.SetMultimapFactory;
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 

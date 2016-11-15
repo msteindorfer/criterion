@@ -43,12 +43,12 @@ import org.rascalmpl.value.io.BinaryValueReader;
 import org.rascalmpl.value.io.BinaryValueWriter;
 import org.rascalmpl.value.io.StandardTextWriter;
 
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TransientMap;
-import io.usethesource.capsule.TransientSet;
-import io.usethesource.capsule.TrieMap_5Bits_LazyHashCode;
-import io.usethesource.capsule.TrieSet_5Bits_LazyHashCode;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientMap;
+import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.experimental.lazy.TrieMap_5Bits_LazyHashCode;
+import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 
 @SuppressWarnings("deprecation")
 public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {

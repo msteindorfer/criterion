@@ -7,12 +7,6 @@
  */
 package io.usethesource.criterion;
 
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MEMOIZED;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_SCALA;
-import static io.usethesource.criterion.PureIntegerWithCustomHashCode.valueOf;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
@@ -29,14 +23,15 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.PersistentHashMap;
 import clojure.lang.PersistentHashSet;
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TrieMap_5Bits;
-import io.usethesource.capsule.TrieSet_5Bits;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
-import io.usethesource.criterion.FootprintUtils.Archetype;
-import io.usethesource.criterion.FootprintUtils.DataType;
+import io.usethesource.criterion.BenchmarkUtils.Archetype;
+import io.usethesource.criterion.BenchmarkUtils.DataType;
+import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset;
 import io.usethesource.criterion.api.JmhValue;
 import scala.Tuple2;
@@ -54,7 +49,7 @@ public final class CalculateFootprints {
 
     for (int i = size; i > 0; i--) {
       final int j = rand.nextInt();
-      final JmhValue current = valueOf(j);
+      final JmhValue current = PureIntegerWithCustomHashCode.valueOf(j);
 
       setWriter.add(current);
     }
@@ -187,32 +182,32 @@ public final class CalculateFootprints {
 
         if (reportSet) {
           results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-              Optional.of(VF_CHAMP.toString()), TrieSet_5Bits.class));
+              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), TrieSet_5Bits.class));
 
           results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-              Optional.of(VF_CHAMP_MEMOIZED.toString()),
+              Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
               TrieSet_5Bits_Memoized_LazyHashCode.class));
 
           results.add(measureFootprintOfPersistentClojureSet(testSet, count, run,
-              Optional.of(VF_CLOJURE.toString())));
+              Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));
 
           results.add(measureFootprintOfPersistentScalaSet(testSet, count, run,
-              Optional.of(VF_SCALA.toString())));
+              Optional.of(ValueFactoryFactory.VF_SCALA.toString())));
         }
 
         if (reportMap) {
           results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-              Optional.of(VF_CHAMP.toString()), TrieMap_5Bits.class));
+              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), TrieMap_5Bits.class));
 
           results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-              Optional.of(VF_CHAMP_MEMOIZED.toString()),
+              Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
               TrieMap_5Bits_Memoized_LazyHashCode.class));
 
           results.add(measureFootprintOfPersistentClojureMap(testSet, count, run,
-              Optional.of(VF_CLOJURE.toString())));
+              Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));
 
           results.add(measureFootprintOfPersistentScalaMap(testSet, count, run,
-              Optional.of(VF_SCALA.toString())));
+              Optional.of(ValueFactoryFactory.VF_SCALA.toString())));
         }
       }
     }

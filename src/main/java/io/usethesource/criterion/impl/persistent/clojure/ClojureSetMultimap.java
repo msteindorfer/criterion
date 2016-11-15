@@ -7,7 +7,7 @@
  */
 package io.usethesource.criterion.impl.persistent.clojure;
 
-import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.util.Collections;
 import java.util.Iterator;

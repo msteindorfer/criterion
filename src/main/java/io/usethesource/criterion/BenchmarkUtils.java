@@ -10,9 +10,9 @@ package io.usethesource.criterion;
 import java.util.Arrays;
 import java.util.Random;
 
-import io.usethesource.capsule.TrieMap_5Bits;
-import io.usethesource.capsule.TrieMap_5Bits_AsSetMultimap;
-import io.usethesource.capsule.TrieSet_5Bits;
+import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+import io.usethesource.capsule.core.deprecated.TrieMap_5Bits_AsSetMultimap;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
@@ -169,6 +169,10 @@ public class BenchmarkUtils {
 
   public static enum DataType {
     MAP, SET_MULTIMAP, SET
+  }
+
+  public enum Archetype {
+    MUTABLE, IMMUTABLE, PERSISTENT
   }
 
   public static enum SampleDataSelection {

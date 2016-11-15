@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.TransientMap;
+import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 

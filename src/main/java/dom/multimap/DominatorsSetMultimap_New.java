@@ -37,10 +37,10 @@ import org.rascalmpl.value.IValueFactory;
 import org.rascalmpl.value.io.BinaryValueReader;
 
 import dom.DominatorBenchmark;
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.Set;
-import io.usethesource.capsule.SetMultimap;
-import io.usethesource.capsule.TrieSet;
+import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.core.TrieSet;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
 
 public class DominatorsSetMultimap_New implements DominatorBenchmark {

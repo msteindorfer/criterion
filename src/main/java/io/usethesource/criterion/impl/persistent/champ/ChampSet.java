@@ -9,7 +9,7 @@ package io.usethesource.criterion.impl.persistent.champ;
 
 import java.util.Iterator;
 
-import io.usethesource.capsule.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
 

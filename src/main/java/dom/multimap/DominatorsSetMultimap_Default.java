@@ -38,12 +38,12 @@ import org.rascalmpl.value.io.BinaryValueReader;
 
 import dom.DominatorBenchmark;
 import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.ImmutableSetMultimap;
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.capsule.TransientSet;
-import io.usethesource.capsule.TransientSetMultimap;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 
 public class DominatorsSetMultimap_Default implements DominatorBenchmark {

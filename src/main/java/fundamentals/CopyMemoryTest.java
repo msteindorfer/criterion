@@ -43,12 +43,14 @@ public class CopyMemoryTest {
   }
 
   public void performTestRangecopyInt(int[] a, int[] d) throws Exception {
-    long bytes = io.usethesource.capsule.RangecopyUtils.rangecopyIntRegion(a, 16L, d, 16L, size);
+    long bytes =
+        io.usethesource.capsule.util.RangecopyUtils.rangecopyIntRegion(a, 16L, d, 16L, size);
     DUMP += bytes;
   }
 
   public void performTestRangecopyObject(Object[] a, Object[] d) throws Exception {
-    long bytes = io.usethesource.capsule.RangecopyUtils.rangecopyObjectRegion(a, 16L, d, 16L, size);
+    long bytes =
+        io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion(a, 16L, d, 16L, size);
     DUMP += bytes;
   }
 

@@ -35,10 +35,10 @@ import org.rascalmpl.value.io.StandardTextWriter;
 
 import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TransientMap;
-import io.usethesource.capsule.TransientSet;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientMap;
+import io.usethesource.capsule.api.deprecated.TransientSet;
 
 @SuppressWarnings("deprecation")
 public class DominatorsPDB {
