@@ -14,7 +14,7 @@ import scala.collection.JavaConversions.mapAsJavaMap
 import scala.collection.JavaConversions.setAsJavaSet
 import scala.collection.immutable
 
-import io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf
 import io.usethesource.criterion.api.JmhSetMultimap
 import io.usethesource.criterion.api.JmhValue
 
