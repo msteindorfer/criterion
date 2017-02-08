@@ -23,8 +23,8 @@ import org.rascalmpl.value.IMap
 import org.rascalmpl.value.ISet
 import org.rascalmpl.value.ITuple
 import org.rascalmpl.value.IValue
-import org.rascalmpl.value.io.BinaryValueReader
-import org.rascalmpl.value.io.BinaryValueWriter
+import org.rascalmpl.value.io.old.BinaryValueReader
+import org.rascalmpl.value.io.old.BinaryValueWriter
 import org.rascalmpl.value.io.StandardTextWriter
 import org.openjdk.jmh.infra.Blackhole
 import org.rascalmpl.interpreter.utils.Timing
@@ -393,7 +393,7 @@ object DominatorsScalaPartlyOptimized {
 	/*
 	 * Subtract one set from another.
 	 */
-	//	public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+	//	public static <K> Immutable<K> subtract(Immutable<K> set1, Immutable<K> set2) {
 	//		if (set1 == null && set2 == null)
 	//			return DefaultTrieSet.of();
 	//		if (set1 == set2)
@@ -403,7 +403,7 @@ object DominatorsScalaPartlyOptimized {
 	//		if (set2 == null)
 	//			return set1;
 	//
-	//		final TransientSet<K> tmp = set1.asTransient();
+	//		final Transient<K> tmp = set1.asTransient();
 	//		boolean modified = false;
 	//
 	//		for (K key : set2) {
@@ -422,7 +422,7 @@ object DominatorsScalaPartlyOptimized {
 	/*
 	 * Union two sets.
 	 */
-	//	public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+	//	public static <K> Immutable<K> union(Immutable<K> set1, Immutable<K> set2) {
 	//		if (set1 == null && set2 == null)
 	//			return DefaultTrieSet.of();
 	//		if (set1 == null)
@@ -448,7 +448,7 @@ object DominatorsScalaPartlyOptimized {
 	//			bigger = set1;
 	//		}
 	//
-	//		final TransientSet<K> tmp = bigger.asTransient();
+	//		final Transient<K> tmp = bigger.asTransient();
 	//		boolean modified = false;
 	//
 	//		for (K key : smaller) {

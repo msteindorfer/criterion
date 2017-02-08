@@ -9,14 +9,11 @@ package io.usethesource.criterion.impl.persistent.scala
 
 import java.util.Map.Entry
 
-import scala.collection.JavaConversions.asJavaIterator
-import scala.collection.JavaConversions.mapAsJavaMap
-import scala.collection.JavaConversions.setAsJavaSet
-import scala.collection.immutable
-
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf
-import io.usethesource.criterion.api.JmhSetMultimap
-import io.usethesource.criterion.api.JmhValue
+import io.usethesource.criterion.api.{JmhSet, JmhSetMultimap, JmhValue}
+
+import scala.collection.JavaConversions.{asJavaIterator, mapAsJavaMap, setAsJavaSet}
+import scala.collection.immutable
 
 case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
@@ -78,6 +75,8 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
   	override def nativeEntryIterator: java.util.Iterator[java.util.Map.Entry[JmhValue, Object]] = {
 		mapAsJavaMap(xs).entrySet.iterator.asInstanceOf[java.util.Iterator[java.util.Map.Entry[JmhValue, Object]]]
   	}
+
+	override def keySet: java.util.Set[JmhValue] = xs.keySet
 
 	override def equals(that: Any): Boolean = that match {
 		case other: ScalaSetMultimap => (this.xs.size == other.xs.size) && (this.xs equals other.xs)

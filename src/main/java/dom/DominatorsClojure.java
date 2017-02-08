@@ -7,15 +7,6 @@
  */
 package dom;
 
-import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
-import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
-import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
-import static dom.UtilClojure.EMPTY;
-import static dom.UtilClojure.carrier;
-import static dom.UtilClojure.intersect;
-import static dom.UtilClojure.project;
-import static dom.UtilClojure.toMap;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,6 +18,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
+import clojure.lang.APersistentMap;
+import clojure.lang.IFn;
+import clojure.lang.IPersistentSet;
+import clojure.lang.ITransientMap;
+import clojure.lang.ITransientSet;
+import clojure.lang.PersistentHashMap;
+import clojure.lang.PersistentHashSet;
+import clojure.set$difference;
+import clojure.set$intersection;
+import clojure.set$union;
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
@@ -37,20 +38,18 @@ import org.rascalmpl.value.ISetWriter;
 import org.rascalmpl.value.ITuple;
 import org.rascalmpl.value.IValue;
 import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.BinaryValueReader;
-import org.rascalmpl.value.io.BinaryValueWriter;
 import org.rascalmpl.value.io.StandardTextWriter;
+import org.rascalmpl.value.io.old.BinaryValueReader;
+import org.rascalmpl.value.io.old.BinaryValueWriter;
 
-import clojure.set$difference;
-import clojure.set$intersection;
-import clojure.set$union;
-import clojure.lang.APersistentMap;
-import clojure.lang.IFn;
-import clojure.lang.IPersistentSet;
-import clojure.lang.ITransientMap;
-import clojure.lang.ITransientSet;
-import clojure.lang.PersistentHashMap;
-import clojure.lang.PersistentHashSet;
+import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
+import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
+import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
+import static dom.UtilClojure.EMPTY;
+import static dom.UtilClojure.carrier;
+import static dom.UtilClojure.intersect;
+import static dom.UtilClojure.project;
+import static dom.UtilClojure.toMap;
 
 @SuppressWarnings("deprecation")
 public class DominatorsClojure implements DominatorBenchmark {

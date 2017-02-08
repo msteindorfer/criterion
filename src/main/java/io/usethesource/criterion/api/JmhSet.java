@@ -11,20 +11,22 @@ import java.util.Iterator;
 
 public interface JmhSet extends JmhValue, Iterable<JmhValue> {
 
-  public boolean isEmpty();
+  boolean isEmpty();
 
-  public int size();
+  int size();
 
-  public boolean contains(JmhValue element);
+  boolean contains(JmhValue element);
 
-  public JmhSet insert(JmhValue element);
+  JmhSet insert(JmhValue element);
 
-  public JmhSet delete(JmhValue elem);
+  JmhSet delete(JmhValue elem);
 
   @Override
-  public Iterator<JmhValue> iterator();
+  Iterator<JmhValue> iterator();
 
-  public static interface Builder extends JmhBuilder {
+  java.util.Set<JmhValue> asJavaSet();
+
+  static interface Builder extends JmhBuilder {
 
     void insert(JmhValue... v);
 

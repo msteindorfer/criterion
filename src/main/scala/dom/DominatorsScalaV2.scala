@@ -24,8 +24,8 @@ import org.rascalmpl.value.IMap
 import org.rascalmpl.value.ISet
 import org.rascalmpl.value.ITuple
 import org.rascalmpl.value.IValue
-import org.rascalmpl.value.io.BinaryValueReader
-import org.rascalmpl.value.io.BinaryValueWriter
+import org.rascalmpl.value.io.old.BinaryValueReader
+import org.rascalmpl.value.io.old.BinaryValueWriter
 import org.rascalmpl.value.io.StandardTextWriter
 import org.rascalmpl.interpreter.utils.Timing
 
@@ -248,7 +248,7 @@ object DominatorsScalaV2 {
 	//	 * Intersect many sets.
 	//	 */
 	//	@SuppressWarnings("unchecked")
-	//	public static <K> ImmutableSet<K> intersect(ImmutableSet<ImmutableSet<K>> sets) {
+	//	public static <K> Immutable<K> intersect(Immutable<Immutable<K>> sets) {
 	//		if (sets == null || sets.isEmpty() || sets.contains(EMPTY)) {
 	//			return EMPTY;
 	//		}
@@ -267,7 +267,7 @@ object DominatorsScalaV2 {
 	/*
 	 * Intersect two sets.
 	 */
-	//	public static <K> ImmutableSet<K> intersect(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+	//	public static <K> Immutable<K> intersect(Immutable<K> set1, Immutable<K> set2) {
 	//		if (set1 == set2)
 	//			return set1;
 	//		if (set1 == null)
@@ -290,7 +290,7 @@ object DominatorsScalaV2 {
 	//			bigger = set1;
 	//		}
 	//
-	//		final TransientSet<K> tmp = smaller.asTransient();
+	//		final Transient<K> tmp = smaller.asTransient();
 	//		boolean modified = false;
 	//
 	//		for (Iterator<K> it = tmp.iterator(); it.hasNext();) {
@@ -311,7 +311,7 @@ object DominatorsScalaV2 {
 	/*
 	 * Subtract one set from another.
 	 */
-	//	public static <K> ImmutableSet<K> subtract(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+	//	public static <K> Immutable<K> subtract(Immutable<K> set1, Immutable<K> set2) {
 	//		if (set1 == null && set2 == null)
 	//			return DefaultTrieSet.of();
 	//		if (set1 == set2)
@@ -321,7 +321,7 @@ object DominatorsScalaV2 {
 	//		if (set2 == null)
 	//			return set1;
 	//
-	//		final TransientSet<K> tmp = set1.asTransient();
+	//		final Transient<K> tmp = set1.asTransient();
 	//		boolean modified = false;
 	//
 	//		for (K key : set2) {
@@ -340,7 +340,7 @@ object DominatorsScalaV2 {
 	/*
 	 * Union two sets.
 	 */
-	//	public static <K> ImmutableSet<K> union(ImmutableSet<K> set1, ImmutableSet<K> set2) {
+	//	public static <K> Immutable<K> union(Immutable<K> set1, Immutable<K> set2) {
 	//		if (set1 == null && set2 == null)
 	//			return DefaultTrieSet.of();
 	//		if (set1 == null)
@@ -366,7 +366,7 @@ object DominatorsScalaV2 {
 	//			bigger = set1;
 	//		}
 	//
-	//		final TransientSet<K> tmp = bigger.asTransient();
+	//		final Transient<K> tmp = bigger.asTransient();
 	//		boolean modified = false;
 	//
 	//		for (K key : smaller) {

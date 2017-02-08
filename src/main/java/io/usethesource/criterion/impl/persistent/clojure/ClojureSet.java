@@ -7,12 +7,14 @@
  */
 package io.usethesource.criterion.impl.persistent.clojure;
 
-import java.util.Iterator;
-
+import clojure.lang.APersistentSet;
 import clojure.lang.IPersistentSet;
 import clojure.lang.PersistentHashSet;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
+
+import java.util.Iterator;
+import java.util.Set;
 
 class ClojureSet implements JmhSet {
 
@@ -62,6 +64,16 @@ class ClojureSet implements JmhSet {
   }
 
   @Override
+  public Set<JmhValue> asJavaSet() {
+    return ((APersistentSet) xs);
+  }
+
+  @Override
+  public int hashCode() {
+    return xs.hashCode();
+  }
+
+  @Override
   public boolean equals(Object other) {
     if (other == this) {
       return true;
@@ -77,11 +89,6 @@ class ClojureSet implements JmhSet {
     }
 
     return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return xs.hashCode();
   }
 
 }

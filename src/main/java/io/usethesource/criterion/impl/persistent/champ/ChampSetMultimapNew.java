@@ -7,12 +7,12 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 public final class ChampSetMultimapNew implements JmhSetMultimap {
 
@@ -66,6 +66,12 @@ public final class ChampSetMultimapNew implements JmhSetMultimap {
   // public JmhValue get(JmhValue key) {
   // return content.get(key);
   // }
+
+  @Override
+  public java.util.Set<JmhValue> keySet() {
+    // return content.keySet();
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
 
   @Override
   public int hashCode() {

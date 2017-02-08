@@ -10,7 +10,7 @@ package io.usethesource.criterion.impl.persistent.champ;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.Map;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 
@@ -19,9 +19,9 @@ import io.usethesource.criterion.api.JmhValue;
  */
 public final class ChampMap implements JmhMap {
 
-  private final ImmutableMap<JmhValue, JmhValue> content;
+  private final Map.Immutable<JmhValue, JmhValue> content;
 
-  protected ChampMap(ImmutableMap<JmhValue, JmhValue> content) {
+  protected ChampMap(Map.Immutable<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

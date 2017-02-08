@@ -7,18 +7,18 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 public final class ChampSetMultimap implements JmhSetMultimap {
 
-  private final ImmutableSetMultimap<JmhValue, JmhValue> content;
+  private final SetMultimap.Immutable<JmhValue, JmhValue> content;
 
-  protected ChampSetMultimap(ImmutableSetMultimap<JmhValue, JmhValue> content) {
+  protected ChampSetMultimap(SetMultimap.Immutable<JmhValue, JmhValue> content) {
     this.content = content;
   }
 
@@ -66,6 +66,11 @@ public final class ChampSetMultimap implements JmhSetMultimap {
   // public JmhValue get(JmhValue key) {
   // return content.get(key);
   // }
+
+  @Override
+  public java.util.Set<JmhValue> keySet() {
+    return content.keySet();
+  }
 
   @Override
   public int hashCode() {

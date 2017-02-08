@@ -7,11 +7,6 @@
  */
 package dom;
 
-import static dom.AllDominatorsRunner.CURRENT_DATA_SET_FILE_NAME;
-import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
-import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
-import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,6 +15,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.usethesource.capsule.DefaultTrieMap;
+import io.usethesource.capsule.DefaultTrieSet;
+import io.usethesource.capsule.api.deprecated.Set;
 import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
 import org.rascalmpl.value.IMap;
@@ -29,16 +27,14 @@ import org.rascalmpl.value.ISetWriter;
 import org.rascalmpl.value.ITuple;
 import org.rascalmpl.value.IValue;
 import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.BinaryValueReader;
-import org.rascalmpl.value.io.BinaryValueWriter;
 import org.rascalmpl.value.io.StandardTextWriter;
+import org.rascalmpl.value.io.old.BinaryValueReader;
+import org.rascalmpl.value.io.old.BinaryValueWriter;
 
-import io.usethesource.capsule.DefaultTrieMap;
-import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.TransientMap;
-import io.usethesource.capsule.api.deprecated.TransientSet;
+import static dom.AllDominatorsRunner.CURRENT_DATA_SET_FILE_NAME;
+import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
+import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
+import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
 
 @SuppressWarnings("deprecation")
 public class DominatorsPDB {
@@ -211,14 +207,14 @@ public class DominatorsPDB {
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
   @SuppressWarnings("unchecked")
-  public static <K, V> ImmutableMap<K, ImmutableSet<V>> toMap(ISet st) {
-    Map<K, TransientSet<V>> hm = new HashMap<>();
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.Immutable<K, Set.Immutable<V>> toMap(ISet st) {
+    Map<K, Set.Transient<V>> hm = new HashMap<>();
 
     for (IValue v : st) {
       ITuple t = (ITuple) v;
       K key = (K) t.get(0);
       V val = (V) t.get(1);
-      TransientSet<V> wValSet = hm.get(key);
+      Set.Transient<V> wValSet = hm.get(key);
       if (wValSet == null) {
         wValSet = DefaultTrieSet.transientOf();
         hm.put(key, wValSet);
@@ -226,7 +222,7 @@ public class DominatorsPDB {
       wValSet.__insert(val);
     }
 
-    TransientMap<K, ImmutableSet<V>> w = DefaultTrieMap.transientOf();
+    io.usethesource.capsule.api.deprecated.Map.Transient<K, Set.Immutable<V>> w = DefaultTrieMap.transientOf();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

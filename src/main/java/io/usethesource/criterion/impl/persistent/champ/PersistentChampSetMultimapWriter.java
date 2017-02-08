@@ -8,13 +8,13 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 
 final class PersistentChampSetMultimapWriter implements JmhSetMultimap.Builder {
 
-  protected ImmutableSetMultimap<JmhValue, JmhValue> mapContent;
+  protected SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
   protected JmhSetMultimap constructedMap;
 
   PersistentChampSetMultimapWriter(SetMultimapFactory setMultimapFactory) {

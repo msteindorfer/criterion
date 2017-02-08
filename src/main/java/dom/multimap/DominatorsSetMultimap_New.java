@@ -7,15 +7,6 @@
  */
 package dom.multimap;
 
-import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
-import static dom.multimap.Util_New.EMPTY;
-import static dom.multimap.Util_New.carrier;
-import static dom.multimap.Util_New.intersect;
-import static dom.multimap.Util_New.project;
-import static dom.multimap.Util_New.subtract;
-import static dom.multimap.Util_New.toMultimap;
-import static dom.multimap.Util_New.union;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +15,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import dom.DominatorBenchmark;
+import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.core.TrieSet;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
@@ -34,14 +30,16 @@ import org.rascalmpl.value.ISetWriter;
 import org.rascalmpl.value.ITuple;
 import org.rascalmpl.value.IValue;
 import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.BinaryValueReader;
+import org.rascalmpl.value.io.old.BinaryValueReader;
 
-import dom.DominatorBenchmark;
-import io.usethesource.capsule.api.Set;
-import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.core.TrieSet;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
+import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
+import static dom.multimap.Util_New.EMPTY;
+import static dom.multimap.Util_New.carrier;
+import static dom.multimap.Util_New.intersect;
+import static dom.multimap.Util_New.project;
+import static dom.multimap.Util_New.subtract;
+import static dom.multimap.Util_New.toMultimap;
+import static dom.multimap.Util_New.union;
 
 public class DominatorsSetMultimap_New implements DominatorBenchmark {
 
@@ -209,13 +207,13 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   private static ISet ImmutableSetOfMapsToSetOfMapValues(
-      Set.Immutable<ImmutableMap<IConstructor, Set.Immutable<IConstructor>>> result) {
+      Set.Immutable<io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
-    for (ImmutableMap<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
+    for (io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
       for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult
@@ -230,7 +228,7 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   private static IMap immutableMapToPdbMap(
-      ImmutableMap<IConstructor, Set.Immutable<IConstructor>> result) {
+      io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 

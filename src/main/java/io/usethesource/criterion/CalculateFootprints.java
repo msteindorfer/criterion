@@ -23,8 +23,7 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.PersistentHashMap;
 import clojure.lang.PersistentHashSet;
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.Map;
 import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
@@ -81,8 +80,8 @@ public final class CalculateFootprints {
       int elementCount, int run, Optional<String> shortName, final Class<?> clazz) {
 
     @SuppressWarnings("unchecked")
-    ImmutableSet<JmhValue> set =
-        (ImmutableSet<JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(clazz);
+    io.usethesource.capsule.api.deprecated.Set.Immutable<JmhValue> set =
+        (io.usethesource.capsule.api.deprecated.Set.Immutable<JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(clazz);
 
     for (JmhValue v : testSet) {
       set = set.__insert(v);
@@ -97,8 +96,8 @@ public final class CalculateFootprints {
       int elementCount, int run, Optional<String> shortName, final Class<?> clazz) {
 
     @SuppressWarnings("unchecked")
-    ImmutableMap<JmhValue, JmhValue> map =
-        (ImmutableMap<JmhValue, JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(clazz);
+    Map.Immutable<JmhValue, JmhValue> map =
+        (Map.Immutable<JmhValue, JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(clazz);
 
     for (JmhValue v : testSet) {
       map = map.__put(v, v);

@@ -35,7 +35,7 @@ import org.rascalmpl.value.IMap;
 import org.rascalmpl.value.ISet;
 import org.rascalmpl.value.IValue;
 import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.BinaryValueReader;
+import org.rascalmpl.value.io.old.BinaryValueReader;
 
 import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
 import io.usethesource.criterion.BenchmarkUtils;

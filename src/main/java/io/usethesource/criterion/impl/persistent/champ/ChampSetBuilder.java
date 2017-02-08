@@ -8,13 +8,13 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.SetFactory;
-import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.api.deprecated.Set;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
 
 class ChampSetBuilder implements JmhSet.Builder {
 
-  protected final TransientSet<JmhValue> setContent;
+  protected final Set.Transient<JmhValue> setContent;
   protected JmhSet constructedSet;
 
   ChampSetBuilder(SetFactory setFactory) {

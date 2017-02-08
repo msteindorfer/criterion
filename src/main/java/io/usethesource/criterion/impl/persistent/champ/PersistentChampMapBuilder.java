@@ -11,13 +11,13 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.Map;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 
 final class PersistentChampMapBuilder implements JmhMap.Builder {
 
-  protected ImmutableMap<JmhValue, JmhValue> mapContent;
+  protected Map.Immutable<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;
 
   PersistentChampMapBuilder(MapFactory mapFactory) {

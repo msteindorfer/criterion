@@ -11,13 +11,13 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.api.deprecated.TransientMap;
+import io.usethesource.capsule.api.deprecated.Map;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 
 final class TransientChampMapBuilder implements JmhMap.Builder {
 
-  protected final TransientMap<JmhValue, JmhValue> mapContent;
+  protected final Map.Transient<JmhValue, JmhValue> mapContent;
   protected JmhMap constructedMap;
 
   TransientChampMapBuilder(MapFactory mapFactory) {

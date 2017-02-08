@@ -7,20 +7,20 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import java.util.Iterator;
-
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.Set;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
+
+import java.util.Iterator;
 
 /*
  * Operates: * without types * with equals() instead of isEqual()
  */
 public final class ChampSet implements JmhSet {
 
-  private final ImmutableSet<JmhValue> content;
+  private final Set.Immutable<JmhValue> content;
 
-  public ChampSet(ImmutableSet<JmhValue> content) {
+  public ChampSet(Set.Immutable<JmhValue> content) {
     this.content = content;
   }
 
@@ -52,6 +52,11 @@ public final class ChampSet implements JmhSet {
   @Override
   public Iterator<JmhValue> iterator() {
     return content.iterator();
+  }
+
+  @Override
+  public java.util.Set<JmhValue> asJavaSet() {
+    return content;
   }
 
   @Override

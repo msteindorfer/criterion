@@ -30,8 +30,6 @@ import com.google.common.base.Predicates;
 import com.gs.collections.impl.map.mutable.primitive.IntIntHashMap;
 
 import gnu.trove.map.hash.TIntIntHashMap;
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8_IntKey;
@@ -493,7 +491,7 @@ public final class CalculateFootprintsHeterogeneous {
       if (keyIdx % stepSizeOneToOneSelector == 0) {
         ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);
       } else {
-        ImmutableSet<Integer> nestedSet = TrieSet_5Bits_Spec0To8_IntKey.of();
+        io.usethesource.capsule.api.deprecated.Set.Immutable<Integer> nestedSet = TrieSet_5Bits_Spec0To8_IntKey.of();
 
         for (int i = 0; i < multimapValueSize; i++) {
           nestedSet = nestedSet.__insert(i);
@@ -565,7 +563,7 @@ public final class CalculateFootprintsHeterogeneous {
 
   public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount,
       int run, MemoryFootprintPreset preset) {
-    ImmutableMap<Integer, Integer> ys = TrieMap_5Bits.of();
+    io.usethesource.capsule.api.deprecated.Map.Immutable<Integer, Integer> ys = TrieMap_5Bits.of();
 
     // for (Object v : data) {
     // ys = ys.__put(v, v);

@@ -7,21 +7,14 @@
  */
 package io.usethesource.criterion;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Level;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OperationsPerInvocation;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
+import io.usethesource.criterion.BenchmarkUtils.DataType;
+import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
+import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
+import io.usethesource.criterion.api.JmhSet;
+import io.usethesource.criterion.api.JmhSetMultimap;
+import io.usethesource.criterion.api.JmhValue;
+import io.usethesource.criterion.api.JmhValueFactory;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,12 +22,10 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import io.usethesource.criterion.BenchmarkUtils.DataType;
-import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
-import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
-import io.usethesource.criterion.api.JmhSetMultimap;
-import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.api.JmhValueFactory;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -92,6 +83,9 @@ public class JmhSetMultimapBenchmarks {
   public JmhSetMultimap testMap;
   private JmhSetMultimap testMapRealDuplicate;
   private JmhSetMultimap testMapDeltaDuplicate;
+
+  private java.util.Set<JmhValue> cachedKeySet;
+  private java.util.Set<JmhValue> canonicalKeySet;
 
   public JmhSetMultimap testMapInt;
 
@@ -254,6 +248,14 @@ public class JmhSetMultimapBenchmarks {
     SleepingInteger.IS_SLEEP_ENABLED_IN_EQUALS = false;
 
     // OverseerUtils.setup(JmhSetMultimapBenchmarks.class, this);
+
+    cachedKeySet = testMap.keySet();
+
+    final JmhSet.Builder keySetWriter = valueFactory.setBuilder();
+    for (JmhValue item : testMap.keySet()) {
+      keySetWriter.insert(item);
+    }
+    canonicalKeySet = keySetWriter.done().asJavaSet();
   }
 
   protected void setUpTestMapWithRandomContent(int size, int run) throws Exception {
@@ -627,18 +629,34 @@ public class JmhSetMultimapBenchmarks {
   // bh.consume(testMap.hashCode());
   // }
 
+  @Benchmark
+  public void timeMultimapLikeKeySet(Blackhole bh) {
+    bh.consume(testMap.keySet());
+  }
+
+  @Benchmark
+  public void timeMultimapLikeKeySetEqualsCanonicalSet(Blackhole bh) {
+    bh.consume(testMap.keySet().equals(canonicalKeySet));
+  }
+
+  @Benchmark
+  public void timeMultimapLikeKeySetCachedEqualsCanonicalSet(Blackhole bh) {
+    bh.consume(cachedKeySet.equals(canonicalKeySet));
+  }
+
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 
     // @formatter:off
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName() + ".timeMultimapLike(Insert|Remove)Tuple$")
+        .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName() + ".timeMultimapLikeKeySet*EqualsCanonicalSet*") // timeMultimapLikeKeySet*EqualsCanonicalSet, timeMultimapLike*
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
         .warmupIterations(10)
         .warmupTime(TimeValue.seconds(1))
         .measurementIterations(10)
         .forks(1)
+        .shouldDoGC(true)
         .param("dataType", "SET_MULTIMAP")
         .param("run", "0")
 //        .param("run", "1")
@@ -648,21 +666,22 @@ public class JmhSetMultimapBenchmarks {
         .param("producer", "PURE_INTEGER")
         .param("sampleDataSelection", "MATCH")
 //        .param("size", "16")
-//        .param("size", "2048")
-        .param("size", "1048576")
-        .param("multimapValueSize", "2")
-        .param("stepSizeOneToOneSelector", "2")
+        .param("size", "2048")
+//        .param("size", "1048576")
+//        .param("size", "8388608")
+        .param("multimapValueSize", "2") // 2
+        .param("stepSizeOneToOneSelector", "2") // 2
 //        .param("valueFactoryFactory", "VF_CHAMP")
 //        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
 //        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
+//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
+//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
+//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
-//        .param("valueFactoryFactory", "VF_SCALA")
+//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
+        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();
     // @formatter:on

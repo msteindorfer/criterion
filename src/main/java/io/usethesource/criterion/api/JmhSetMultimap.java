@@ -40,6 +40,8 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 
   Iterator<Entry<JmhValue, Object>> nativeEntryIterator();
 
+  java.util.Set<JmhValue> keySet();
+
   public static interface Builder extends JmhBuilder {
 
     void insert(JmhValue key, JmhValue value);

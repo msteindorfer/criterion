@@ -14,7 +14,7 @@ import java.io.IOException;
 import org.rascalmpl.value.IMap;
 import org.rascalmpl.value.ISet;
 import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.BinaryValueReader;
+import org.rascalmpl.value.io.old.BinaryValueReader;
 
 public class AllDominatorsRunner {
 
