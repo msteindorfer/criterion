@@ -23,8 +23,8 @@ import dom.JmhCfgDominatorBenchmarks;
 import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.capsule.api.deprecated.Set;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
@@ -244,13 +244,13 @@ public class DominatorsSetMultimap_Default_Instrumented2 implements DominatorBen
   }
 
   private static ISet immutableSetOfMapsToSetOfMapValues(
-      Set.Immutable<io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
+      Set.Immutable<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
-    for (io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
+    for (io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
       for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult.entrySet()) {
@@ -264,7 +264,7 @@ public class DominatorsSetMultimap_Default_Instrumented2 implements DominatorBen
   }
 
   private static IMap immutableMapToPdbMap(
-      io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
+      io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
@@ -566,7 +566,7 @@ class Util_Default_Instrumented2 {
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
   @SuppressWarnings("unchecked")
-  public static <K, V> io.usethesource.capsule.api.deprecated.Map.Immutable<K, Set.Immutable<V>> toMap(Set.Immutable<ITuple> st) {
+  public static <K, V> io.usethesource.capsule.api.Map.Immutable<K, Set.Immutable<V>> toMap(Set.Immutable<ITuple> st) {
     Map<K, Set.Transient<V>> hm = new HashMap<>();
 
     for (ITuple t : st) {
@@ -580,7 +580,7 @@ class Util_Default_Instrumented2 {
       wValSet.__insert(val);
     }
 
-    io.usethesource.capsule.api.deprecated.Map.Transient<K, Set.Immutable<V>> w = DefaultTrieMap.transientOf();
+    io.usethesource.capsule.api.Map.Transient<K, Set.Immutable<V>> w = DefaultTrieMap.transientOf();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

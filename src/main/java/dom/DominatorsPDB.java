@@ -17,7 +17,7 @@ import java.util.Map;
 
 import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 import org.rascalmpl.interpreter.utils.Timing;
 import org.rascalmpl.value.IConstructor;
 import org.rascalmpl.value.IMap;
@@ -207,7 +207,7 @@ public class DominatorsPDB {
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
   @SuppressWarnings("unchecked")
-  public static <K, V> io.usethesource.capsule.api.deprecated.Map.Immutable<K, Set.Immutable<V>> toMap(ISet st) {
+  public static <K, V> io.usethesource.capsule.api.Map.Immutable<K, Set.Immutable<V>> toMap(ISet st) {
     Map<K, Set.Transient<V>> hm = new HashMap<>();
 
     for (IValue v : st) {
@@ -222,7 +222,7 @@ public class DominatorsPDB {
       wValSet.__insert(val);
     }
 
-    io.usethesource.capsule.api.deprecated.Map.Transient<K, Set.Immutable<V>> w = DefaultTrieMap.transientOf();
+    io.usethesource.capsule.api.Map.Transient<K, Set.Immutable<V>> w = DefaultTrieMap.transientOf();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

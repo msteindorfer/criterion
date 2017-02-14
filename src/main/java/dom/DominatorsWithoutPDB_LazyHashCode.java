@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.experimental.lazy.TrieMap_5Bits_LazyHashCode;
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 import org.openjdk.jmh.infra.Blackhole;
@@ -49,7 +49,7 @@ import static dom.Util_LazyHashCode.union;
 @SuppressWarnings("deprecation")
 public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
 
-  private Set.Immutable setofdomsets(io.usethesource.capsule.api.deprecated.Map.Immutable dom, Set.Immutable preds) {
+  private Set.Immutable setofdomsets(io.usethesource.capsule.api.Map.Immutable dom, Set.Immutable preds) {
     Set.Transient result = TrieSet_5Bits_LazyHashCode.transientOf();
 
     for (Object p : preds) {
@@ -78,32 +78,32 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     throw new NoSuchElementException("No candidate found.");
   }
 
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> calculateDominators(
+  public io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> calculateDominators(
       Set.Immutable<ITuple> graph) {
     IConstructor n0 = getTop(graph);
     Set.Immutable<IConstructor> nodes = carrier(graph);
     // if (!nodes.getElementType().isAbstractData()) {
     // throw new RuntimeException("nodes is not the right type");
     // }
-    io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> preds = toMap(project(graph, 1, 0));
+    io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> preds = toMap(project(graph, 1, 0));
     // nodes = nodes.delete(n0);
 
-    io.usethesource.capsule.api.deprecated.Map.Transient<IConstructor, Set.Immutable<IConstructor>> w =
+    io.usethesource.capsule.api.Map.Transient<IConstructor, Set.Immutable<IConstructor>> w =
         TrieMap_5Bits_LazyHashCode.transientOf();
     w.__put(n0, TrieSet_5Bits_LazyHashCode.of(n0));
     for (IConstructor n : nodes.__remove(n0)) {
       w.__put(n, nodes);
     }
-    io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dom = w.freeze();
+    io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dom = w.freeze();
 
-    io.usethesource.capsule.api.deprecated.Map.Immutable prev = TrieMap_5Bits_LazyHashCode.of();
+    io.usethesource.capsule.api.Map.Immutable prev = TrieMap_5Bits_LazyHashCode.of();
     /*
      * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <- preds[n]?{}});
      */
     while (!prev.equals(dom)) {
       prev = dom;
 
-      io.usethesource.capsule.api.deprecated.Map.Transient<IConstructor, Set.Immutable<IConstructor>> newDom =
+      io.usethesource.capsule.api.Map.Transient<IConstructor, Set.Immutable<IConstructor>> newDom =
           TrieMap_5Bits_LazyHashCode.transientOf();
 
       for (IConstructor n : nodes) {
@@ -159,7 +159,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     Set.Immutable<ITuple> graph = pdbSetToImmutableSet(data);
 
     long before = Timing.getCpuTime();
-    io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> results =
+    io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> results =
         new DominatorsWithoutPDB_LazyHashCode().calculateDominators(graph);
     System.err.println("PDB_LESS_IMPLEMENTATION" + "\nDuration: "
         + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
@@ -183,7 +183,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     // convert data to remove PDB dependency
     ArrayList<Set.Immutable<ITuple>> graphs = pdbMapToArrayListOfValues(sampledGraphs);
 
-    Set.Transient<io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result =
+    Set.Transient<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result =
         TrieSet_5Bits_LazyHashCode.transientOf();
     long before = Timing.getCpuTime();
     for (Set.Immutable<ITuple> graph : graphs) {
@@ -229,13 +229,13 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   }
 
   private static ISet immutableSetOfMapsToSetOfMapValues(
-      Set.Immutable<io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
+      Set.Immutable<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
-    for (io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
+    for (io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
       for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult.entrySet()) {
@@ -249,7 +249,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   }
 
   private static IMap immutableMapToPdbMap(
-      io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
+      io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
@@ -547,7 +547,7 @@ class Util_LazyHashCode {
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
   @SuppressWarnings("unchecked")
-  public static <K, V> io.usethesource.capsule.api.deprecated.Map.Immutable<K, Set.Immutable<V>> toMap(Set.Immutable<ITuple> st) {
+  public static <K, V> io.usethesource.capsule.api.Map.Immutable<K, Set.Immutable<V>> toMap(Set.Immutable<ITuple> st) {
     Map<K, Set.Transient<V>> hm = new HashMap<>();
 
     for (ITuple t : st) {
@@ -561,7 +561,7 @@ class Util_LazyHashCode {
       wValSet.__insert(val);
     }
 
-    io.usethesource.capsule.api.deprecated.Map.Transient<K, Set.Immutable<V>> w = TrieMap_5Bits_LazyHashCode.transientOf();
+    io.usethesource.capsule.api.Map.Transient<K, Set.Immutable<V>> w = TrieMap_5Bits_LazyHashCode.transientOf();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

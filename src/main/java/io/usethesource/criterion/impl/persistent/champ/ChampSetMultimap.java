@@ -7,12 +7,12 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import io.usethesource.capsule.api.deprecated.SetMultimap;
-import io.usethesource.criterion.api.JmhSetMultimap;
-import io.usethesource.criterion.api.JmhValue;
-
 import java.util.Iterator;
 import java.util.Map.Entry;
+
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.criterion.api.JmhSetMultimap;
+import io.usethesource.criterion.api.JmhValue;
 
 public final class ChampSetMultimap implements JmhSetMultimap {
 
@@ -39,7 +39,7 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 
   @Override
   public JmhSetMultimap remove(JmhValue key, JmhValue value) {
-    return new ChampSetMultimap(content.__removeEntry(key, value));
+    return new ChampSetMultimap(content.__remove(key, value));
   }
 
   @Override

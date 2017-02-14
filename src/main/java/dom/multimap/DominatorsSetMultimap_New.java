@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import dom.DominatorBenchmark;
-import io.usethesource.capsule.api.Set;
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.api.experimental.Set;
+import io.usethesource.capsule.api.experimental.SetMultimap;
 import io.usethesource.capsule.core.TrieSet;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
 import org.openjdk.jmh.infra.Blackhole;
@@ -207,13 +207,13 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   private static ISet ImmutableSetOfMapsToSetOfMapValues(
-      Set.Immutable<io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
+      Set.Immutable<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
-    for (io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
+    for (io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
       for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult
@@ -228,7 +228,7 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   private static IMap immutableMapToPdbMap(
-      io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
+      io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 

@@ -491,7 +491,7 @@ public final class CalculateFootprintsHeterogeneous {
       if (keyIdx % stepSizeOneToOneSelector == 0) {
         ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);
       } else {
-        io.usethesource.capsule.api.deprecated.Set.Immutable<Integer> nestedSet = TrieSet_5Bits_Spec0To8_IntKey.of();
+        io.usethesource.capsule.api.Set.Immutable<Integer> nestedSet = TrieSet_5Bits_Spec0To8_IntKey.of();
 
         for (int i = 0; i < multimapValueSize; i++) {
           nestedSet = nestedSet.__insert(i);
@@ -563,7 +563,7 @@ public final class CalculateFootprintsHeterogeneous {
 
   public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount,
       int run, MemoryFootprintPreset preset) {
-    io.usethesource.capsule.api.deprecated.Map.Immutable<Integer, Integer> ys = TrieMap_5Bits.of();
+    io.usethesource.capsule.api.Map.Immutable<Integer, Integer> ys = TrieMap_5Bits.of();
 
     // for (Object v : data) {
     // ys = ys.__put(v, v);

@@ -8,7 +8,7 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.SetFactory;
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
 

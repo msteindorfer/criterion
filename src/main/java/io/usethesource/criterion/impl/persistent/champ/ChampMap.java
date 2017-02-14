@@ -10,7 +10,7 @@ package io.usethesource.criterion.impl.persistent.champ;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import io.usethesource.capsule.api.deprecated.Map;
+import io.usethesource.capsule.api.Map;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 

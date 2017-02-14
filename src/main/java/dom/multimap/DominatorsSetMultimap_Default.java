@@ -18,8 +18,8 @@ import java.util.NoSuchElementException;
 import dom.DominatorBenchmark;
 import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.capsule.api.deprecated.Set;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
@@ -219,13 +219,13 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
   }
 
   private static ISet immutableSetOfMapsToSetOfMapValues(
-      Set.Immutable<io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
+      Set.Immutable<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
-    for (io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
+    for (io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
       for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult.entrySet()) {
@@ -239,7 +239,7 @@ public class DominatorsSetMultimap_Default implements DominatorBenchmark {
   }
 
   private static IMap immutableMapToPdbMap(
-      io.usethesource.capsule.api.deprecated.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
+      io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
 
