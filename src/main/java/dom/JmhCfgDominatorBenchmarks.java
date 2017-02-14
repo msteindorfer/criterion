@@ -31,11 +31,11 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.rascalmpl.value.IMap;
-import org.rascalmpl.value.ISet;
-import org.rascalmpl.value.IValue;
-import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.old.BinaryValueReader;
+import io.usethesource.vallang.IMap;
+import io.usethesource.vallang.ISet;
+import io.usethesource.vallang.IValue;
+import io.usethesource.vallang.IValueFactory;
+import io.usethesource.vallang.io.old.BinaryValueReader;
 
 import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
 import io.usethesource.criterion.BenchmarkUtils;
@@ -78,7 +78,7 @@ public class JmhCfgDominatorBenchmarks {
   }
 
   protected void deseriaizeFullDataSet() {
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     try {
       int bufferSize = 512 * 1024 * 1024;
@@ -122,7 +122,7 @@ public class JmhCfgDominatorBenchmarks {
         ISet mapValue = (ISet) DATA_SET_FULL.get(mapKey);
 
         // /**** REMOVE ANNOTATIONS ***/
-        // IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+        // IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
         //
         // ISetWriter bldr = vf.setWriter();
         // for (IValue untypedTuple : mapValue) {

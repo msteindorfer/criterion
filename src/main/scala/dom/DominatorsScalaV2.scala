@@ -19,14 +19,14 @@ import scala.collection.immutable.Map
 import scala.collection.immutable.Set
 import scala.collection.mutable.Builder
 
-import org.rascalmpl.value.IConstructor
-import org.rascalmpl.value.IMap
-import org.rascalmpl.value.ISet
-import org.rascalmpl.value.ITuple
-import org.rascalmpl.value.IValue
-import org.rascalmpl.value.io.old.BinaryValueReader
-import org.rascalmpl.value.io.old.BinaryValueWriter
-import org.rascalmpl.value.io.StandardTextWriter
+import io.usethesource.vallang.IConstructor
+import io.usethesource.vallang.IMap
+import io.usethesource.vallang.ISet
+import io.usethesource.vallang.ITuple
+import io.usethesource.vallang.IValue
+import io.usethesource.vallang.io.old.BinaryValueReader
+import io.usethesource.vallang.io.old.BinaryValueWriter
+import io.usethesource.vallang.io.StandardTextWriter
 import org.rascalmpl.interpreter.utils.Timing
 
 import dom.AllDominatorsRunner.CURRENT_DATA_SET
@@ -114,7 +114,7 @@ object DominatorsScalaV2 {
 	}
 
 	def testOne: IMap = {
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val data = new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME)).asInstanceOf[ISet]
 
@@ -190,7 +190,7 @@ object DominatorsScalaV2 {
 
 	def immutableSetOfMapsToSetOfMapValues(result: Set[Map[IConstructor, Set[IConstructor]]]): ISet = {
 		// convert back to PDB for serialization
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val resultBuilder = vf.setWriter
 
@@ -216,7 +216,7 @@ object DominatorsScalaV2 {
 	}
 
 	def immutableSetToPdbSet[K <: IValue](set: Set[K]): ISet = {
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val builder = vf.setWriter
 
@@ -230,7 +230,7 @@ object DominatorsScalaV2 {
 	def immutableMapToPdbMap(
 		result: Map[IConstructor, Set[IConstructor]]): IMap = {
 		// convert back to PDB for serialization
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val builder = vf.mapWriter
 

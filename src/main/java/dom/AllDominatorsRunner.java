@@ -8,13 +8,11 @@
 package dom;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.rascalmpl.value.IMap;
-import org.rascalmpl.value.ISet;
-import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.old.BinaryValueReader;
+import io.usethesource.vallang.IMap;
+import io.usethesource.vallang.IValueFactory;
+import io.usethesource.vallang.io.old.BinaryValueReader;
 
 public class AllDominatorsRunner {
 
@@ -32,7 +30,7 @@ public class AllDominatorsRunner {
   public static final IMap CURRENT_DATA_SET;
 
   static {
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     try {
       CURRENT_DATA_SET =
@@ -45,58 +43,58 @@ public class AllDominatorsRunner {
     System.err.println();
   }
 
-  public static void main(String[] args) throws FileNotFoundException, IOException {
-    IMap resultsBareMetalOne = DominatorsWithoutPDB_Default.testOne();
-    IMap resultsClojureOne = DominatorsClojure.testOne();
-    IMap resultsScalaOne = DominatorsScalaV1.testOne();
-    // IMap resultsPdbPersistentOne =
-    // DominatorsPDB.testOne(org.rascalmpl.value.impl.persistent.ValueFactory.getInstance());
-    // IMap resultsPdbFastOne =
-    // DominatorsPDB.testOne(org.rascalmpl.value.impl.fast.ValueFactory.getInstance());
-    //
-    // if (!resultsPdbPersistentOne.equals(resultsBareMetalOne)) {
-    // throw new Error("Dominator calculations do differ [PDB Persistent vs CHART]!");
-    // } else {
-    // System.err.println("Are equal!\n\n");
-    // }
-
-    if (!resultsBareMetalOne.equals(resultsScalaOne)) {
-      throw new Error("Dominator calculations do differ [CHART vs Scala]!");
-    } else {
-      System.err.println("[CHART and Scala] are equal!\n\n");
-    }
-
-    if (!resultsBareMetalOne.equals(resultsClojureOne)) {
-      throw new Error("Dominator calculations do differ [CHART vs Clojure]!");
-    } else {
-      System.err.println("[CHART and Clojure] are equal!\n\n");
-    }
-
-    ISet resultsBareMetal = DominatorsWithoutPDB_Default.testAll(CURRENT_DATA_SET);
-    ISet resultsClojure = DominatorsClojure.testAll(CURRENT_DATA_SET);
-    ISet resultsScala = DominatorsScalaV1.testAll(CURRENT_DATA_SET);
-    // ISet resultsPdbPersistent =
-    // DominatorsPDB.testAll(org.rascalmpl.value.impl.persistent.ValueFactory.getInstance());
-    // ISet resultsPdbFast =
-    // DominatorsPDB.testAll(org.rascalmpl.value.impl.fast.ValueFactory.getInstance());
-    //
-    // if (!resultsPdbPersistent.equals(resultsBareMetal)) {
-    // throw new Error("Dominator calculations do differ [PDB Persistent vs CHART]!");
-    // } else {
-    // System.err.println("Are equal!\n\n");
-    // }
-
-    if (!resultsBareMetal.equals(resultsScala)) {
-      throw new Error("Dominator calculations do differ [CHART vs Scala]!");
-    } else {
-      System.err.println("[CHART and Scala] are equal!\n\n");
-    }
-
-    if (!resultsBareMetal.equals(resultsClojure)) {
-      throw new Error("Dominator calculations do differ [CHART vs Clojure]!");
-    } else {
-      System.err.println("[CHART and Clojure] are equal!\n\n");
-    }
-  }
+//  public static void main(String[] args) throws FileNotFoundException, IOException {
+//    IMap resultsBareMetalOne = DominatorsWithoutPDB_Default.testOne();
+//    IMap resultsClojureOne = DominatorsClojure.testOne();
+//    IMap resultsScalaOne = DominatorsScalaV1.testOne();
+//    // IMap resultsPdbPersistentOne =
+//    // DominatorsPDB.testOne(io.usethesource.vallang.impl.persistent.ValueFactory.getInstance());
+//    // IMap resultsPdbFastOne =
+//    // DominatorsPDB.testOne(io.usethesource.vallang.impl.fast.ValueFactory.getInstance());
+//    //
+//    // if (!resultsPdbPersistentOne.equals(resultsBareMetalOne)) {
+//    // throw new Error("Dominator calculations do differ [PDB Persistent vs CHART]!");
+//    // } else {
+//    // System.err.println("Are equal!\n\n");
+//    // }
+//
+//    if (!resultsBareMetalOne.equals(resultsScalaOne)) {
+//      throw new Error("Dominator calculations do differ [CHART vs Scala]!");
+//    } else {
+//      System.err.println("[CHART and Scala] are equal!\n\n");
+//    }
+//
+//    if (!resultsBareMetalOne.equals(resultsClojureOne)) {
+//      throw new Error("Dominator calculations do differ [CHART vs Clojure]!");
+//    } else {
+//      System.err.println("[CHART and Clojure] are equal!\n\n");
+//    }
+//
+//    ISet resultsBareMetal = DominatorsWithoutPDB_Default.testAll(CURRENT_DATA_SET);
+//    ISet resultsClojure = DominatorsClojure.testAll(CURRENT_DATA_SET);
+//    ISet resultsScala = DominatorsScalaV1.testAll(CURRENT_DATA_SET);
+//    // ISet resultsPdbPersistent =
+//    // DominatorsPDB.testAll(io.usethesource.vallang.impl.persistent.ValueFactory.getInstance());
+//    // ISet resultsPdbFast =
+//    // DominatorsPDB.testAll(io.usethesource.vallang.impl.fast.ValueFactory.getInstance());
+//    //
+//    // if (!resultsPdbPersistent.equals(resultsBareMetal)) {
+//    // throw new Error("Dominator calculations do differ [PDB Persistent vs CHART]!");
+//    // } else {
+//    // System.err.println("Are equal!\n\n");
+//    // }
+//
+//    if (!resultsBareMetal.equals(resultsScala)) {
+//      throw new Error("Dominator calculations do differ [CHART vs Scala]!");
+//    } else {
+//      System.err.println("[CHART and Scala] are equal!\n\n");
+//    }
+//
+//    if (!resultsBareMetal.equals(resultsClojure)) {
+//      throw new Error("Dominator calculations do differ [CHART vs Clojure]!");
+//    } else {
+//      System.err.println("[CHART and Clojure] are equal!\n\n");
+//    }
+//  }
 
 }

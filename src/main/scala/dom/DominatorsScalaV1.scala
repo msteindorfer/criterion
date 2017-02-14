@@ -7,16 +7,11 @@
   */
 package dom
 
-import java.io.{FileInputStream, FileOutputStream, FileWriter}
 import java.util.ArrayList
 
-import dom.AllDominatorsRunner.{DATA_SET_SINGLE_FILE_NAME, LOG_BINARY_RESULTS, LOG_TEXTUAL_RESULTS}
 import dom.DominatorsScalaV1._
+import io.usethesource.vallang._
 import org.openjdk.jmh.infra.Blackhole
-import org.rascalmpl.interpreter.utils.Timing
-import org.rascalmpl.value._
-import org.rascalmpl.value.io.StandardTextWriter
-import org.rascalmpl.value.io.old.{BinaryValueReader, BinaryValueWriter}
 
 import scala.collection.JavaConverters.{asScalaBufferConverter, asScalaSetConverter, iterableAsScalaIterableConverter}
 import scala.collection.immutable.{HashMap, HashSet}
@@ -139,138 +134,138 @@ class DominatorsScalaV1 extends DominatorBenchmark {
 
 object DominatorsScalaV1 {
 
-  def main(args: Array[String]) {
-    testOne
-    //		testAll
-  }
-
-  def testOne: IMap = {
-    val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
-
-    val data = new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME)).asInstanceOf[ISet]
-
-    // convert data to remove PDB dependency
-    val graph: HashSet[ITuple] = pdbSetToImmutableSet(data);
-
-    val before = Timing.getCpuTime();
-    val results: HashMap[IConstructor, HashSet[IConstructor]] = new DominatorsScalaV1().calculateDominators(graph);
-
-    System.err.println("SCALA" + "\nDuration: "
-      + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
-
-    val pdbResults: IMap = immutableMapToPdbMap(results)
-
-    if (LOG_BINARY_RESULTS)
-      new BinaryValueWriter().write(pdbResults, new FileOutputStream(
-        "data/dominators-java-without-pdb-single.bin"));
-
-    if (LOG_TEXTUAL_RESULTS)
-      new StandardTextWriter().write(pdbResults, new FileWriter(
-        "data/dominators-java-without-pdb-single.txt"));
-
-    return pdbResults;
-  }
-
-  def testAll(sampledGraphs: IMap): ISet = {
-    // convert data to remove PDB dependency
-    val graphs: ArrayList[HashSet[ITuple]] = pdbMapToArrayListOfValues(sampledGraphs);
-
-    val resultBldr = HashSet.newBuilder[HashMap[IConstructor, HashSet[IConstructor]]]
-
-    val before = Timing.getCpuTime();
-    for (graph <- graphs.asScala) {
-      try {
-        resultBldr += new DominatorsScalaV1().calculateDominators(graph)
-      } catch {
-        case e: RuntimeException => System.err.println(e.getMessage)
-      }
-    }
-
-    System.err.println("SCALA" + "\nDuration: "
-      + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n")
-
-    // convert back to PDB for serialization
-    val pdbResults = immutableSetOfMapsToSetOfMapValues(resultBldr.result);
-
-    if (LOG_BINARY_RESULTS)
-      new BinaryValueWriter().write(pdbResults, new FileOutputStream(
-        "data/dominators-scala.bin"));
-
-    if (LOG_TEXTUAL_RESULTS)
-      new StandardTextWriter().write(pdbResults, new FileWriter(
-        "data/dominators-scala.txt"));
-
-    return pdbResults;
-  }
-
-  def pdbMapToArrayListOfValues(data: IMap): ArrayList[HashSet[ITuple]] = {
-    // convert data to remove PDB dependency
-    val graphs: ArrayList[HashSet[ITuple]] = new ArrayList(data.size())
-
-    for (key <- data.asScala) {
-      val value = data.get(key).asInstanceOf[ISet]
-      val convertedValueBldr = HashSet.newBuilder[ITuple]
-      for (tuple <- value.asScala) {
-        convertedValueBldr += tuple.asInstanceOf[ITuple]
-      }
-      graphs add convertedValueBldr.result
-    }
-
-    graphs
-  }
-
-  def immutableSetOfMapsToSetOfMapValues(result: HashSet[HashMap[IConstructor, HashSet[IConstructor]]]): ISet = {
-    // convert back to PDB for serialization
-    val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
-
-    val resultBuilder = vf.setWriter
-
-    for (dominatorResult <- result) {
-      val builder = vf.mapWriter
-      for (entry <- dominatorResult) {
-        builder.put(entry._1, immutableSetToPdbSet(entry._2))
-      }
-      resultBuilder insert builder.done
-    }
-
-    resultBuilder.done
-  }
-
-  def pdbSetToImmutableSet(set: ISet): HashSet[ITuple] = {
-    val bldr = HashSet.newBuilder[ITuple]
-
-    for (tuple <- set.asScala) {
-      bldr += tuple.asInstanceOf[ITuple]
-    }
-
-    return bldr.result
-  }
-
-  def immutableSetToPdbSet[K <: IValue](set: HashSet[K]): ISet = {
-    val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
-
-    val builder = vf.setWriter
-
-    for (key <- set) {
-      builder.insert(key)
-    }
-
-    return builder.done
-  }
-
-  def immutableMapToPdbMap(
-                            result: HashMap[IConstructor, HashSet[IConstructor]]): IMap = {
-    // convert back to PDB for serialization
-    val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
-
-    val builder = vf.mapWriter
-
-    for (entry <- result) {
-      builder.put(entry._1, immutableSetToPdbSet(entry._2))
-    }
-
-    builder.done
-  }
+//  def main(args: Array[String]) {
+//    testOne
+//    //		testAll
+//  }
+//
+//  def testOne: IMap = {
+//    val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
+//
+//    val data = new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME)).asInstanceOf[ISet]
+//
+//    // convert data to remove PDB dependency
+//    val graph: HashSet[ITuple] = pdbSetToImmutableSet(data);
+//
+//    val before = Timing.getCpuTime();
+//    val results: HashMap[IConstructor, HashSet[IConstructor]] = new DominatorsScalaV1().calculateDominators(graph);
+//
+//    System.err.println("SCALA" + "\nDuration: "
+//      + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n");
+//
+//    val pdbResults: IMap = immutableMapToPdbMap(results)
+//
+//    if (LOG_BINARY_RESULTS)
+//      new BinaryValueWriter().write(pdbResults, new FileOutputStream(
+//        "data/dominators-java-without-pdb-single.bin"));
+//
+//    if (LOG_TEXTUAL_RESULTS)
+//      new StandardTextWriter().write(pdbResults, new FileWriter(
+//        "data/dominators-java-without-pdb-single.txt"));
+//
+//    return pdbResults;
+//  }
+//
+//  def testAll(sampledGraphs: IMap): ISet = {
+//    // convert data to remove PDB dependency
+//    val graphs: ArrayList[HashSet[ITuple]] = pdbMapToArrayListOfValues(sampledGraphs);
+//
+//    val resultBldr = HashSet.newBuilder[HashMap[IConstructor, HashSet[IConstructor]]]
+//
+//    val before = Timing.getCpuTime();
+//    for (graph <- graphs.asScala) {
+//      try {
+//        resultBldr += new DominatorsScalaV1().calculateDominators(graph)
+//      } catch {
+//        case e: RuntimeException => System.err.println(e.getMessage)
+//      }
+//    }
+//
+//    System.err.println("SCALA" + "\nDuration: "
+//      + ((Timing.getCpuTime() - before) / 1000000000) + " seconds\n")
+//
+//    // convert back to PDB for serialization
+//    val pdbResults = immutableSetOfMapsToSetOfMapValues(resultBldr.result);
+//
+//    if (LOG_BINARY_RESULTS)
+//      new BinaryValueWriter().write(pdbResults, new FileOutputStream(
+//        "data/dominators-scala.bin"));
+//
+//    if (LOG_TEXTUAL_RESULTS)
+//      new StandardTextWriter().write(pdbResults, new FileWriter(
+//        "data/dominators-scala.txt"));
+//
+//    return pdbResults;
+//  }
+//
+//  def pdbMapToArrayListOfValues(data: IMap): ArrayList[HashSet[ITuple]] = {
+//    // convert data to remove PDB dependency
+//    val graphs: ArrayList[HashSet[ITuple]] = new ArrayList(data.size())
+//
+//    for (key <- data.asScala) {
+//      val value = data.get(key).asInstanceOf[ISet]
+//      val convertedValueBldr = HashSet.newBuilder[ITuple]
+//      for (tuple <- value.asScala) {
+//        convertedValueBldr += tuple.asInstanceOf[ITuple]
+//      }
+//      graphs add convertedValueBldr.result
+//    }
+//
+//    graphs
+//  }
+//
+//  def immutableSetOfMapsToSetOfMapValues(result: HashSet[HashMap[IConstructor, HashSet[IConstructor]]]): ISet = {
+//    // convert back to PDB for serialization
+//    val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
+//
+//    val resultBuilder = vf.setWriter
+//
+//    for (dominatorResult <- result) {
+//      val builder = vf.mapWriter
+//      for (entry <- dominatorResult) {
+//        builder.put(entry._1, immutableSetToPdbSet(entry._2))
+//      }
+//      resultBuilder insert builder.done
+//    }
+//
+//    resultBuilder.done
+//  }
+//
+//  def pdbSetToImmutableSet(set: ISet): HashSet[ITuple] = {
+//    val bldr = HashSet.newBuilder[ITuple]
+//
+//    for (tuple <- set.asScala) {
+//      bldr += tuple.asInstanceOf[ITuple]
+//    }
+//
+//    return bldr.result
+//  }
+//
+//  def immutableSetToPdbSet[K <: IValue](set: HashSet[K]): ISet = {
+//    val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
+//
+//    val builder = vf.setWriter
+//
+//    for (key <- set) {
+//      builder.insert(key)
+//    }
+//
+//    return builder.done
+//  }
+//
+//  def immutableMapToPdbMap(
+//                            result: HashMap[IConstructor, HashSet[IConstructor]]): IMap = {
+//    // convert back to PDB for serialization
+//    val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
+//
+//    val builder = vf.mapWriter
+//
+//    for (entry <- result) {
+//      builder.put(entry._1, immutableSetToPdbSet(entry._2))
+//    }
+//
+//    builder.done
+//  }
 
   //	@SuppressWarnings("rawtypes")
   //	public final static ImmutableSet EMPTY = DefaultTrieSet.of();

@@ -47,10 +47,10 @@
 //
 // import objectexplorer.ObjectGraphMeasurer.Footprint;
 //
-// import org.rascalmpl.value.ISet;
-// import org.rascalmpl.value.ISetWriter;
-// import org.rascalmpl.value.IValue;
-// import org.rascalmpl.value.IValueFactory;
+// import io.usethesource.vallang.ISet;
+// import io.usethesource.vallang.ISetWriter;
+// import io.usethesource.vallang.IValue;
+// import io.usethesource.vallang.IValueFactory;
 // import io.usethesource.capsule.ImmutableMap;
 // import io.usethesource.capsule.ImmutableSet;
 // import io.usethesource.capsule.TrieMap_5Bits;
@@ -248,7 +248,7 @@
 // IValue>of();
 ////
 //// final BiFunction<IValue, IValue, ITuple> tupleOf = (first, second) ->
-// org.rascalmpl.value.impl.fast.Tuple
+// io.usethesource.vallang.impl.fast.Tuple
 //// .newTuple(first, second);
 ////
 //// final BiFunction<ITuple, Integer, Object> tupleElementAt = (tuple, position) -> {

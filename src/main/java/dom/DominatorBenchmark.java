@@ -10,7 +10,7 @@ package dom;
 import java.util.ArrayList;
 
 import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.value.ISet;
+import io.usethesource.vallang.ISet;
 
 public interface DominatorBenchmark {
 

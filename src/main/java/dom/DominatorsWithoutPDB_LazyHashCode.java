@@ -23,17 +23,17 @@ import io.usethesource.capsule.experimental.lazy.TrieMap_5Bits_LazyHashCode;
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 import org.openjdk.jmh.infra.Blackhole;
 import org.rascalmpl.interpreter.utils.Timing;
-import org.rascalmpl.value.IConstructor;
-import org.rascalmpl.value.IMap;
-import org.rascalmpl.value.IMapWriter;
-import org.rascalmpl.value.ISet;
-import org.rascalmpl.value.ISetWriter;
-import org.rascalmpl.value.ITuple;
-import org.rascalmpl.value.IValue;
-import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.StandardTextWriter;
-import org.rascalmpl.value.io.old.BinaryValueReader;
-import org.rascalmpl.value.io.old.BinaryValueWriter;
+import io.usethesource.vallang.IConstructor;
+import io.usethesource.vallang.IMap;
+import io.usethesource.vallang.IMapWriter;
+import io.usethesource.vallang.ISet;
+import io.usethesource.vallang.ISetWriter;
+import io.usethesource.vallang.ITuple;
+import io.usethesource.vallang.IValue;
+import io.usethesource.vallang.IValueFactory;
+import io.usethesource.vallang.io.StandardTextWriter;
+import io.usethesource.vallang.io.old.BinaryValueReader;
+import io.usethesource.vallang.io.old.BinaryValueWriter;
 
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
@@ -150,7 +150,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   }
 
   public static IMap testOne() throws IOException, FileNotFoundException {
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     ISet data =
         (ISet) new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME));
@@ -231,7 +231,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   private static ISet immutableSetOfMapsToSetOfMapValues(
       Set.Immutable<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
@@ -251,7 +251,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   private static IMap immutableMapToPdbMap(
       io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     IMapWriter builder = vf.mapWriter();
 
@@ -263,7 +263,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   }
 
   private static <K extends IValue> ISet immutableSetToPdbSet(Set.Immutable<K> set) {
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter builder = vf.setWriter();
 
@@ -278,7 +278,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   // immutableMapToPdbMap(
   // Immutable<K, V> map) {
   // IValueFactory vf =
-  // org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+  // io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
   //
   // IMapWriter builder = vf.mapWriter();
   //
@@ -300,7 +300,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   }
 
   public static void assertDominatorsEqual() throws FileNotFoundException, IOException {
-    IValueFactory vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance();
+    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     ISet dominatorsRascal =
         (ISet) new BinaryValueReader().read(vf, new FileInputStream("data/dominators-rascal.bin"));

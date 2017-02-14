@@ -17,14 +17,14 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.immutable.HashMap
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.Builder
-import org.rascalmpl.value.IConstructor
-import org.rascalmpl.value.IMap
-import org.rascalmpl.value.ISet
-import org.rascalmpl.value.ITuple
-import org.rascalmpl.value.IValue
-import org.rascalmpl.value.io.old.BinaryValueReader
-import org.rascalmpl.value.io.old.BinaryValueWriter
-import org.rascalmpl.value.io.StandardTextWriter
+import io.usethesource.vallang.IConstructor
+import io.usethesource.vallang.IMap
+import io.usethesource.vallang.ISet
+import io.usethesource.vallang.ITuple
+import io.usethesource.vallang.IValue
+import io.usethesource.vallang.io.old.BinaryValueReader
+import io.usethesource.vallang.io.old.BinaryValueWriter
+import io.usethesource.vallang.io.StandardTextWriter
 import org.rascalmpl.interpreter.utils.Timing
 import dom.AllDominatorsRunner.CURRENT_DATA_SET
 import dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME
@@ -154,7 +154,7 @@ object DominatorsScala_Default {
 	}
 
 	def testOne: IMap = {
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val data = new BinaryValueReader().read(vf, new FileInputStream(DATA_SET_SINGLE_FILE_NAME)).asInstanceOf[ISet]
 
@@ -230,7 +230,7 @@ object DominatorsScala_Default {
 
 	def immutableSetOfMapsToSetOfMapValues(result: HashSet[HashMap[IConstructor, HashSet[IConstructor]]]): ISet = {
 		// convert back to PDB for serialization
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val resultBuilder = vf.setWriter
 
@@ -256,7 +256,7 @@ object DominatorsScala_Default {
 	}
 
 	def immutableSetToPdbSet[K <: IValue](set: HashSet[K]): ISet = {
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val builder = vf.setWriter
 
@@ -270,7 +270,7 @@ object DominatorsScala_Default {
 	def immutableMapToPdbMap(
 		result: HashMap[IConstructor, HashSet[IConstructor]]): IMap = {
 		// convert back to PDB for serialization
-		val vf = org.rascalmpl.value.impl.persistent.ValueFactory.getInstance
+		val vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance
 
 		val builder = vf.mapWriter
 

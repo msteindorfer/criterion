@@ -19,17 +19,17 @@ import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.api.Set;
 import org.rascalmpl.interpreter.utils.Timing;
-import org.rascalmpl.value.IConstructor;
-import org.rascalmpl.value.IMap;
-import org.rascalmpl.value.IMapWriter;
-import org.rascalmpl.value.ISet;
-import org.rascalmpl.value.ISetWriter;
-import org.rascalmpl.value.ITuple;
-import org.rascalmpl.value.IValue;
-import org.rascalmpl.value.IValueFactory;
-import org.rascalmpl.value.io.StandardTextWriter;
-import org.rascalmpl.value.io.old.BinaryValueReader;
-import org.rascalmpl.value.io.old.BinaryValueWriter;
+import io.usethesource.vallang.IConstructor;
+import io.usethesource.vallang.IMap;
+import io.usethesource.vallang.IMapWriter;
+import io.usethesource.vallang.ISet;
+import io.usethesource.vallang.ISetWriter;
+import io.usethesource.vallang.ITuple;
+import io.usethesource.vallang.IValue;
+import io.usethesource.vallang.IValueFactory;
+import io.usethesource.vallang.io.StandardTextWriter;
+import io.usethesource.vallang.io.old.BinaryValueReader;
+import io.usethesource.vallang.io.old.BinaryValueWriter;
 
 import static dom.AllDominatorsRunner.CURRENT_DATA_SET_FILE_NAME;
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
@@ -146,8 +146,8 @@ public class DominatorsPDB {
   }
 
   public static void main(String[] args) throws FileNotFoundException, IOException {
-    testAll(org.rascalmpl.value.impl.persistent.ValueFactory.getInstance());
-    testAll(org.rascalmpl.value.impl.fast.ValueFactory.getInstance());
+    testAll(io.usethesource.vallang.impl.persistent.ValueFactory.getInstance());
+    testAll(io.usethesource.vallang.impl.fast.ValueFactory.getInstance());
   }
 
   public static IMap testOne(IValueFactory vf) throws IOException, FileNotFoundException {

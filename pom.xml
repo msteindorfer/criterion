@@ -251,11 +251,6 @@
 			<artifactId>fastutil</artifactId>
 			<version>7.0.10</version>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.rascalmpl</groupId> -->
-		<!-- <artifactId>value</artifactId> -->
-		<!-- <version>0.5.2</version> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>io.usethesource</groupId>
 			<artifactId>vallang</artifactId>
@@ -271,7 +266,7 @@
 			<groupId>io.usethesource</groupId>
 			<artifactId>capsule</artifactId>
 			<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
