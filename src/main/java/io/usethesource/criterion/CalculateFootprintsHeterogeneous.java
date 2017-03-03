@@ -7,8 +7,7 @@
  */
 package io.usethesource.criterion;
 
-import static io.usethesource.criterion.FootprintUtils.createExponentialRange;
-
+import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.math.BigInteger;
@@ -23,16 +22,30 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.mahout.math.map.OpenIntIntHashMap;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.gs.collections.impl.map.mutable.primitive.IntIntHashMap;
-
+import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
+import com.pholser.junit.quickcheck.generator.GenerationStatus;
+import com.pholser.junit.quickcheck.generator.Generator;
+import com.pholser.junit.quickcheck.generator.Size;
+import com.pholser.junit.quickcheck.generator.java.lang.IntegerGenerator;
+import com.pholser.junit.quickcheck.internal.GeometricDistribution;
+import com.pholser.junit.quickcheck.internal.generator.SimpleGenerationStatus;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import gnu.trove.map.hash.TIntIntHashMap;
-import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.api.TernaryRelation;
+import io.usethesource.capsule.api.Triple;
+import io.usethesource.capsule.core.PersistentTrieMap;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8_IntKey;
+import io.usethesource.capsule.generators.TripleGenerator;
+import io.usethesource.capsule.generators.multimap.AbstractSetMultimapGenerator;
+import io.usethesource.capsule.generators.multimap.SetMultimapGenerator_HCHAMP;
+import io.usethesource.capsule.generators.relation.AbstractTernaryRelationGenerator;
+import io.usethesource.capsule.generators.relation.BidirectionalTrieSetMultimapGenerator;
+import io.usethesource.capsule.generators.relation.TernaryTrieSetMultimapGenerator;
 import io.usethesource.criterion.BenchmarkUtils.Archetype;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
@@ -40,6 +53,10 @@ import io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset;
 import io.usethesource.criterion.api.JmhValue;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import objectexplorer.ObjectGraphMeasurer.Footprint;
+import org.apache.mahout.math.map.OpenIntIntHashMap;
+
+import static io.usethesource.criterion.BenchmarkUtils.seedFromSizeAndRun;
+import static io.usethesource.criterion.FootprintUtils.createExponentialRange;
 
 public final class CalculateFootprintsHeterogeneous {
 
@@ -47,7 +64,7 @@ public final class CalculateFootprintsHeterogeneous {
 
   static {
     /*
-     * http://stackoverflow.com/questions/1518213/read-java-jvm-startup- parameters-eg-xmx
+     * http://stackoverflow.com/questions/1518213/read-java-jvm-startup-parameters-eg-xmx
      */
     RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
     List<String> args = bean.getInputArguments();
@@ -63,16 +80,40 @@ public final class CalculateFootprintsHeterogeneous {
 
   private static int stepSizeOneToOneSelector = 2;
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InstantiationException, IllegalAccessException {
+
+    int elementCount = 1048576;
+
+    final Class<? extends AbstractSetMultimapGenerator<? extends SetMultimap.Immutable>>[] generatorClasses =
+        new Class[]{BidirectionalTrieSetMultimapGenerator.class,
+            SetMultimapGenerator_HCHAMP.class};
+
+    System.out.println("\n\n\n\n");
+
+    {
+      final String result = createAndMeasureXXX_2(TernaryTrieSetMultimapGenerator.class,
+          elementCount, 2, 2, 0, MemoryFootprintPreset.RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER);
+
+      System.out.println("\n" + result + "\n\n\n\n");
+    }
+
+    Arrays.asList(generatorClasses).forEach(clazz -> {
+      final String result = createAndMeasureXXX(clazz, elementCount, 2, 2, 0,
+          MemoryFootprintPreset.RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER);
+
+      System.out.println("\n" + result + "\n\n\n\n");
+    });
+
     // testOneConfiguration(2097152);
 
-    String userHome = System.getProperty("user.home");
-    String userHomeRelativePath =
-        "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
-    boolean appendToFile = false;
-
-    createExponentialRange(20, 21).stream().flatMap(size -> testOneConfiguration(size, 0).stream())
-        .collect(Collectors.toList());
+    // String userHome = System.getProperty("user.home");
+    // String userHomeRelativePath =
+    // "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
+    // boolean appendToFile = false;
+    //
+    // createExponentialRange(20, 21).stream().flatMap(size -> testOneConfiguration(size,
+    // 0).stream())
+    // .collect(Collectors.toList());
 
     // // createExponentialRangeWithIntermediatePoints()
     // writeToFile(Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_"
@@ -187,8 +228,8 @@ public final class CalculateFootprintsHeterogeneous {
 
     EnumSet<MemoryFootprintPreset> presets =
         EnumSet.of(MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD
-        // ,
-        // MemoryFootprintPreset.RETAINED_SIZE
+            // ,
+            // MemoryFootprintPreset.RETAINED_SIZE
         );
 
     // for (MemoryFootprintPreset preset : presets) {
@@ -202,7 +243,7 @@ public final class CalculateFootprintsHeterogeneous {
     // }
 
     return presets.stream()
-        .flatMap(preset -> Arrays.stream(new String[] {
+        .flatMap(preset -> Arrays.stream(new String[]{
             createAndMeasurePersistentMap(ValueFactoryFactory.VF_CHAMP, size, run, preset),
 
             /* Map<K, V> 3rd party libraries containing persistent data structures */
@@ -211,48 +252,48 @@ public final class CalculateFootprintsHeterogeneous {
             createAndMeasurePersistentMap(ValueFactoryFactory.VF_JAVASLANG, size, run, preset),
             createAndMeasurePersistentMap(ValueFactoryFactory.VF_PCOLLECTIONS, size, run, preset),
 
-        // /* Map<K, V> vs Multimap<K, V> */
-        // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
-        // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
-        // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
-        // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size,
-        // run, preset),
-        //
-        // /* Multimap<K, V> */
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size,
-        // multimapValueSize, stepSizeOneToOneSelector, run, preset),
-        // // TODO: investigate why it's failing
-        // //
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED,
-        // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,
-        // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED,
-        // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED,
-        // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize,
-        // stepSizeOneToOneSelector, run, preset),
-        // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize,
-        // stepSizeOneToOneSelector, run, preset),
+            // /* Map<K, V> vs Multimap<K, V> */
+            // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP, size, run, preset),
+            // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP, size, run, preset),
+            // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size, run, preset),
+            // createAndMeasureTrieMap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED, size,
+            // run, preset),
+            //
+            // /* Multimap<K, V> */
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT, size,
+            // multimapValueSize, stepSizeOneToOneSelector, run, preset),
+            // // TODO: investigate why it's failing
+            // //
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED,
+            // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,
+            // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED,
+            // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED,
+            // size, multimapValueSize, stepSizeOneToOneSelector, run, preset),
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_SCALA, size, multimapValueSize,
+            // stepSizeOneToOneSelector, run, preset),
+            // createAndMeasureTrieSetMultimap(ValueFactoryFactory.VF_CLOJURE, size, multimapValueSize,
+            // stepSizeOneToOneSelector, run, preset),
 
-        // /* Map[int, int] */
-        // createAndMeasureTrieMapHeterogeneous(data, size, run, preset, false),
-        //
-        // createAndMeasureFastUtilInt2IntOpenHashMap(data, size, run, preset),
-        // createAndMeasureMahoutMutableIntIntHashMap(data, size, run, preset),
-        // createAndMeasureTrove4jTIntIntHashMap(data, size, run, preset),
-        // createAndMeasureGsImmutableIntIntMap(data, size, run, preset),
+            // /* Map[int, int] */
+            // createAndMeasureTrieMapHeterogeneous(data, size, run, preset, false),
+            //
+            // createAndMeasureFastUtilInt2IntOpenHashMap(data, size, run, preset),
+            // createAndMeasureMahoutMutableIntIntHashMap(data, size, run, preset),
+            // createAndMeasureTrove4jTIntIntHashMap(data, size, run, preset),
+            // createAndMeasureGsImmutableIntIntMap(data, size, run, preset),
 
         /* SetMultimap */
-        // , createAndMeasureGsImmutableSetMultimap(data, size, 0, preset)
-        // , createAndMeasureGuavaImmutableSetMultimap(data, size, 0, preset)
+            // , createAndMeasureGsImmutableSetMultimap(data, size, 0, preset)
+            // , createAndMeasureGuavaImmutableSetMultimap(data, size, 0, preset)
 
-        // createAndMeasureJavaUtilHashMap(data, size, 0, preset)
-        // , createAndMeasureTrieMapHomogeneous(data, size, 0, preset)
-        // , createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
-        // , createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
-        // , createAndMeasureTrove4jTIntIntHashMap(data, size, 0, preset)
+            // createAndMeasureJavaUtilHashMap(data, size, 0, preset)
+            // , createAndMeasureTrieMapHomogeneous(data, size, 0, preset)
+            // , createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, true)
+            // , createAndMeasureTrieMapHeterogeneous(data, size, 0, preset, false)
+            // , createAndMeasureTrove4jTIntIntHashMap(data, size, 0, preset)
         })).collect(Collectors.toList());
   }
 
@@ -303,7 +344,7 @@ public final class CalculateFootprintsHeterogeneous {
 
     final MemoryFootprintPreset preset =
         MemoryFootprintPreset.RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER;
-    return Arrays.stream(new String[] {
+    return Arrays.stream(new String[]{
         /* Map[int, int] */
         createAndMeasureGuavaImmutableMap(data, size, run, preset), // Reference
         createAndMeasureTrieMapHeterogeneous_asMap(data, size, run, preset),
@@ -491,7 +532,8 @@ public final class CalculateFootprintsHeterogeneous {
       if (keyIdx % stepSizeOneToOneSelector == 0) {
         ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);
       } else {
-        io.usethesource.capsule.api.Set.Immutable<Integer> nestedSet = TrieSet_5Bits_Spec0To8_IntKey.of();
+        io.usethesource.capsule.Set.Immutable<Integer> nestedSet =
+            TrieSet_5Bits_Spec0To8_IntKey.of();
 
         for (int i = 0; i < multimapValueSize; i++) {
           nestedSet = nestedSet.__insert(i);
@@ -544,6 +586,114 @@ public final class CalculateFootprintsHeterogeneous {
     return "ERROR";
   }
 
+  public final static Size size(int min, int max) {
+    return new Size() {
+      @Override
+      public int min() {
+        return min;
+      }
+
+      @Override
+      public int max() {
+        return max;
+      }
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return Size.class;
+      }
+    };
+  }
+
+  public static String createAndMeasureXXX(
+      Class<? extends AbstractSetMultimapGenerator<? extends SetMultimap.Immutable>> generatorClass,
+      int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
+      MemoryFootprintPreset preset) {
+
+    try {
+      final AbstractSetMultimapGenerator<? extends SetMultimap.Immutable> gen =
+          generatorClass.newInstance();
+
+      gen.configure(size(elementCount, elementCount));
+
+      gen.addComponentGenerators(Arrays.asList(new IntegerGenerator(), new IntegerGenerator()));
+
+      final SourceOfRandomness random =
+          new SourceOfRandomness(new Random(seedFromSizeAndRun(elementCount, run)));
+
+      final GenerationStatus status =
+          new SimpleGenerationStatus(new GeometricDistribution(), random, 1);
+
+      final Object setMultimapInstance = gen.generate(random, status);
+
+      // System.out.println(setMultimapInstance);
+
+      return measureAndReport(setMultimapInstance, generatorClass.getName(), DataType.SET_MULTIMAP,
+          Archetype.PERSISTENT, false, elementCount, run, preset);
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    }
+
+    return "ERROR";
+  }
+
+  public static final <T> Class<T> classCast(Class clazz) {
+    return (Class<T>) clazz;
+  }
+
+  public static String createAndMeasureXXX_2(
+      Class<? extends AbstractTernaryRelationGenerator<? extends TernaryRelation.Immutable>> generatorClass,
+      int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
+      MemoryFootprintPreset preset) {
+
+    final Class<TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> targetClass = classCast(
+        TernaryRelation.Immutable.class);
+
+    final ComponentizedGenerator<TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> generator =
+        new ComponentizedGenerator(targetClass) {
+          @Override
+          public TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>> generate(
+              SourceOfRandomness sourceOfRandomness, GenerationStatus generationStatus) {
+            return null;
+          }
+        };
+
+    try {
+      final AbstractTernaryRelationGenerator<? extends TernaryRelation.Immutable> gen =
+          generatorClass.newInstance();
+
+      gen.configure(size(elementCount, elementCount));
+
+      Generator<Triple> tripleGenerator = new TripleGenerator();
+      tripleGenerator.addComponentGenerators(
+          Arrays.asList(new IntegerGenerator(), new IntegerGenerator(), new IntegerGenerator()));
+
+      gen.addComponentGenerators(Arrays.asList(new IntegerGenerator(), new IntegerGenerator(),
+          new IntegerGenerator(), tripleGenerator));
+
+      final SourceOfRandomness random =
+          new SourceOfRandomness(new Random(seedFromSizeAndRun(elementCount, run)));
+
+      final GenerationStatus status =
+          new SimpleGenerationStatus(new GeometricDistribution(), random, 1);
+
+      final Object setMultimapInstance = gen.generate(random, status);
+
+      // System.out.println(setMultimapInstance);
+
+      return measureAndReport(setMultimapInstance, generatorClass.getName(), DataType.SET_MULTIMAP,
+          Archetype.PERSISTENT, false, elementCount, run, preset);
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    }
+
+    return "ERROR";
+  }
+
   public static String createAndMeasureTrieSetMultimap(ValueFactoryFactory valueFactoryFactory,
       int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
       MemoryFootprintPreset preset) {
@@ -563,7 +713,7 @@ public final class CalculateFootprintsHeterogeneous {
 
   public static String createAndMeasureTrieMapHomogeneous(final Object[] data, int elementCount,
       int run, MemoryFootprintPreset preset) {
-    io.usethesource.capsule.api.Map.Immutable<Integer, Integer> ys = TrieMap_5Bits.of();
+    io.usethesource.capsule.Map.Immutable<Integer, Integer> ys = PersistentTrieMap.of();
 
     // for (Object v : data) {
     // ys = ys.__put(v, v);
@@ -686,7 +836,6 @@ public final class CalculateFootprintsHeterogeneous {
         Archetype.MUTABLE, false, elementCount, run, preset);
   }
 
-  @SuppressWarnings("unchecked")
   private static String measureAndReport(final Object objectToMeasure, final String className,
       DataType dataType, Archetype archetype, boolean supportsStagedMutability, int size, int run,
       MemoryFootprintPreset preset) {

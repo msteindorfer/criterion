@@ -14,18 +14,26 @@ import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
-import org.openjdk.jmh.annotations.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OperationsPerInvocation;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -315,7 +323,8 @@ public class JmhSetMultimapBenchmarks {
     // TODO: put is compatible with regular map backends that don't
     // implement insert, but won't work for real multimaps. fix it.
     testMapRealDuplicateSameSizeButDifferent =
-        testMapRealDuplicate.remove(VALUE_EXISTING).put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
+        testMapRealDuplicate.remove(VALUE_EXISTING, VALUE_EXISTING)
+            .put(VALUE_NOT_EXISTING, VALUE_NOT_EXISTING);
 
     if (testMap.size() != testMapRealDuplicateSameSizeButDifferent.size()) {
       throw new IllegalStateException();
@@ -394,7 +403,7 @@ public class JmhSetMultimapBenchmarks {
       }
     }
 
-    return new Object[] {VALUE_EXISTING, VALUE_NOT_EXISTING};
+    return new Object[]{VALUE_EXISTING, VALUE_NOT_EXISTING};
   }
 
   // @TearDown(Level.Trial)
@@ -433,6 +442,14 @@ public class JmhSetMultimapBenchmarks {
   public void timeMapLikeContainsKey(Blackhole bh) {
     for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
       bh.consume(testMap.containsKey(cachedNumbers[i]));
+    }
+  }
+
+  @Benchmark
+  @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+  public void timeMapLikeContainsValue(Blackhole bh) {
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testMap.containsValue(cachedNumbers[i]));
     }
   }
 
@@ -475,7 +492,7 @@ public class JmhSetMultimapBenchmarks {
 
   @Benchmark
   public void timeMapLikeIterationKey(Blackhole bh) {
-    for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
+    for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext(); ) {
       bh.consume(iterator.next());
     }
   }
@@ -483,7 +500,7 @@ public class JmhSetMultimapBenchmarks {
   @Benchmark
   public void timeMapLikeIterationNativeEntry(Blackhole bh) {
     for (Iterator<java.util.Map.Entry<JmhValue, Object>> iterator =
-        testMap.nativeEntryIterator(); iterator.hasNext();) {
+        testMap.nativeEntryIterator(); iterator.hasNext(); ) {
       bh.consume(iterator.next());
     }
   }
@@ -498,7 +515,7 @@ public class JmhSetMultimapBenchmarks {
   @Benchmark
   public void timeMultimapLikeIterationFlattenedEntry(Blackhole bh) {
     for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator =
-        testMap.entryIterator(); iterator.hasNext();) {
+        testMap.entryIterator(); iterator.hasNext(); ) {
       bh.consume(iterator.next());
     }
   }
@@ -647,9 +664,13 @@ public class JmhSetMultimapBenchmarks {
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 
+    // timeMultimapLikeKeySet*EqualsCanonicalSet, timeMultimapLike*
+    // (timeMapLikeContainsValue|timeMultimapLikeInsertTuple|timeMultimapLikeRemoveTuple)
+
     // @formatter:off
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName() + ".timeMultimapLikeKeySet*EqualsCanonicalSet*") // timeMultimapLikeKeySet*EqualsCanonicalSet, timeMultimapLike*
+        .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
+            + ".(timeMultimapLikeInsertTuple)")
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
         .warmupIterations(10)
@@ -671,6 +692,7 @@ public class JmhSetMultimapBenchmarks {
 //        .param("size", "8388608")
         .param("multimapValueSize", "2") // 2
         .param("stepSizeOneToOneSelector", "2") // 2
+        .param("valueFactoryFactory", "VF_BINARY_RELATION")
 //        .param("valueFactoryFactory", "VF_CHAMP")
 //        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")

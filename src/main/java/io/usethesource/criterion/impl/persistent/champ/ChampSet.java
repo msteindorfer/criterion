@@ -7,11 +7,11 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import io.usethesource.capsule.api.Set;
+import java.util.Iterator;
+
+import io.usethesource.capsule.Set;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
-
-import java.util.Iterator;
 
 /*
  * Operates: * without types * with equals() instead of isEqual()

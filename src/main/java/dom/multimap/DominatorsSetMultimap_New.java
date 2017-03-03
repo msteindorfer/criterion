@@ -18,10 +18,8 @@ import java.util.NoSuchElementException;
 import dom.DominatorBenchmark;
 import io.usethesource.capsule.api.experimental.Set;
 import io.usethesource.capsule.api.experimental.SetMultimap;
-import io.usethesource.capsule.core.TrieSet;
+import io.usethesource.capsule.core.experimental.TrieSet;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
-import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
 import io.usethesource.vallang.IConstructor;
 import io.usethesource.vallang.IMap;
 import io.usethesource.vallang.IMapWriter;
@@ -31,6 +29,8 @@ import io.usethesource.vallang.ITuple;
 import io.usethesource.vallang.IValue;
 import io.usethesource.vallang.IValueFactory;
 import io.usethesource.vallang.io.old.BinaryValueReader;
+import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.interpreter.utils.Timing;
 
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.multimap.Util_New.EMPTY;
@@ -48,7 +48,6 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
     Set.Transient<Set.Immutable<IConstructor>> result = TrieSet.transientOf();
 
     for (IConstructor p : preds) {
-      @SuppressWarnings("unchecked")
       Set.Immutable<IConstructor> ps = dom.apply(p).orElse(EMPTY);
       result.insert(ps);
     }
@@ -99,7 +98,6 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
       SetMultimap.Transient<IConstructor, IConstructor> newDom = TrieSetMultimap.transientOf();
 
       for (IConstructor n : nodes) {
-        @SuppressWarnings("unchecked")
         Set.Immutable<IConstructor> ps = preds.apply(n).orElse(EMPTY);
 
         Set.Immutable<Set.Immutable<IConstructor>> sos = setofdomsets(dom, ps);
@@ -207,13 +205,13 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   private static ISet ImmutableSetOfMapsToSetOfMapValues(
-      Set.Immutable<io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
+      Set.Immutable<io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     ISetWriter resultBuilder = vf.setWriter();
 
-    for (io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
+    for (io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
       for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult
@@ -228,7 +226,7 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   private static IMap immutableMapToPdbMap(
-      io.usethesource.capsule.api.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
+      io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> result) {
     // convert back to PDB for serialization
     IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
@@ -276,7 +274,6 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
     for (Set.Immutable<ITuple> graph : (ArrayList<Set.Immutable<ITuple>>) sampledGraphsNative) {
@@ -311,13 +308,11 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
 
 class Util_New {
 
-  @SuppressWarnings("rawtypes")
   public final static Set.Immutable EMPTY = TrieSet.of();
 
   /*
    * Intersect many sets.
    */
-  @SuppressWarnings("unchecked")
   public static <K> Set.Immutable<K> intersect(Set.Immutable<Set.Immutable<K>> sets) {
     if (sets == null || sets.isEmpty() || sets.contains(EMPTY)) {
       return EMPTY;
@@ -366,7 +361,7 @@ class Util_New {
     final Set.Transient<K> tmp = smaller.asTransient();
     boolean modified = false;
 
-    for (Iterator<K> it = tmp.iterator(); it.hasNext();) {
+    for (Iterator<K> it = tmp.iterator(); it.hasNext(); ) {
       final K key = it.next();
       if (!bigger.contains(key)) {
         it.remove();
@@ -467,7 +462,6 @@ class Util_New {
    * Flattening of a set (of ITuple elements). Because of the untyped nature of ITuple, the
    * implementation is not strongly typed.
    */
-  @SuppressWarnings("unchecked")
   public static <K extends Iterable<?>, T> Set.Immutable<T> carrier(Set.Immutable<K> set1) {
     Set.Transient<Object> builder = TrieSet.transientOf();
 
@@ -483,7 +477,6 @@ class Util_New {
   /*
    * Projection from a tuple to single field.
    */
-  @SuppressWarnings("unchecked")
   public static <K extends IValue> Set.Immutable<K> project(Set.Immutable<ITuple> set1, int field) {
     Set.Transient<K> builder = TrieSet.transientOf();
 
@@ -510,7 +503,6 @@ class Util_New {
   /*
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
-  @SuppressWarnings("unchecked")
   public static <K, V> SetMultimap.Immutable<K, V> toMultimap(Set.Immutable<ITuple> st) {
     SetMultimap.Transient<K, V> mm = TrieSetMultimap.transientOf();
 

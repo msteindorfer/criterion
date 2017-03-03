@@ -53,9 +53,9 @@
 // import io.usethesource.vallang.IValueFactory;
 // import io.usethesource.capsule.ImmutableMap;
 // import io.usethesource.capsule.ImmutableSet;
-// import io.usethesource.capsule.TrieMap_5Bits;
+// import io.usethesource.capsule.PersistentTrieMap;
 // import io.usethesource.capsule.TrieMap_5Bits_Memoized_LazyHashCode;
-// import io.usethesource.capsule.TrieSet_5Bits;
+// import io.usethesource.capsule.PersistentTrieSet;
 // import io.usethesource.capsule.TrieSet_5Bits_Memoized_LazyHashCode;
 //
 // import scala.Tuple2;
@@ -222,7 +222,7 @@
 // }
 //
 //// public static void timeTrieMultimap(final ISet testSet, int elementCount, int run) {
-////// ImmutableSet<IValue> xs = TrieSet_5Bits.<IValue>of();
+////// ImmutableSet<IValue> xs = PersistentTrieSet.<IValue>of();
 //// ImmutableSetMultimap<IValue, IValue> ys = TrieSetMultimap_BleedingEdge.<IValue, IValue>of();
 ////
 //// for (IValue v : testSet) {
@@ -234,9 +234,9 @@
 //// }
 ////
 ////// // statistics should exactly match, thus only printing them once
-////// ((TrieSet_5Bits) xs).printStatistics();
+////// ((PersistentTrieSet) xs).printStatistics();
 ////
-////// if (reportSet) measureAndReport(xs, "io.usethesource.capsule.TrieSet_5Bits", DataType.SET,
+////// if (reportSet) measureAndReport(xs, "io.usethesource.capsule.PersistentTrieSet", DataType.SET,
 // Archetype.PERSISTENT, false, elementCount, run);
 //// if (reportMap) measureAndReport(ys, "io.usethesource.capsule.TrieSetMultimap_BleedingEdge",
 // DataType.MULTIMAP, Archetype.PERSISTENT, false, elementCount, run);
@@ -265,7 +265,7 @@
 //// ImmutableSet<ITuple> xs = new ImmutableSetMultimapAsImmutableSetView<IValue, IValue,
 // ITuple>(multimap, tupleOf,
 //// tupleElementAt);
-////// ImmutableMap<IValue, IValue> ys = TrieMap_5Bits.<IValue, IValue>of();
+////// ImmutableMap<IValue, IValue> ys = PersistentTrieMap.<IValue, IValue>of();
 ////
 //// for (IValue v : testSet) {
 //// if (reportSet) xs = xs.__insert((ITuple) v);
@@ -273,7 +273,7 @@
 //// }
 ////
 ////// // statistics should exactly match, thus only printing them once
-////// ((TrieSet_5Bits) xs).printStatistics();
+////// ((PersistentTrieSet) xs).printStatistics();
 ////
 //// if (reportSet) measureAndReport(xs,
 // "io.usethesource.capsule.ImmutableSetMultimapAsImmutableSetView", DataType.SET,
@@ -284,8 +284,8 @@
 //// }
 //
 // public void timeTrieSet0To4(final ISet testSet, int elementCount, int run) {
-//// TransientSet<IValue> transientSet = TrieSet0To4.<IValue>transientOf();
-//// TransientMap<IValue, IValue> transientMap = TrieMap0To4.<IValue, IValue>transientOf();
+//// TransientSet<IValue> transientSet = TrieSet0To4.<IValue>of();
+//// TransientMap<IValue, IValue> transientMap = TrieMap0To4.<IValue, IValue>of();
 ////
 //// for (IValue v : testSet) {
 //// if (reportSet) transientSet.__insert(v);
@@ -302,8 +302,8 @@
 // }
 //
 // public void timeTrieSet0To8(final ISet testSet, int elementCount, int run) {
-//// TransientSet<IValue> transientSet = TrieSet0To8.<IValue>transientOf();
-//// TransientMap<IValue, IValue> transientMap = TrieMap0To8.<IValue, IValue>transientOf();
+//// TransientSet<IValue> transientSet = TrieSet0To8.<IValue>of();
+//// TransientMap<IValue, IValue> transientMap = TrieMap0To8.<IValue, IValue>of();
 ////
 //// for (IValue v : testSet) {
 //// if (reportSet) transientSet.__insert(v);
@@ -320,8 +320,8 @@
 // }
 //
 // public void timeTrieSet0To12(final ISet testSet, int elementCount, int run) {
-//// TransientSet<IValue> transientSet = TrieSet0To12.<IValue>transientOf();
-//// TransientMap<IValue, IValue> transientMap = TrieMap0To12.<IValue, IValue>transientOf();
+//// TransientSet<IValue> transientSet = TrieSet0To12.<IValue>of();
+//// TransientMap<IValue, IValue> transientMap = TrieMap0To12.<IValue, IValue>of();
 ////
 //// for (IValue v : testSet) {
 //// if (reportSet) transientSet.__insert(v);
@@ -339,9 +339,9 @@
 //
 // public void timeTrieSetSpecializationWithUntypedVariables(final ISet testSet, int elementCount,
 // int run) {
-//// TransientSet<IValue> transientSet = TrieSet_5Bits_Untyped_Spec0To8.<IValue>transientOf();
+//// TransientSet<IValue> transientSet = TrieSet_5Bits_Untyped_Spec0To8.<IValue>of();
 //// TransientMap<IValue, IValue> transientMap = TrieMap_5Bits_Untyped_Spec0To8.<IValue,
-// IValue>transientOf();
+// IValue>of();
 ////
 //// for (IValue v : testSet) {
 //// if (reportSet) transientSet.__insert(v);
@@ -363,8 +363,8 @@
 // }
 //
 // public static void timeTrieSet_BleedingEdge(final ISet testSet, int elementCount, int run) {
-//// TransientSet<IValue> transientSet = TrieSet_BleedingEdge.<IValue>transientOf();
-//// TransientMap<IValue, IValue> transientMap = TrieMap_BleedingEdge.<IValue, IValue>transientOf();
+//// TransientSet<IValue> transientSet = TrieSet_BleedingEdge.<IValue>of();
+//// TransientMap<IValue, IValue> transientMap = TrieMap_BleedingEdge.<IValue, IValue>of();
 ////
 //// for (IValue v : testSet) {
 //// if (reportSet) transientSet.__insert(v);
@@ -383,9 +383,9 @@
 // // TODO
 // public void timeTrieSetSpecializationInt(final java.util.Set<java.lang.Integer> testSet, int
 // elementCount, int run) {
-//// TransientSet<java.lang.Integer> transientSet = TrieSet_IntKey_IntValue.transientOf();
+//// TransientSet<java.lang.Integer> transientSet = TrieSet_IntKey_IntValue.of();
 //// TransientMap<java.lang.Integer, java.lang.Integer> transientMap =
-// TrieMap_IntKey_IntValue.<IValue, IValue>transientOf();
+// TrieMap_IntKey_IntValue.<IValue, IValue>of();
 ////
 //// for (int v : testSet) {
 //// if (reportSet) transientSet.__insert(v);
@@ -737,7 +737,7 @@
 //
 // timeTrieSet(testSet, count, currentRun,
 // Optional.of(VF_PDB_PERSISTENT_CURRENT.toString()),
-// TrieSet_5Bits.class, TrieMap_5Bits.class);
+// PersistentTrieSet.class, PersistentTrieMap.class);
 //
 //// timeTrieSet(testSet, count, currentRun,
 //// Optional.of(VF_PDB_PERSISTENT_LAZY.toString()),

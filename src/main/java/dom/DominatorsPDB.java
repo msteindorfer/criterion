@@ -15,10 +15,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.usethesource.capsule.DefaultTrieMap;
-import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.api.Set;
-import org.rascalmpl.interpreter.utils.Timing;
+import io.usethesource.capsule.Set;
+import io.usethesource.capsule.Set.Transient;
 import io.usethesource.vallang.IConstructor;
 import io.usethesource.vallang.IMap;
 import io.usethesource.vallang.IMapWriter;
@@ -30,14 +28,15 @@ import io.usethesource.vallang.IValueFactory;
 import io.usethesource.vallang.io.StandardTextWriter;
 import io.usethesource.vallang.io.old.BinaryValueReader;
 import io.usethesource.vallang.io.old.BinaryValueWriter;
+import org.rascalmpl.interpreter.utils.Timing;
 
 import static dom.AllDominatorsRunner.CURRENT_DATA_SET_FILE_NAME;
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
 import static dom.AllDominatorsRunner.LOG_TEXTUAL_RESULTS;
 
-@SuppressWarnings("deprecation")
 public class DominatorsPDB {
+
   public final IValueFactory vf;
   public final ISet EMPTY;
 
@@ -206,8 +205,8 @@ public class DominatorsPDB {
   /*
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
-  @SuppressWarnings("unchecked")
-  public static <K, V> io.usethesource.capsule.api.Map.Immutable<K, Set.Immutable<V>> toMap(ISet st) {
+  public static <K, V> io.usethesource.capsule.Map.Immutable<K, Set.Immutable<V>> toMap(
+      ISet st) {
     Map<K, Set.Transient<V>> hm = new HashMap<>();
 
     for (IValue v : st) {
@@ -216,13 +215,14 @@ public class DominatorsPDB {
       V val = (V) t.get(1);
       Set.Transient<V> wValSet = hm.get(key);
       if (wValSet == null) {
-        wValSet = DefaultTrieSet.transientOf();
+        wValSet = Transient.of();
         hm.put(key, wValSet);
       }
       wValSet.__insert(val);
     }
 
-    io.usethesource.capsule.api.Map.Transient<K, Set.Immutable<V>> w = DefaultTrieMap.transientOf();
+    io.usethesource.capsule.Map.Transient<K, Set.Immutable<V>> w = io.usethesource.capsule.Map
+        .transientOf();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

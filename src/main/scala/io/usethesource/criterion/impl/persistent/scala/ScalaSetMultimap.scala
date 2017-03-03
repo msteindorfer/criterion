@@ -54,6 +54,8 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
   override def containsKey(k: JmhValue) = xs contains k
 
+	override def containsValue(v: JmhValue) = xs containsValue v
+
   override def contains(k: JmhValue, v: JmhValue) = entryExists(k, _ == v)
 	
 //	override def get(k: JmhValue) = xs getOrElse(k, null)

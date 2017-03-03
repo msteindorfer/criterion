@@ -23,9 +23,9 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.PersistentHashMap;
 import clojure.lang.PersistentHashSet;
-import io.usethesource.capsule.api.Map;
-import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.Map;
+import io.usethesource.capsule.core.PersistentTrieMap;
+import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.criterion.BenchmarkUtils.Archetype;
@@ -79,9 +79,9 @@ public final class CalculateFootprints {
   public static String measureFootprintOfPersistentChampSet(final Set<JmhValue> testSet,
       int elementCount, int run, Optional<String> shortName, final Class<?> clazz) {
 
-    @SuppressWarnings("unchecked")
-    io.usethesource.capsule.api.Set.Immutable<JmhValue> set =
-        (io.usethesource.capsule.api.Set.Immutable<JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(clazz);
+    io.usethesource.capsule.Set.Immutable<JmhValue> set =
+        (io.usethesource.capsule.Set.Immutable<JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(
+            clazz);
 
     for (JmhValue v : testSet) {
       set = set.__insert(v);
@@ -95,7 +95,6 @@ public final class CalculateFootprints {
   public static String measureFootprintOfPersistentChampMap(final Set<JmhValue> testSet,
       int elementCount, int run, Optional<String> shortName, final Class<?> clazz) {
 
-    @SuppressWarnings("unchecked")
     Map.Immutable<JmhValue, JmhValue> map =
         (Map.Immutable<JmhValue, JmhValue>) invokeFactoryMethodAndYieldEmptyInstance(clazz);
 
@@ -181,7 +180,7 @@ public final class CalculateFootprints {
 
         if (reportSet) {
           results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), TrieSet_5Bits.class));
+              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieSet.class));
 
           results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
@@ -196,7 +195,7 @@ public final class CalculateFootprints {
 
         if (reportMap) {
           results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), TrieMap_5Bits.class));
+              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieMap.class));
 
           results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),

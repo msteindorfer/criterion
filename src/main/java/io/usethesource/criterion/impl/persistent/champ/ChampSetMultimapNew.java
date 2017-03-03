@@ -7,12 +7,12 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import io.usethesource.capsule.api.experimental.SetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
-
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 public final class ChampSetMultimapNew implements JmhSetMultimap {
 
@@ -55,6 +55,11 @@ public final class ChampSetMultimapNew implements JmhSetMultimap {
   @Override
   public boolean containsKey(JmhValue key) {
     return content.contains(key);
+  }
+
+  @Override
+  public boolean containsValue(JmhValue value) {
+    return content.contains(value);
   }
 
   @Override

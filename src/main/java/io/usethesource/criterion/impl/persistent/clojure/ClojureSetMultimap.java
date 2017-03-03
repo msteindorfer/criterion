@@ -7,17 +7,17 @@
  */
 package io.usethesource.criterion.impl.persistent.clojure;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import clojure.lang.APersistentMap;
 import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.PersistentHashSet;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
@@ -106,6 +106,11 @@ public class ClojureSetMultimap implements JmhSetMultimap {
   @Override
   public boolean containsKey(JmhValue key) {
     return xs.containsKey(key);
+  }
+
+  @Override
+  public boolean containsValue(JmhValue value) {
+    return ((APersistentMap) xs).values().contains(value);
   }
 
   @Override

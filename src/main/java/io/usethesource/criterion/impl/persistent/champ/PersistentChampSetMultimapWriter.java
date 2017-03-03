@@ -8,7 +8,7 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.SetMultimapFactory;
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.SetMultimap;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 

@@ -26,6 +26,8 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 
   boolean containsKey(JmhValue key);
 
+  boolean containsValue(JmhValue value);
+
   boolean contains(JmhValue key, JmhValue value);
 
   // JmhValue get(JmhValue key);
