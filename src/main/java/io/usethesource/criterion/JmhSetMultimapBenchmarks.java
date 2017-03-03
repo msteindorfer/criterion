@@ -7,6 +7,11 @@
  */
 package io.usethesource.criterion;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
@@ -14,10 +19,6 @@ import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.api.JmhValueFactory;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -670,13 +671,13 @@ public class JmhSetMultimapBenchmarks {
     // @formatter:off
     Options opt = new OptionsBuilder()
         .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-            + ".(timeMultimapLikeInsertTuple)")
+            + ".timeMapLikePut.*")
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
         .warmupIterations(10)
         .warmupTime(TimeValue.seconds(1))
         .measurementIterations(10)
-        .forks(1)
+        .forks(0)
         .shouldDoGC(true)
         .param("dataType", "SET_MULTIMAP")
         .param("run", "0")
@@ -690,20 +691,20 @@ public class JmhSetMultimapBenchmarks {
         .param("size", "2048")
 //        .param("size", "1048576")
 //        .param("size", "8388608")
-        .param("multimapValueSize", "2") // 2
-        .param("stepSizeOneToOneSelector", "2") // 2
-        .param("valueFactoryFactory", "VF_BINARY_RELATION")
+        .param("multimapValueSize", "1") // 2
+        .param("stepSizeOneToOneSelector", "1") // 2
+//        .param("valueFactoryFactory", "VF_BINARY_RELATION")
 //        .param("valueFactoryFactory", "VF_CHAMP")
 //        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
-//        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
+        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
+//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
-        .param("valueFactoryFactory", "VF_SCALA")
+//        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();
     // @formatter:on
