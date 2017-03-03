@@ -222,7 +222,7 @@ public class DominatorsPDB {
     }
 
     io.usethesource.capsule.Map.Transient<K, Set.Immutable<V>> w = io.usethesource.capsule.Map
-        .transientOf();
+        .Transient.of();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

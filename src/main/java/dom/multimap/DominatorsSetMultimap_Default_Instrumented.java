@@ -606,7 +606,7 @@ class Util_Default_Instrumented {
     }
 
     io.usethesource.capsule.Map.Transient<K, Set.Immutable<V>> w =
-        io.usethesource.capsule.Map.transientOf();
+        io.usethesource.capsule.Map.Transient.of();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

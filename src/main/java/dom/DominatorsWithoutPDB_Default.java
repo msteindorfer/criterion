@@ -90,7 +90,7 @@ public class DominatorsWithoutPDB_Default implements DominatorBenchmark {
     // nodes = nodes.delete(n0);
 
     io.usethesource.capsule.Map.Transient<IConstructor, Set.Immutable<IConstructor>> w = io.usethesource.capsule.Map
-        .transientOf();
+        .Transient.of();
     w.__put(n0, Immutable.of(n0));
     for (IConstructor n : nodes.__remove(n0)) {
       w.__put(n, nodes);
@@ -98,7 +98,7 @@ public class DominatorsWithoutPDB_Default implements DominatorBenchmark {
     io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dom = w
         .freeze();
 
-    io.usethesource.capsule.Map.Immutable prev = io.usethesource.capsule.Map.of();
+    io.usethesource.capsule.Map.Immutable prev = io.usethesource.capsule.Map.Immutable.of();
     /*
      * solve (dom) for (n <- nodes) dom[n] = {n} + intersect({dom[p] | p <- preds[n]?{}});
      */
@@ -106,7 +106,7 @@ public class DominatorsWithoutPDB_Default implements DominatorBenchmark {
       prev = dom;
 
       io.usethesource.capsule.Map.Transient<IConstructor, Set.Immutable<IConstructor>> newDom = io.usethesource.capsule.Map
-          .transientOf();
+          .Transient.of();
 
       for (IConstructor n : nodes) {
         Set.Immutable ps = preds.get(n);
@@ -560,7 +560,7 @@ class Util_Default {
     }
 
     io.usethesource.capsule.Map.Transient<K, Set.Immutable<V>> w = io.usethesource.capsule.Map
-        .transientOf();
+        .Transient.of();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }
