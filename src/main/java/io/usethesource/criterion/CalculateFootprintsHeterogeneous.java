@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,8 +106,12 @@ public final class CalculateFootprintsHeterogeneous {
   private static int stepSizeOneToOneSelector = 2;
 
   public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-    final String userHome = System.getProperty("user.home");
-    final String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
+//    final String userHome = System.getProperty("user.home");
+//    final String userHomeRelativePath = "Research/datastructures-for-metaprogramming/hamt-heterogeneous/data";
+//    final Path directoryPath = Paths.get(userHome, userHomeRelativePath);
+
+    final Path directoryPath = Paths.get(".", "target").toAbsolutePath().normalize();
+
     final boolean appendToFile = false;
 
     final int numberOfRuns = 1;
@@ -122,40 +127,40 @@ public final class CalculateFootprintsHeterogeneous {
             (size, run) -> measurePersistentMultimaps(size, run, DATA_STRUCTURE_OVERHEAD).stream());
 
     writeToFile(
-        Paths.get(userHome, userHomeRelativePath,
-            "map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"),
-        appendToFile,
-        product(exponentialSizes, runs).stream()
-            .flatMap(measureAllMultimaps)
-            .collect(Collectors.toList()));
-
-    writeToFile(
-        Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_tiny.csv"),
+        directoryPath.resolve("map_sizes_heterogeneous_tiny.csv"),
         appendToFile,
         product(rangeInclusive(0, 100, 1), runs).stream()
             .flatMap(measureAllMultimaps)
             .collect(Collectors.toList()));
 
     writeToFile(
-        Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_small.csv"),
+        directoryPath.resolve("map_sizes_heterogeneous_small.csv"),
         appendToFile,
         product(rangeInclusive(100, 10_000, 100), runs).stream()
             .flatMap(measureAllMultimaps)
             .collect(Collectors.toList()));
 
 //    writeToFile(
-//        Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_medium.csv"),
+//        directoryPath.resolve("map_sizes_heterogeneous_medium.csv"),
 //        appendToFile,
 //        product(rangeInclusive(10_000, 100_000, 1_000), runs).stream()
 //            .flatMap(measureAllMultimaps)
 //            .collect(Collectors.toList()));
 //
 //    writeToFile(
-//        Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_large.csv"),
+//        directoryPath.resolve("map_sizes_heterogeneous_large.csv"),
 //        appendToFile,
 //        product(rangeInclusive(100_000, 8_000_000, 100_000), runs).stream()
 //            .flatMap(measureAllMultimaps)
 //            .collect(Collectors.toList()));
+
+    writeToFile(
+        directoryPath
+            .resolve("map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"),
+        appendToFile,
+        product(exponentialSizes, runs).stream()
+            .flatMap(measureAllMultimaps)
+            .collect(Collectors.toList()));
 
     /*
      * PRIMITIVE DATA
@@ -167,7 +172,7 @@ public final class CalculateFootprintsHeterogeneous {
                 RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER).stream());
 
     writeToFile(
-        Paths.get(userHome, userHomeRelativePath, "map_sizes_heterogeneous_exponential_"
+        directoryPath.resolve("map_sizes_heterogeneous_exponential_"
             + memoryArchitecture + "_primitive_latest.csv"),
         appendToFile,
         product(exponentialSizes, runs).stream()
