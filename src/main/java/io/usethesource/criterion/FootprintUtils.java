@@ -17,7 +17,6 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-
 import io.usethesource.criterion.BenchmarkUtils.Archetype;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.api.JmhValue;
@@ -67,6 +66,18 @@ public final class FootprintUtils {
         memoryFootprint.getReferences());
 
     return statFileString;
+  }
+
+  static List<Integer> rangeInclusive(int first, int last) {
+    return createLinearRange(first, last + 1, 1);
+  }
+
+  static List<Integer> rangeExclusive(int first, int afterLast) {
+    return createLinearRange(first, afterLast, 1);
+  }
+
+  static List<Integer> rangeInclusive(int first, int last, int stride) {
+    return createLinearRange(first, last + stride, stride);
   }
 
   static List<Integer> createLinearRange(int start, int end, int stride) {
