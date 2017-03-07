@@ -116,7 +116,8 @@ public final class CalculateFootprintsHeterogeneous {
 
     final int numberOfRuns = 1;
 
-    final List<Integer> exponentialSizes = createExponentialRangeWithIntermediatePoints();
+    final List<Integer> sizes = Arrays
+        .asList(16, 2048, 1048576, 8388608); // createExponentialRangeWithIntermediatePoints();
     final List<Integer> runs = rangeExclusive(0, numberOfRuns);
 
 //    final EnumSet<MemoryFootprintPreset> presets = EnumSet
@@ -133,13 +134,13 @@ public final class CalculateFootprintsHeterogeneous {
             .flatMap(measureAllMultimaps)
             .collect(Collectors.toList()));
 
-    writeToFile(
-        directoryPath.resolve("map_sizes_heterogeneous_small.csv"),
-        appendToFile,
-        product(rangeInclusive(100, 10_000, 100), runs).stream()
-            .flatMap(measureAllMultimaps)
-            .collect(Collectors.toList()));
-
+//    writeToFile(
+//        directoryPath.resolve("map_sizes_heterogeneous_small.csv"),
+//        appendToFile,
+//        product(rangeInclusive(100, 10_000, 100), runs).stream()
+//            .flatMap(measureAllMultimaps)
+//            .collect(Collectors.toList()));
+//
 //    writeToFile(
 //        directoryPath.resolve("map_sizes_heterogeneous_medium.csv"),
 //        appendToFile,
@@ -158,26 +159,26 @@ public final class CalculateFootprintsHeterogeneous {
         directoryPath
             .resolve("map_sizes_heterogeneous_exponential_" + memoryArchitecture + "_latest.csv"),
         appendToFile,
-        product(exponentialSizes, runs).stream()
+        product(sizes, runs).stream()
             .flatMap(measureAllMultimaps)
             .collect(Collectors.toList()));
 
-    /*
-     * PRIMITIVE DATA
-     */
-
-    final Function<Map.Entry<Integer, Integer>, Stream<String>> measureAllPrimitiveMultimaps =
-        (sizeRunTuple) -> extractAndApply(sizeRunTuple,
-            (size, run) -> measureMutablePrimitiveMaps(size, run,
-                RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER).stream());
-
-    writeToFile(
-        directoryPath.resolve("map_sizes_heterogeneous_exponential_"
-            + memoryArchitecture + "_primitive_latest.csv"),
-        appendToFile,
-        product(exponentialSizes, runs).stream()
-            .flatMap(measureAllPrimitiveMultimaps)
-            .collect(Collectors.toList()));
+//    /*
+//     * PRIMITIVE DATA
+//     */
+//
+//    final Function<Map.Entry<Integer, Integer>, Stream<String>> measureAllPrimitiveMultimaps =
+//        (sizeRunTuple) -> extractAndApply(sizeRunTuple,
+//            (size, run) -> measureMutablePrimitiveMaps(size, run,
+//                RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER).stream());
+//
+//    writeToFile(
+//        directoryPath.resolve("map_sizes_heterogeneous_exponential_"
+//            + memoryArchitecture + "_primitive_latest.csv"),
+//        appendToFile,
+//        product(sizes, runs).stream()
+//            .flatMap(measureAllPrimitiveMultimaps)
+//            .collect(Collectors.toList()));
   }
 
   public static List<String> measurePersistentMultimaps(int size, int run,
