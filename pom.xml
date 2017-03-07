@@ -39,10 +39,10 @@
     <maven.compiler.source>1.8</maven.compiler.source>
 
     <!-- JMH (internal customized build) -->
-    <!-- <jmh.version>1.11-SNAPSHOT</jmh.version> -->
+    <jmh.version>1.11-MAD-SNAPSHOT</jmh.version>
 
     <!-- JMH (off-the-shelf) -->
-    <jmh.version>1.13</jmh.version>
+    <!-- <jmh.version>1.13</jmh.version> -->
 
     <gs-collections.version>7.0.3</gs-collections.version>
   </properties>
