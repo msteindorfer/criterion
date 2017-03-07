@@ -648,24 +648,24 @@ public class JmhSetMultimapBenchmarks {
   // }
 
   @Benchmark
-  public void timeMultimapLikeKeySet(Blackhole bh) {
+  public void timeKeySet(Blackhole bh) {
     bh.consume(testMap.keySet());
   }
 
   @Benchmark
-  public void timeMultimapLikeKeySetEqualsCanonicalSet(Blackhole bh) {
+  public void timeKeySetEqualsCanonicalSet(Blackhole bh) {
     bh.consume(testMap.keySet().equals(canonicalKeySet));
   }
 
   @Benchmark
-  public void timeMultimapLikeKeySetCachedEqualsCanonicalSet(Blackhole bh) {
+  public void timeKeySetCachedEqualsCanonicalSet(Blackhole bh) {
     bh.consume(cachedKeySet.equals(canonicalKeySet));
   }
 
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhSetMultimapBenchmarks.class.getSimpleName());
 
-    // timeMultimapLikeKeySet*EqualsCanonicalSet, timeMultimapLike*
+    // timeKeySet*EqualsCanonicalSet, timeMultimapLike*
     // (timeMapLikeContainsValue|timeMultimapLikeInsertTuple|timeMultimapLikeRemoveTuple)
 
     // @formatter:off
