@@ -25,6 +25,7 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Speci
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 import io.usethesource.criterion.api.JmhValueFactory;
+import io.usethesource.criterion.impl.immutable.guava.ImmutableGuavaValueFactory;
 
 public class BenchmarkUtils {
 
@@ -70,6 +71,12 @@ public class BenchmarkUtils {
       @Override
       public JmhValueFactory getInstance() {
         return new io.usethesource.criterion.impl.persistent.pcollections.PcollectionsValueFactory();
+      }
+    },
+    VF_GUAVA_IMMUTABLE {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new ImmutableGuavaValueFactory();
       }
     },
     VF_CHAMP_MEMOIZED {

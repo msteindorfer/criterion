@@ -11,6 +11,12 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import io.usethesource.criterion.BenchmarkUtils.DataType;
+import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
+import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
+import io.usethesource.criterion.api.JmhSet;
+import io.usethesource.criterion.api.JmhValue;
+import io.usethesource.criterion.api.JmhValueFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -27,13 +33,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-
-import io.usethesource.criterion.BenchmarkUtils.DataType;
-import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
-import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
-import io.usethesource.criterion.api.JmhSet;
-import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.api.JmhValueFactory;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -245,7 +244,7 @@ public class JmhSetBenchmarks {
 
   @Benchmark
   public void timeIteration(Blackhole bh) {
-    for (Iterator<JmhValue> iterator = testSet.iterator(); iterator.hasNext();) {
+    for (Iterator<JmhValue> iterator = testSet.iterator(); iterator.hasNext(); ) {
       bh.consume(iterator.next());
     }
   }
@@ -305,6 +304,16 @@ public class JmhSetBenchmarks {
   @Benchmark
   public void timeEqualsDeltaDuplicate(Blackhole bh) {
     bh.consume(testSet.equals(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeSize(Blackhole bh) {
+    bh.consume(testSet.size());
+  }
+
+  @Benchmark
+  public void timeHashCode(Blackhole bh) {
+    bh.consume(testSet.hashCode());
   }
 
   public static void main(String[] args) throws RunnerException {

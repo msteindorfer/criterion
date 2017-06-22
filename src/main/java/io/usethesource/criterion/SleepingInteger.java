@@ -7,10 +7,9 @@
  */
 package io.usethesource.criterion;
 
+import io.usethesource.criterion.api.JmhValue;
 import org.openjdk.jmh.annotations.CompilerControl;
 import org.openjdk.jmh.annotations.CompilerControl.Mode;
-
-import io.usethesource.criterion.api.JmhValue;
 
 @CompilerControl(Mode.DONT_INLINE)
 public class SleepingInteger implements JmhValue {
@@ -19,11 +18,11 @@ public class SleepingInteger implements JmhValue {
   public static boolean IS_SLEEP_ENABLED_IN_EQUALS = true;
 
   private static final int MAX_SLEEP_IN_MILLISECONDS = 0;
-  private static final int MAX_SLEEP_IN_NANOSECONDS = 100;
+  private static final int MAX_SLEEP_IN_NANOSECONDS = 10;
 
   private int value;
 
-  SleepingInteger(int value) {
+  public SleepingInteger(int value) {
     this.value = value;
   }
 
@@ -66,8 +65,7 @@ public class SleepingInteger implements JmhValue {
       int otherValue = ((SleepingInteger) other).value;
 
       if (IS_SLEEP_ENABLED_IN_EQUALS) {
-        sleep(value);
-        sleep(otherValue);
+        sleep(value + otherValue);
       }
 
       return value == otherValue;

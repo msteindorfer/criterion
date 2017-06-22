@@ -7,15 +7,15 @@
  */
 package dom;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import org.openjdk.jmh.infra.Blackhole;
 import io.usethesource.vallang.ISet;
+import org.openjdk.jmh.infra.Blackhole;
 
 public interface DominatorBenchmark {
 
-  void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative);
+  void performBenchmark(Blackhole bh, List<?> sampledGraphsNative);
 
-  ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs);
+  List<?> convertDataToNativeFormat(List<ISet> sampledGraphs);
 
 }

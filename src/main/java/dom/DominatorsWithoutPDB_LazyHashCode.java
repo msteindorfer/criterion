@@ -21,8 +21,6 @@ import java.util.NoSuchElementException;
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.experimental.lazy.TrieMap_5Bits_LazyHashCode;
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
-import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
 import io.usethesource.vallang.IConstructor;
 import io.usethesource.vallang.IMap;
 import io.usethesource.vallang.IMapWriter;
@@ -34,6 +32,8 @@ import io.usethesource.vallang.IValueFactory;
 import io.usethesource.vallang.io.StandardTextWriter;
 import io.usethesource.vallang.io.old.BinaryValueReader;
 import io.usethesource.vallang.io.old.BinaryValueWriter;
+import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.interpreter.utils.Timing;
 
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
@@ -46,10 +46,10 @@ import static dom.Util_LazyHashCode.subtract;
 import static dom.Util_LazyHashCode.toMap;
 import static dom.Util_LazyHashCode.union;
 
-@SuppressWarnings("deprecation")
 public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
 
-  private Set.Immutable setofdomsets(io.usethesource.capsule.Map.Immutable dom, Set.Immutable preds) {
+  private Set.Immutable setofdomsets(io.usethesource.capsule.Map.Immutable dom,
+      Set.Immutable preds) {
     Set.Transient result = TrieSet_5Bits_LazyHashCode.transientOf();
 
     for (Object p : preds) {
@@ -85,7 +85,8 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     // if (!nodes.getElementType().isAbstractData()) {
     // throw new RuntimeException("nodes is not the right type");
     // }
-    io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> preds = toMap(project(graph, 1, 0));
+    io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> preds = toMap(
+        project(graph, 1, 0));
     // nodes = nodes.delete(n0);
 
     io.usethesource.capsule.Map.Transient<IConstructor, Set.Immutable<IConstructor>> w =
@@ -94,7 +95,8 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     for (IConstructor n : nodes.__remove(n0)) {
       w.__put(n, nodes);
     }
-    io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dom = w.freeze();
+    io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dom = w
+        .freeze();
 
     io.usethesource.capsule.Map.Immutable prev = TrieMap_5Bits_LazyHashCode.of();
     /*
@@ -238,7 +240,8 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     for (io.usethesource.capsule.Map.Immutable<IConstructor, Set.Immutable<IConstructor>> dominatorResult : result) {
       IMapWriter builder = vf.mapWriter();
 
-      for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult.entrySet()) {
+      for (Map.Entry<IConstructor, Set.Immutable<IConstructor>> entry : dominatorResult
+          .entrySet()) {
         builder.put(entry.getKey(), immutableSetToPdbSet(entry.getValue()));
       }
 
@@ -312,9 +315,8 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
+  public void performBenchmark(Blackhole bh, java.util.List<?> sampledGraphsNative) {
     for (Set.Immutable<ITuple> graph : (ArrayList<Set.Immutable<ITuple>>) sampledGraphsNative) {
       try {
         bh.consume(new DominatorsWithoutPDB_LazyHashCode().calculateDominators(graph));
@@ -325,7 +327,7 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
   }
 
   @Override
-  public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
+  public ArrayList<?> convertDataToNativeFormat(java.util.List<ISet> sampledGraphs) {
     // convert data to remove PDB dependency
     ArrayList<Set.Immutable<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
 
@@ -347,13 +349,11 @@ public class DominatorsWithoutPDB_LazyHashCode implements DominatorBenchmark {
 
 class Util_LazyHashCode {
 
-  @SuppressWarnings("rawtypes")
   public final static Set.Immutable EMPTY = TrieSet_5Bits_LazyHashCode.of();
 
   /*
    * Intersect many sets.
    */
-  @SuppressWarnings("unchecked")
   public static <K> Set.Immutable<K> intersect(Set.Immutable<Set.Immutable<K>> sets) {
     if (sets == null || sets.isEmpty() || sets.contains(EMPTY)) {
       return EMPTY;
@@ -402,7 +402,7 @@ class Util_LazyHashCode {
     final Set.Transient<K> tmp = smaller.asTransient();
     boolean modified = false;
 
-    for (Iterator<K> it = tmp.iterator(); it.hasNext();) {
+    for (Iterator<K> it = tmp.iterator(); it.hasNext(); ) {
       final K key = it.next();
       if (!bigger.contains(key)) {
         it.remove();
@@ -503,7 +503,6 @@ class Util_LazyHashCode {
    * Flattening of a set (of ITuple elements). Because of the untyped nature of ITuple, the
    * implementation is not strongly typed.
    */
-  @SuppressWarnings("unchecked")
   public static <K extends Iterable<?>, T> Set.Immutable<T> carrier(Set.Immutable<K> set1) {
     Set.Transient<Object> builder = TrieSet_5Bits_LazyHashCode.transientOf();
 
@@ -519,7 +518,6 @@ class Util_LazyHashCode {
   /*
    * Projection from a tuple to single field.
    */
-  @SuppressWarnings("unchecked")
   public static <K extends IValue> Set.Immutable<K> project(Set.Immutable<ITuple> set1, int field) {
     Set.Transient<K> builder = TrieSet_5Bits_LazyHashCode.transientOf();
 
@@ -546,8 +544,8 @@ class Util_LazyHashCode {
   /*
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
-  @SuppressWarnings("unchecked")
-  public static <K, V> io.usethesource.capsule.Map.Immutable<K, Set.Immutable<V>> toMap(Set.Immutable<ITuple> st) {
+  public static <K, V> io.usethesource.capsule.Map.Immutable<K, Set.Immutable<V>> toMap(
+      Set.Immutable<ITuple> st) {
     Map<K, Set.Transient<V>> hm = new HashMap<>();
 
     for (ITuple t : st) {
@@ -561,7 +559,8 @@ class Util_LazyHashCode {
       wValSet.__insert(val);
     }
 
-    io.usethesource.capsule.Map.Transient<K, Set.Immutable<V>> w = TrieMap_5Bits_LazyHashCode.transientOf();
+    io.usethesource.capsule.Map.Transient<K, Set.Immutable<V>> w = TrieMap_5Bits_LazyHashCode
+        .transientOf();
     for (K k : hm.keySet()) {
       w.__put(k, hm.get(k).freeze());
     }

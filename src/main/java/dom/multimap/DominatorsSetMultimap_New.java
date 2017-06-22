@@ -275,7 +275,7 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   @Override
-  public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
+  public void performBenchmark(Blackhole bh, java.util.List<?> sampledGraphsNative) {
     for (Set.Immutable<ITuple> graph : (ArrayList<Set.Immutable<ITuple>>) sampledGraphsNative) {
       try {
         bh.consume(new DominatorsSetMultimap_New().calculateDominators(graph));
@@ -286,7 +286,7 @@ public class DominatorsSetMultimap_New implements DominatorBenchmark {
   }
 
   @Override
-  public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
+  public ArrayList<?> convertDataToNativeFormat(java.util.List<ISet> sampledGraphs) {
     // convert data to remove PDB dependency
     ArrayList<Set.Immutable<ITuple>> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
 

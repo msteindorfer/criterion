@@ -648,6 +648,16 @@ public class JmhSetMultimapBenchmarks {
   // }
 
   @Benchmark
+  public void timeKeySetWithBuilder(Blackhole bh) {
+    final java.util.Set<JmhValue> keySetView = testMap.keySet();
+    final JmhSet.Builder builder = valueFactory.setBuilder();
+
+    keySetView.forEach(builder::insert);
+
+    bh.consume(builder.done());
+  }
+
+  @Benchmark
   public void timeKeySet(Blackhole bh) {
     bh.consume(testMap.keySet());
   }
@@ -671,7 +681,7 @@ public class JmhSetMultimapBenchmarks {
     // @formatter:off
     Options opt = new OptionsBuilder()
         .include(".*" + JmhSetMultimapBenchmarks.class.getSimpleName()
-            + ".timeMapLikePut.*")
+            + ".timeMultimapLikeContainsTuple$")
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
         .warmupIterations(10)
@@ -687,23 +697,24 @@ public class JmhSetMultimapBenchmarks {
 //        .param("run", "4")
         .param("producer", "PURE_INTEGER")
         .param("sampleDataSelection", "MATCH")
-//        .param("size", "16")
-        .param("size", "2048")
-//        .param("size", "1048576")
 //        .param("size", "8388608")
-        .param("multimapValueSize", "1") // 2
-        .param("stepSizeOneToOneSelector", "1") // 2
+//        .param("size", "1048576")
+        .param("size", "2048")
+        .param("size", "16")
+        .param("multimapValueSize", "2") // 2
+        .param("stepSizeOneToOneSelector", "2") // 2
+        .param("valueFactoryFactory", "VF_GUAVA_IMMUTABLE")
 //        .param("valueFactoryFactory", "VF_BINARY_RELATION")
 //        .param("valueFactoryFactory", "VF_CHAMP")
 //        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
-        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
+//        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
         .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
+        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();

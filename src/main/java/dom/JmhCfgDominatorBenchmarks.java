@@ -11,12 +11,21 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
+import io.usethesource.criterion.BenchmarkUtils;
+import io.usethesource.vallang.IMap;
+import io.usethesource.vallang.ISet;
+import io.usethesource.vallang.IValue;
+import io.usethesource.vallang.IValueFactory;
+import io.usethesource.vallang.io.old.BinaryValueReader;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -31,14 +40,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import io.usethesource.vallang.IMap;
-import io.usethesource.vallang.ISet;
-import io.usethesource.vallang.IValue;
-import io.usethesource.vallang.IValueFactory;
-import io.usethesource.vallang.io.old.BinaryValueReader;
-
-import dom.DominatorBenchmarkUtils.DominatorBenchmarkEnum;
-import io.usethesource.criterion.BenchmarkUtils;
 
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -56,7 +57,7 @@ public class JmhCfgDominatorBenchmarks {
   @Param({"4096", "2048", "1024", "512", "256", "128"})
   protected int size;
 
-  // @Param({ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" })
+  @Param({"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"})
   protected int run = 0;
 
   private DominatorBenchmark dominatorBenchmark;
@@ -64,24 +65,31 @@ public class JmhCfgDominatorBenchmarks {
   private final String DATA_SET_FULL_FILE_NAME = "data/wordpress-cfgs-as-graphs.bin";
   private IMap DATA_SET_FULL;
 
-  private ArrayList<ISet> sampledGraphs;
-  private ArrayList<?> sampledGraphsNative;
+  public static final String DATA_SET_SINGLE_FILE_NAME = "data/single.bin";
+  private ISet DATA_SET_SINGLE;
+
+  private List<ISet> sampledGraphs;
+  private List<?> sampledGraphsNative;
 
   @Setup(Level.Trial)
   public void setUp() throws Exception {
-    deseriaizeFullDataSet();
+    System.out.println("\n>> setUp >>");
+
+    deserializeFullDataSet();
     setUpTestSetWithRandomContent(size, run);
 
     // convert data to remove PDB dependency
     dominatorBenchmark = dominatorBenchmarkEnum.getBenchmark();
     sampledGraphsNative = dominatorBenchmark.convertDataToNativeFormat(sampledGraphs);
+
+    System.out.println("<< setUp <<");
   }
 
-  protected void deseriaizeFullDataSet() {
-    IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
+  protected void deserializeFullDataSet() {
+    final IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
 
     try {
-      int bufferSize = 512 * 1024 * 1024;
+      final int bufferSize = 512 * 1024 * 1024;
 
       DATA_SET_FULL = (IMap) new BinaryValueReader().read(vf,
           new BufferedInputStream(new FileInputStream(DATA_SET_FULL_FILE_NAME), bufferSize));
@@ -95,7 +103,25 @@ public class JmhCfgDominatorBenchmarks {
     // System.err.println();
   }
 
+  protected void deserializeSingleDataSet() {
+    final IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
+
+    try {
+      final int bufferSize = 512 * 1024 * 1024;
+
+      DATA_SET_SINGLE = (ISet) new BinaryValueReader().read(vf,
+          new BufferedInputStream(new FileInputStream(DATA_SET_SINGLE_FILE_NAME), bufferSize));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   protected void setUpTestSetWithRandomContent(int size, int run) throws Exception {
+    if (size == 1) {
+      deserializeSingleDataSet();
+      sampledGraphs = Arrays.asList(DATA_SET_SINGLE);
+    }
+
     // int seedForThisTrial = BenchmarkUtils.seedFromSizeAndRun(size, run);
 
     // same seed for different sizes to achieve subsume relationship
@@ -189,20 +215,27 @@ public class JmhCfgDominatorBenchmarks {
             ".*" + JmhCfgDominatorBenchmarks.class.getSimpleName() + ".(timeDominatorCalculation$)")
         .warmupIterations(0).measurementIterations(1).mode(Mode.AverageTime).forks(1)
         .timeUnit(TimeUnit.SECONDS)
-        // .param("size", "16")
-        // .param("size", "128")
-        .param("size", "4096").param("run", "0")
-        // .param("dominatorBenchmarkEnum", "CHART")
-        // .param("dominatorBenchmarkEnum", "CLOJURE_LAZY")
-        // .param("dominatorBenchmarkEnum", "SCALA")
-        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_INSTRUMENTED")
-        .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
+//        .param("size", "1")
+//        .param("size", "16")
+//        .param("size", "128")
+//        .param("size", "1024")
+//        .param("size", "2048")
+        .param("size", "4096")
+        .param("run", "0")
+//        .param("run", "1")
+//        .param("run", "2")
+//        .param("dominatorBenchmarkEnum", "CHART")
+//        // .param("dominatorBenchmarkEnum", "CLOJURE_LAZY")
+//        // .param("dominatorBenchmarkEnum", "SCALA")
+//        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_INSTRUMENTED")
+//        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
+//        .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HCHAMP")
         .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT")
-        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
-        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
-        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED")
-        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED_INSTR")
-        // .output("JmhCfgDominatorBenchmarks.log")
+//        .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
+//        .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
+//        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED")
+//        // .param("dominatorBenchmarkEnum", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED_INSTR")
+//        // .output("JmhCfgDominatorBenchmarks.log")
         .shouldDoGC(true).build();
 
     new Runner(opt).run();

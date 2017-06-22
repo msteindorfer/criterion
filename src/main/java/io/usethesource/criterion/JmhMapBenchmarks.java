@@ -12,6 +12,12 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import io.usethesource.criterion.BenchmarkUtils.DataType;
+import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
+import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
+import io.usethesource.criterion.api.JmhMap;
+import io.usethesource.criterion.api.JmhValue;
+import io.usethesource.criterion.api.JmhValueFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -30,13 +36,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-
-import io.usethesource.criterion.BenchmarkUtils.DataType;
-import io.usethesource.criterion.BenchmarkUtils.SampleDataSelection;
-import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
-import io.usethesource.criterion.api.JmhMap;
-import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.api.JmhValueFactory;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -340,7 +339,7 @@ public class JmhMapBenchmarks {
       }
     }
 
-    return new Object[] {VALUE_EXISTING, VALUE_NOT_EXISTING};
+    return new Object[]{VALUE_EXISTING, VALUE_NOT_EXISTING};
   }
 
   // @TearDown(Level.Trial)
@@ -400,15 +399,15 @@ public class JmhMapBenchmarks {
 
   @Benchmark
   public void timeIteration(Blackhole bh) {
-    for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext();) {
+    for (Iterator<JmhValue> iterator = testMap.iterator(); iterator.hasNext(); ) {
       bh.consume(iterator.next());
     }
   }
 
   @Benchmark
-  public void timeEntryIteration(Blackhole bh) {
+  public void timeIterationEntry(Blackhole bh) {
     for (Iterator<java.util.Map.Entry<JmhValue, JmhValue>> iterator =
-        testMap.entryIterator(); iterator.hasNext();) {
+        testMap.entryIterator(); iterator.hasNext(); ) {
       bh.consume(iterator.next());
     }
   }
@@ -517,6 +516,7 @@ public class JmhMapBenchmarks {
 //        .param("valueFactoryFactory", "VF_UNCLEJIM")
 //        .param("valueFactoryFactory", "VF_DEXX")
 //        .param("valueFactoryFactory", "VF_PCOLLECTIONS")
+//        .param("valueFactoryFactory", "VF_GUAVA_IMMUTABLE")
         .build();
     // @formatter:on
 

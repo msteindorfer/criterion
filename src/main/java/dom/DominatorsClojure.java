@@ -28,8 +28,6 @@ import clojure.lang.PersistentHashSet;
 import clojure.set$difference;
 import clojure.set$intersection;
 import clojure.set$union;
-import org.openjdk.jmh.infra.Blackhole;
-import org.rascalmpl.interpreter.utils.Timing;
 import io.usethesource.vallang.IConstructor;
 import io.usethesource.vallang.IMap;
 import io.usethesource.vallang.IMapWriter;
@@ -41,6 +39,8 @@ import io.usethesource.vallang.IValueFactory;
 import io.usethesource.vallang.io.StandardTextWriter;
 import io.usethesource.vallang.io.old.BinaryValueReader;
 import io.usethesource.vallang.io.old.BinaryValueWriter;
+import org.openjdk.jmh.infra.Blackhole;
+import org.rascalmpl.interpreter.utils.Timing;
 
 import static dom.AllDominatorsRunner.DATA_SET_SINGLE_FILE_NAME;
 import static dom.AllDominatorsRunner.LOG_BINARY_RESULTS;
@@ -51,7 +51,6 @@ import static dom.UtilClojure.intersect;
 import static dom.UtilClojure.project;
 import static dom.UtilClojure.toMap;
 
-@SuppressWarnings("deprecation")
 public class DominatorsClojure implements DominatorBenchmark {
 
   private PersistentHashSet setofdomsets(PersistentHashMap dom, PersistentHashSet preds) {
@@ -70,7 +69,6 @@ public class DominatorsClojure implements DominatorBenchmark {
     return (PersistentHashSet) UtilClojure.set$difference(project(graph, 0), project(graph, 1));
   }
 
-  @SuppressWarnings("unchecked")
   public IConstructor getTop(PersistentHashSet graph) {
     for (IConstructor candidate : (Iterable<IConstructor>) top(graph)) {
       switch (candidate.getName()) {
@@ -84,7 +82,6 @@ public class DominatorsClojure implements DominatorBenchmark {
     throw new NoSuchElementException("No candidate found.");
   }
 
-  @SuppressWarnings("unchecked")
   public PersistentHashMap calculateDominators(PersistentHashSet graph) {
     IConstructor n0 = getTop(graph);
     PersistentHashSet nodes = carrier(graph);
@@ -232,7 +229,6 @@ public class DominatorsClojure implements DominatorBenchmark {
     return graphs;
   }
 
-  @SuppressWarnings("unchecked")
   private static ISet persistentHashSetOfMapsToSetOfMapValues(PersistentHashSet result) {
     // convert back to PDB for serialization
     IValueFactory vf = io.usethesource.vallang.impl.persistent.ValueFactory.getInstance();
@@ -319,9 +315,8 @@ public class DominatorsClojure implements DominatorBenchmark {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void performBenchmark(Blackhole bh, ArrayList<?> sampledGraphsNative) {
+  public void performBenchmark(Blackhole bh, java.util.List<?> sampledGraphsNative) {
     for (PersistentHashSet graph : (ArrayList<PersistentHashSet>) sampledGraphsNative) {
       try {
         bh.consume(new DominatorsClojure().calculateDominators(graph));
@@ -332,7 +327,7 @@ public class DominatorsClojure implements DominatorBenchmark {
   }
 
   @Override
-  public ArrayList<?> convertDataToNativeFormat(ArrayList<ISet> sampledGraphs) {
+  public ArrayList<?> convertDataToNativeFormat(java.util.List<ISet> sampledGraphs) {
     // convert data to remove PDB dependency
     ArrayList<PersistentHashSet> sampledGraphsNative = new ArrayList<>(sampledGraphs.size());
 
@@ -354,13 +349,11 @@ public class DominatorsClojure implements DominatorBenchmark {
 
 class UtilClojure {
 
-  @SuppressWarnings("rawtypes")
   public final static PersistentHashSet EMPTY = PersistentHashSet.create();
 
   /*
    * Intersect many sets.
    */
-  @SuppressWarnings("unchecked")
   public static <K> PersistentHashSet intersect(PersistentHashSet sets) {
     if (sets == null || sets.isEmpty() || sets.contains(EMPTY)) {
       return EMPTY;
@@ -519,7 +512,6 @@ class UtilClojure {
    * Flattening of a set (of ITuple elements). Because of the untyped nature of ITuple, the
    * implementation is not strongly typed.
    */
-  @SuppressWarnings("unchecked")
   public static <K extends Iterable<?>, T> PersistentHashSet carrier(PersistentHashSet set1) {
     ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 
@@ -535,7 +527,6 @@ class UtilClojure {
   /*
    * Projection from a tuple to single field.
    */
-  @SuppressWarnings("unchecked")
   public static <K extends IValue> PersistentHashSet project(PersistentHashSet set1, int field) {
     ITransientSet builder = (ITransientSet) PersistentHashSet.EMPTY.asTransient();
 
@@ -562,7 +553,6 @@ class UtilClojure {
   /*
    * Convert a set of tuples to a map; value in old map is associated with a set of keys in old map.
    */
-  @SuppressWarnings("unchecked")
   public static <K, V> PersistentHashMap toMap(PersistentHashSet st) {
     Map<K, ITransientSet> hm = new HashMap<>();
 

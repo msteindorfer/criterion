@@ -106,7 +106,7 @@ class DominatorsScalaV1 extends DominatorBenchmark {
     dom
   }
 
-  def performBenchmark(bh: Blackhole, sampledGraphsNative: ArrayList[_]): Unit = {
+  def performBenchmark(bh: Blackhole, sampledGraphsNative: java.util.List[_]): Unit = {
     for (graph <- sampledGraphsNative.asInstanceOf[ArrayList[HashSet[ITuple]]].asScala) {
       try {
         bh.consume(new DominatorsScalaV1().calculateDominators(graph))
@@ -116,8 +116,8 @@ class DominatorsScalaV1 extends DominatorBenchmark {
     }
   }
 
-  def convertDataToNativeFormat(sampledGraphs: ArrayList[ISet]): ArrayList[_] = {
-    val graphs: ArrayList[HashSet[ITuple]] = new ArrayList(sampledGraphs.size())
+  def convertDataToNativeFormat(sampledGraphs: java.util.List[ISet]): java.util.List[_] = {
+    val graphs: ArrayList[HashSet[ITuple]] = new ArrayList[HashSet[ITuple]](sampledGraphs.size())
 
     for (graph <- sampledGraphs.asScala) {
       val convertedValueBldr = HashSet.newBuilder[ITuple]
