@@ -86,6 +86,8 @@ case class ScalaSetMultimap(xs: ScalaSetMultimap.Coll) extends JmhSetMultimap {
 
   override def hashCode = xs.hashCode
 
+  override def unwrap(): AnyRef = xs
+
   /////
   // Mulitmap Utilities
   //////

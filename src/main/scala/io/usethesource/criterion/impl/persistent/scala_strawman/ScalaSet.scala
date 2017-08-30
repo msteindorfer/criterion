@@ -101,6 +101,8 @@ case class ScalaSet(val xs: ScalaSet.Coll) extends JmhSet {
 
   override def hashCode = xs.hashCode
 
+  override def unwrap(): AnyRef = xs
+
 }
 
 object ScalaSet {

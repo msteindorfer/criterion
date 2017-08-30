@@ -109,4 +109,9 @@ public final class ChampSet implements JmhSet {
     return false;
   }
 
+  @Override
+  public Object unwrap() {
+    return content;
+  }
+
 }

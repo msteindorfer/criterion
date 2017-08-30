@@ -7,6 +7,7 @@
  */
 package io.usethesource.criterion;
 
+import io.usethesource.criterion.profiler.MemoryFootprintProfiler;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -217,6 +218,21 @@ public class JmhSetBenchmarks {
     testSetDifferent = writer1.done();
   }
 
+  public static final JmhSet createTestObject(final JmhValueFactory valueFactory,
+      final ElementProducer producer, final int size, final int run) {
+
+    final JmhSet.Builder builder = valueFactory.setBuilder();
+    final Random rand = new Random(BenchmarkUtils.seedFromSizeAndRun(size, run) + 43);
+
+    final int[] data = BenchmarkUtils.generateTestData(size, rand);
+
+    for (int i = size - 1; i >= 0; i--) {
+      builder.insert(producer.createFromInt(data[i]));
+    }
+
+    return builder.done();
+  }
+
   // @TearDown(Level.Trial)
   // public void tearDown() {
   // OverseerUtils.tearDown();
@@ -409,17 +425,23 @@ public class JmhSetBenchmarks {
     bh.consume(testSet.hashCode());
   }
 
+  @Benchmark
+  public void footprint(Blackhole bh) {
+    bh.consume(testSet); // no-op returning identity
+  }
+
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhSetBenchmarks.class.getSimpleName());
 
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".time((Union|Subtract|Intersect)RealDuplicate)(.*)") // Union|Subtract|Intersect
+        .include(".*" + JmhSetBenchmarks.class.getSimpleName()
+            + ".footprint(.*)") // Union|Subtract|Intersect
         .timeUnit(TimeUnit.NANOSECONDS)
-        .mode(Mode.AverageTime)
-        .warmupIterations(5)
+        .mode(Mode.SingleShotTime)
+        .warmupIterations(0)
         .warmupTime(TimeValue.seconds(1))
-        .measurementIterations(5)
-        .forks(1)
+        .measurementIterations(1)
+        .forks(0)
         .param("dataType", "SET")
         .param("run", "0")
 //        .param("run", "1")
@@ -427,6 +449,7 @@ public class JmhSetBenchmarks {
 //        .param("run", "3")
 //        .param("run", "4")
         .param("producer", "PURE_INTEGER") // PURE_INTEGER, SLEEPING_INTEGER
+        .addProfiler(MemoryFootprintProfiler.class)
         .param("sampleDataSelection", "MATCH")
 //        .param("size", "16")
 //        .param("size", "2048")

@@ -91,4 +91,9 @@ class ClojureSet implements JmhSet {
     return false;
   }
 
+  @Override
+  public Object unwrap() {
+    return xs;
+  }
+
 }

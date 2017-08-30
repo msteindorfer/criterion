@@ -81,6 +81,11 @@ public class ClojureMap implements JmhMap {
     return false;
   }
 
+  @Override
+  public Object unwrap() {
+    return xs;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Iterator<JmhValue> iterator() {

@@ -46,6 +46,8 @@ case class ScalaMap(xs: ScalaMap.Coll) extends JmhMap {
 
 	override def hashCode = xs.hashCode
 
+	override def unwrap(): AnyRef = xs
+
 }
 
 object ScalaMap {

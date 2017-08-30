@@ -105,6 +105,11 @@ public final class ChampSetMultimap implements JmhSetMultimap {
   }
 
   @Override
+  public Object unwrap() {
+    return content;
+  }
+
+  @Override
   public Iterator<JmhValue> iterator() {
     return content.keyIterator();
   }

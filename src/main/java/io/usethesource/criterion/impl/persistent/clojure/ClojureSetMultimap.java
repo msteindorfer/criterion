@@ -164,6 +164,11 @@ public class ClojureSetMultimap implements JmhSetMultimap {
     return false;
   }
 
+  @Override
+  public Object unwrap() {
+    return xs;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Iterator<JmhValue> iterator() {

@@ -74,6 +74,11 @@ public class SleepingInteger implements JmhValue {
   }
 
   @Override
+  public Object unwrap() {
+    return this; // cannot be unwrapped
+  }
+
+  @Override
   public String toString() {
     return String.valueOf(value);
   }

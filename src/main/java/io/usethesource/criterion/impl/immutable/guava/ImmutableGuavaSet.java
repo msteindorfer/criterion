@@ -91,6 +91,11 @@ public final class ImmutableGuavaSet implements JmhSet {
   }
 
   @Override
+  public Object unwrap() {
+    return content;
+  }
+
+  @Override
   public Iterator<JmhValue> iterator() {
     return content.iterator();
   }

@@ -13,4 +13,11 @@ import org.openjdk.jmh.annotations.CompilerControl.Mode;
 @CompilerControl(Mode.DONT_INLINE)
 public interface JmhValue {
 
+  /**
+   * Removes the JmhValue delegation object to reveal its internal representation.
+   *
+   * @return internal representation
+   */
+  Object unwrap();
+
 }

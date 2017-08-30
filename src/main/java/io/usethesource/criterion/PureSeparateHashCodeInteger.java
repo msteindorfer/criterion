@@ -46,6 +46,11 @@ public class PureSeparateHashCodeInteger implements JmhValue {
   }
 
   @Override
+  public Object unwrap() {
+    return this; // cannot be unwrapped
+  }
+
+  @Override
   public String toString() {
     return String.format("%d [hash = %d]", value, hash);
   }

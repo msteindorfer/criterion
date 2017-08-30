@@ -86,6 +86,11 @@ public final class PcollectionsMap implements JmhMap {
   }
 
   @Override
+  public Object unwrap() {
+    return content;
+  }
+
+  @Override
   public Iterator<JmhValue> iterator() {
     return content.keySet().iterator();
   }

@@ -85,6 +85,11 @@ public final class JavaslangMap implements JmhMap {
   }
 
   @Override
+  public Object unwrap() {
+    return content;
+  }
+
+  @Override
   public Iterator<JmhValue> iterator() {
     return content.keySet().iterator();
   }
