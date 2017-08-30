@@ -28,5 +28,3 @@ java -javaagent:$MEMORY_MEASURER_AGENT -jar ./target/benchmarks.jar \
 	-p valueFactoryFactory=$PARAM_VALUE_FACTORY \
 	-prof io.usethesource.criterion.profiler.MemoryFootprintProfiler \
 	-jvmArgsAppend "-Dstrawman.collection.immutable.$1"
-
-read -n1 -r -p "Press space to continue..." key
