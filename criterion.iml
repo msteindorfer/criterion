@@ -43,7 +43,9 @@
     <orderEntry type="library" name="Maven: javassist:javassist:3.11.0.GA" level="project" />
     <orderEntry type="library" name="Maven: ru.vyarus:generics-resolver:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.pholser:junit-quickcheck-generators:0.7" level="project" />
-    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.11.8" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.12.3" level="project" />
+    <orderEntry type="library" name="Maven: ch.epfl.scala:collection-strawman_2.12:0.4.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang.modules:scala-java8-compat_2.12:0.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:clojure:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: net.sf.trove4j:trove4j:3.0.3" level="project" />
     <orderEntry type="library" name="Maven: io.javaslang:javaslang:2.0.2" level="project" />

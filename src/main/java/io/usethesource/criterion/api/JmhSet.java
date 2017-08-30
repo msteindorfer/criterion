@@ -21,12 +21,37 @@ public interface JmhSet extends JmhValue, Iterable<JmhValue> {
 
   JmhSet delete(JmhValue elem);
 
+  default boolean subsetOf(JmhSet other) {
+     throw new UnsupportedOperationException();
+  }
+
+  default JmhSet union(JmhSet other) {
+    throw new UnsupportedOperationException();
+  }
+
+  default JmhSet subtract(JmhSet other) {
+    throw new UnsupportedOperationException();
+  }
+
+  default JmhSet intersect(JmhSet other) {
+    throw new UnsupportedOperationException();
+  }
+
+  default JmhSet fromIterable(Iterable<JmhValue> iterable) {
+    throw new UnsupportedOperationException();
+  }
+
   @Override
   Iterator<JmhValue> iterator();
 
   java.util.Set<JmhValue> asJavaSet();
 
-  static interface Builder extends JmhBuilder {
+  interface Builder extends JmhBuilder {
+
+    @Deprecated
+    default void insert(JmhValue value) {
+      insert(new JmhValue[]{value});
+    }
 
     void insert(JmhValue... v);
 

@@ -7,14 +7,13 @@
  */
 package io.usethesource.criterion;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
 import io.usethesource.capsule.core.PersistentTrieMap;
 import io.usethesource.capsule.core.PersistentTrieSet;
+import io.usethesource.capsule.core.PersistentTrieSetExtended;
 import io.usethesource.capsule.core.PersistentTrieSetMultimap;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.experimental.memoized.AxiomHashTrieSet;
 import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.multimap.TrieMap_5Bits_AsSetMultimap;
@@ -26,6 +25,8 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Speci
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 import io.usethesource.criterion.api.JmhValueFactory;
 import io.usethesource.criterion.impl.immutable.guava.ImmutableGuavaValueFactory;
+import java.util.Arrays;
+import java.util.Random;
 
 public class BenchmarkUtils {
 
@@ -40,6 +41,12 @@ public class BenchmarkUtils {
       @Override
       public JmhValueFactory getInstance() {
         return new io.usethesource.criterion.impl.persistent.scala.ScalaValueFactory();
+      }
+    },
+    VF_SCALA_STRAWMAN {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new io.usethesource.criterion.impl.persistent.scala_strawman.ScalaValueFactory();
       }
     },
     VF_CHAMP {
@@ -85,6 +92,20 @@ public class BenchmarkUtils {
         return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
             TrieSet_5Bits_Memoized_LazyHashCode.class, TrieMap_5Bits_Memoized_LazyHashCode.class,
             PersistentTrieSetMultimap.class);
+      }
+    },
+    VF_CHAMP_EXTENDED {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
+            PersistentTrieSetExtended.class, null, null);
+      }
+    },
+    VF_AXIOM {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
+            AxiomHashTrieSet.class, null, null);
       }
     },
     VF_CHAMP_HETEROGENEOUS {
@@ -241,13 +262,16 @@ public class BenchmarkUtils {
   }
 
   static int[] generateTestData(int size, int run) {
-    int[] data = new int[size];
-
     int seedForThisTrial = seedFromSizeAndRun(size, run);
     Random rand = new Random(seedForThisTrial);
 
-    // System.out.println(String.format("Seed for this trial: %d.",
-    // seedForThisTrial));
+    return generateTestData(size, rand);
+  }
+
+  static int[] generateTestData(final int size, final Random rand) {
+    int[] data = new int[size];
+
+    // System.out.println(String.format("Seed for this trial: %d.", seedForThisTrial));
 
     for (int i = size - 1; i >= 0; i--) {
       data[i] = rand.nextInt();

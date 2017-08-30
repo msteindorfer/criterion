@@ -40,6 +40,32 @@ public final class ChampSet implements JmhSet {
   }
 
   @Override
+  public JmhSet union(JmhSet other) {
+    final ChampSet that = (ChampSet) other;
+    return new ChampSet(content.union(that.content));
+  }
+
+  @Override
+  public JmhSet subtract(JmhSet other) {
+    final ChampSet that = (ChampSet) other;
+    return new ChampSet(content.subtract(that.content));
+  }
+
+  @Override
+  public JmhSet intersect(JmhSet other) {
+    final ChampSet that = (ChampSet) other;
+    return new ChampSet(content.intersect(that.content));
+  }
+
+  @Override
+  public JmhSet fromIterable(Iterable<JmhValue> iterable) {
+    // NOTE: remove; makes use of static factory!
+    final Set.Transient<JmhValue> builder = Set.Transient.of();
+    iterable.forEach(builder::__insert);
+    return new ChampSet(builder.freeze());
+  }
+
+  @Override
   public int size() {
     return content.size();
   }
