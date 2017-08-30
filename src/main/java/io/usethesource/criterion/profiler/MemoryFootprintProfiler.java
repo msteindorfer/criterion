@@ -26,6 +26,7 @@ import org.openjdk.jmh.profile.ProfilerResult;
 import org.openjdk.jmh.results.AggregationPolicy;
 import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.Result;
+import org.openjdk.jmh.results.ResultRole;
 
 public class MemoryFootprintProfiler implements InternalProfiler {
 
@@ -66,7 +67,7 @@ public class MemoryFootprintProfiler implements InternalProfiler {
           Predicates.not(Predicates.instanceOf(JmhValue.class));
       final Predicate<Object> predicateRetainedSize = Predicates.alwaysTrue();
 
-      final List<ProfilerResult> results = new ArrayList<>();
+      final List<ProfilerResult> profilerResults = new ArrayList<>();
 
       /**
        * Traverse object graph for measuring memory footprint (in bytes).
@@ -74,10 +75,13 @@ public class MemoryFootprintProfiler implements InternalProfiler {
       long memoryInBytes = objectexplorer.MemoryMeasurer
           .measureBytes(objectToMeasure, predicateDataStructureOverhead);
 
+      // NOTE: non-standard constructor for passing ResultRole.PRIMARY
       final ProfilerResult memoryResult =
-          new ProfilerResult("memory", memoryInBytes, UNIT_BYTES, POLICY);
+          new ProfilerResult(ResultRole.PRIMARY, "memory", memoryInBytes, UNIT_BYTES, POLICY);
 
-      results.add(memoryResult);
+      // hack: substitute results
+      result.resetResults();
+      result.addResult(memoryResult);
 
 //      /**
 //       * Traverse object graph for measuring field statistics.
@@ -87,17 +91,17 @@ public class MemoryFootprintProfiler implements InternalProfiler {
 //
 //      final ProfilerResult objectsResult =
 //          new ProfilerResult("objects", statistic.getObjects(), UNIT_COUNT, POLICY);
-//      results.add(objectsResult);
+//      profilerResults.add(objectsResult);
 //
 //      final ProfilerResult referencesResult =
 //          new ProfilerResult("references", statistic.getReferences(), UNIT_COUNT, POLICY);
-//      results.add(referencesResult);
+//      profilerResults.add(referencesResult);
 //
 //      final ProfilerResult primitivesResult =
 //          new ProfilerResult("primitives", statistic.getPrimitives().size(), UNIT_COUNT, POLICY);
-//      results.add(primitivesResult);
+//      profilerResults.add(primitivesResult);
 
-      return results;
+      return profilerResults;
     } catch (Exception e) {
       e.printStackTrace();
       return Arrays.asList();
