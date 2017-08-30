@@ -1,4 +1,4 @@
-export PARAM_SIZE="1048576"
+export PARAM_SIZE="16,2048,1048576"
 export PARAM_VALUE_FACTORY="VF_SCALA_STRAWMAN,VF_SCALA"
 export MEMORY_MEASURER_AGENT=`echo $(cd $(dirname ~); pwd)/$(basename ~)`/.m2/repository/com/github/msteindorfer/memory-measurer/0.1.0-SNAPSHOT/memory-measurer-0.1.0-SNAPSHOT.jar
 
