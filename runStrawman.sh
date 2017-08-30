@@ -12,9 +12,10 @@ java -jar ./target/benchmarks.jar \
 	-p producer=PURE_INTEGER \
 	-p size=$PARAM_SIZE \
 	-p valueFactoryFactory=$PARAM_VALUE_FACTORY \
-	-jvmArgsAppend "-Dstrawman.collection.immutable.$1"
+	-rf text -rff logStrawman-Runtime-useCapsule-$1.txt \
+	-jvmArgsAppend "-Dstrawman.collection.immutable.useCapsule=$1"
 
-read -n1 -r -p "Press space to continue..." key
+# # read -n1 -r -p "Press space to continue..." key
 
 ####
 # MEASURE MEMORY FOOTPRINT 
@@ -27,4 +28,5 @@ java -javaagent:$MEMORY_MEASURER_AGENT -jar ./target/benchmarks.jar \
 	-p size=$PARAM_SIZE \
 	-p valueFactoryFactory=$PARAM_VALUE_FACTORY \
 	-prof io.usethesource.criterion.profiler.MemoryFootprintProfiler \
-	-jvmArgsAppend "-Dstrawman.collection.immutable.$1"
+	-rf text -rff logStrawman-Memory-useCapsule-$1.txt \
+	-jvmArgsAppend "-Dstrawman.collection.immutable.useCapsule=$1"
