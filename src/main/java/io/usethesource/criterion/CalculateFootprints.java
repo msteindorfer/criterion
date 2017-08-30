@@ -34,6 +34,8 @@ import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset;
 import io.usethesource.criterion.api.JmhValue;
 import scala.Tuple2;
+import strawman.collection.immutable.HashMap$;
+import strawman.collection.immutable.HashSet$;
 
 public final class CalculateFootprints {
 
@@ -138,6 +140,36 @@ public final class CalculateFootprints {
         MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
   }
 
+  public static String measureFootprintOfPersistentScalaStrawmanMap(final Set<JmhValue> testSet,
+      int elementCount, int run, Optional<String> shortName) {
+    final Class<?> clazz = strawman.collection.immutable.HashMap.class;
+
+    strawman.collection.immutable.HashMap<JmhValue, JmhValue> map = HashMap$.MODULE$.empty();
+
+    for (JmhValue v : testSet) {
+      map = map.updated(v, v);
+    }
+
+    return FootprintUtils.measureAndReport(map, shortName.orElse(classToName(clazz)), DataType.MAP,
+        Archetype.PERSISTENT, false, elementCount, run,
+        MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
+  }
+
+  public static String measureFootprintOfPersistentScalaStrawmanSet(final Set<JmhValue> testSet,
+      int elementCount, int run, Optional<String> shortName) {
+    final Class<?> clazz = strawman.collection.immutable.HashSet.class;
+
+    strawman.collection.immutable.HashSet<JmhValue> set = HashSet$.MODULE$.empty();
+
+    for (JmhValue v : testSet) {
+      set = set.incl(v);
+    }
+
+    return FootprintUtils.measureAndReport(set, shortName.orElse(classToName(clazz)), DataType.SET,
+        Archetype.PERSISTENT, false, elementCount, run,
+        MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
+  }
+
   public static String measureFootprintOfPersistentScalaSet(final Set<JmhValue> testSet,
       int elementCount, int run, Optional<String> shortName) {
     final Class<?> clazz = scala.collection.immutable.HashSet.class;
@@ -186,11 +218,24 @@ public final class CalculateFootprints {
               Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
               TrieSet_5Bits_Memoized_LazyHashCode.class));
 
+//          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
+//              Optional.of(ValueFactoryFactory.VF_AXIOM.toString()),
+//              AxiomHashTrieSet.class));
+
+//          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
+//              Optional.of(ValueFactoryFactory.VF_CHAMP_EXTENDED.toString()),
+//              PersistentTrieSetExtended.class));
+
           results.add(measureFootprintOfPersistentClojureSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));
 
           results.add(measureFootprintOfPersistentScalaSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_SCALA.toString())));
+
+          results.add(measureFootprintOfPersistentScalaStrawmanSet(testSet, count, run,
+              Optional.of(ValueFactoryFactory.VF_SCALA_STRAWMAN.toString())));
+
+          System.out.println();
         }
 
         if (reportMap) {
@@ -201,11 +246,24 @@ public final class CalculateFootprints {
               Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
               TrieMap_5Bits_Memoized_LazyHashCode.class));
 
+//          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
+//              Optional.of(ValueFactoryFactory.VF_AXIOM.toString()),
+//              AxiomHashTrieMap.class));
+
+//          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
+//                  Optional.of("VF_CHAMP_EXTENDED"),
+//                  PersistentTrieMapExtended.class));
+
           results.add(measureFootprintOfPersistentClojureMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));
 
           results.add(measureFootprintOfPersistentScalaMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_SCALA.toString())));
+
+          results.add(measureFootprintOfPersistentScalaStrawmanMap(testSet, count, run,
+              Optional.of(ValueFactoryFactory.VF_SCALA_STRAWMAN.toString())));
+
+          System.out.println();
         }
       }
     }
