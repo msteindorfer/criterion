@@ -70,6 +70,8 @@ public class JmhSetBenchmarks {
 
   private JmhSet testSetRealDuplicateSameSizeButDifferent;
 
+  private JmhSet testSetDifferent;
+
   public JmhValue VALUE_EXISTING;
   public JmhValue VALUE_NOT_EXISTING;
 
@@ -80,6 +82,7 @@ public class JmhSetBenchmarks {
   @Setup(Level.Trial)
   public void setUp() throws Exception {
     setUpTestSetWithRandomContent(size, run);
+    setUpTestSetWithRandomContentDifferent(size, run); // TODO unify
 
     switch (sampleDataSelection) {
 
@@ -200,6 +203,20 @@ public class JmhSetBenchmarks {
         testSetRealDuplicate.insert(VALUE_NOT_EXISTING).delete(VALUE_EXISTING);
   }
 
+  protected void setUpTestSetWithRandomContentDifferent(int size, int run) throws Exception {
+    JmhSet.Builder writer1 = valueFactory.setBuilder();
+
+    final Random rand = new Random(BenchmarkUtils.seedFromSizeAndRun(size, run) + 43);
+
+    int[] data = BenchmarkUtils.generateTestData(size, rand);
+
+    for (int i = size - 1; i >= 0; i--) {
+      writer1.insert(producer.createFromInt(data[i]));
+    }
+
+    testSetDifferent = writer1.done();
+  }
+
   // @TearDown(Level.Trial)
   // public void tearDown() {
   // OverseerUtils.tearDown();
@@ -227,8 +244,21 @@ public class JmhSetBenchmarks {
   // }
 
   @Benchmark
+  @OperationsPerInvocation(2 * CACHED_NUMBERS_SIZE)
+  public void timeLookup(Blackhole bh) {
+    // full match
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testSet.contains(cachedNumbers[i]));
+    }
+    // no match
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testSet.contains(cachedNumbersNotContained[i]));
+    }
+  }
+
+  @Benchmark
   @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-  public void timeContainsKey(Blackhole bh) {
+  public void timeLookupKeyContained(Blackhole bh) {
     for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
       bh.consume(testSet.contains(cachedNumbers[i]));
     }
@@ -236,7 +266,7 @@ public class JmhSetBenchmarks {
 
   @Benchmark
   @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-  public void timeContainsKeyNotContained(Blackhole bh) {
+  public void timeLookupKeyNotContained(Blackhole bh) {
     for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
       bh.consume(testSet.contains(cachedNumbersNotContained[i]));
     }
@@ -249,17 +279,22 @@ public class JmhSetBenchmarks {
     }
   }
 
-  // @Benchmark
-  // public void timeEntryIteration(Blackhole bh) {
-  // for (Iterator<java.util.Map.Entry<IValue, IValue>> iterator = testSet.entryIterator(); iterator
-  // .hasNext();) {
-  // bh.consume(iterator.next());
-  // }
-  // }
+  @Benchmark
+  @OperationsPerInvocation(2 * CACHED_NUMBERS_SIZE)
+  public void timeInsert(Blackhole bh) {
+    // full match
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testSet.insert(cachedNumbers[i]));
+    }
+    // no match
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testSet.insert(cachedNumbersNotContained[i]));
+    }
+  }
 
   @Benchmark
   @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-  public void timeInsert(Blackhole bh) {
+  public void timeInsertNotContained(Blackhole bh) {
     for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
       bh.consume(testSet.insert(cachedNumbersNotContained[i]));
 
@@ -276,8 +311,21 @@ public class JmhSetBenchmarks {
   }
 
   @Benchmark
+  @OperationsPerInvocation(2 * CACHED_NUMBERS_SIZE)
+  public void timeRemove(Blackhole bh) {
+    // full match
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testSet.delete(cachedNumbers[i]));
+    }
+    // no match
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testSet.delete(cachedNumbersNotContained[i]));
+    }
+  }
+
+  @Benchmark
   @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
-  public void timeRemoveKey(Blackhole bh) {
+  public void timeRemoveKeyContained(Blackhole bh) {
     for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
       bh.consume(testSet.delete(cachedNumbers[i]));
     }
@@ -292,18 +340,63 @@ public class JmhSetBenchmarks {
   }
 
   @Benchmark
-  public void timeEqualsRealDuplicate(Blackhole bh) {
+  public void timeEqualsWorstCase(Blackhole bh) {
     bh.consume(testSet.equals(testSetRealDuplicate));
   }
 
   @Benchmark
-  public void timeEqualsRealDuplicateModified(Blackhole bh) {
+  public void timeEqualsGoodCase(Blackhole bh) {
     bh.consume(testSet.equals(testSetRealDuplicateSameSizeButDifferent));
   }
 
   @Benchmark
-  public void timeEqualsDeltaDuplicate(Blackhole bh) {
-    bh.consume(testSet.equals(testSetDeltaDuplicate));
+  public void timeSubsetOf(Blackhole bh) {
+    bh.consume(testSet.subsetOf(testSetRealDuplicate));
+  }
+
+  @Benchmark
+  public void timeUnionRealDuplicate(Blackhole bh) {
+    bh.consume(testSet.union(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeUnionDeltaDuplicate(Blackhole bh) {
+    bh.consume(testSet.union(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeUnionDifferent(Blackhole bh) {
+    bh.consume(testSet.union(testSetDifferent));
+  }
+
+  @Benchmark
+  public void timeSubtractRealDuplicate(Blackhole bh) {
+    bh.consume(testSet.subtract(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeSubtractDeltaDuplicate(Blackhole bh) {
+    bh.consume(testSet.subtract(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeSubtractDifferent(Blackhole bh) {
+    bh.consume(testSet.subtract(testSetDifferent));
+  }
+
+  @Benchmark
+  public void timeIntersectRealDuplicate(Blackhole bh) {
+    bh.consume(testSet.intersect(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeIntersectDeltaDuplicate(Blackhole bh) {
+    bh.consume(testSet.intersect(testSetDeltaDuplicate));
+  }
+
+  @Benchmark
+  public void timeIntersectDifferent(Blackhole bh) {
+    bh.consume(testSet.intersect(testSetDifferent));
   }
 
   @Benchmark
@@ -319,14 +412,13 @@ public class JmhSetBenchmarks {
   public static void main(String[] args) throws RunnerException {
     System.out.println(JmhSetBenchmarks.class.getSimpleName());
 
-    // @formatter:off
     Options opt = new OptionsBuilder()
-        .include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".(.*)")
+        .include(".*" + JmhSetBenchmarks.class.getSimpleName() + ".time((Union|Subtract|Intersect)RealDuplicate)(.*)") // Union|Subtract|Intersect
         .timeUnit(TimeUnit.NANOSECONDS)
         .mode(Mode.AverageTime)
-        .warmupIterations(10)
+        .warmupIterations(5)
         .warmupTime(TimeValue.seconds(1))
-        .measurementIterations(10)
+        .measurementIterations(5)
         .forks(1)
         .param("dataType", "SET")
         .param("run", "0")
@@ -334,13 +426,18 @@ public class JmhSetBenchmarks {
 //        .param("run", "2")
 //        .param("run", "3")
 //        .param("run", "4")
-        .param("producer", "PURE_INTEGER")
+        .param("producer", "PURE_INTEGER") // PURE_INTEGER, SLEEPING_INTEGER
         .param("sampleDataSelection", "MATCH")
-        .param("size", "16")
-        .param("size", "2048")
+//        .param("size", "16")
+//        .param("size", "2048")
         .param("size", "1048576")
+        .param("valueFactoryFactory", "VF_SCALA_STRAWMAN")
+        .param("valueFactoryFactory", "VF_SCALA")
+//        .param("valueFactoryFactory", "VF_AXIOM")
         .param("valueFactoryFactory", "VF_CHAMP")
+////        .param("valueFactoryFactory", "VF_CHAMP_EXTENDED")
         .build();
+    // @formatter:off
     // @formatter:on
 
     new Runner(opt).run();

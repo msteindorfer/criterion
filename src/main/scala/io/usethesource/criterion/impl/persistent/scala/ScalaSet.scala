@@ -44,17 +44,17 @@ case class ScalaSet(val xs: ScalaSet.Coll) extends JmhSet {
     case _ => throw new IllegalArgumentException
   }
 
-  override def fromIterable(iterable: java.lang.Iterable[JmhValue]): JmhSet = {
-    ScalaSet(ScalaSet.empty ++ iterable.asScala)
-
-//    val builder = HashSet.newBuilder[JmhValue]
-//    iterable.forEach(item => builder += item)
-//    ScalaSet(builder.result)
-
-//    val builder = HashSet.newBuilder[JmhValue]
-//    builder ++= iterable.asScala
-//    ScalaSet(builder.result)
-  }
+//  override def fromIterable(iterable: java.lang.Iterable[JmhValue]): JmhSet = {
+//    ScalaSet(ScalaSet.empty ++ iterable.asScala)
+//
+////    val builder = HashSet.newBuilder[JmhValue]
+////    iterable.forEach(item => builder += item)
+////    ScalaSet(builder.result)
+//
+////    val builder = HashSet.newBuilder[JmhValue]
+////    builder ++= iterable.asScala
+////    ScalaSet(builder.result)
+//  }
 
   def iterator = xs.iterator.asJava
 

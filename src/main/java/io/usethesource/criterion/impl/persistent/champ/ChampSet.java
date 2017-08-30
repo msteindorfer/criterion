@@ -13,9 +13,6 @@ import io.usethesource.capsule.Set;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
 
-/*
- * Operates: * without types * with equals() instead of isEqual()
- */
 public final class ChampSet implements JmhSet {
 
   private final Set.Immutable<JmhValue> content;
@@ -57,13 +54,13 @@ public final class ChampSet implements JmhSet {
     return new ChampSet(content.intersect(that.content));
   }
 
-  @Override
-  public JmhSet fromIterable(Iterable<JmhValue> iterable) {
-    // NOTE: remove; makes use of static factory!
-    final Set.Transient<JmhValue> builder = Set.Transient.of();
-    iterable.forEach(builder::__insert);
-    return new ChampSet(builder.freeze());
-  }
+//  @Override
+//  public JmhSet fromIterable(Iterable<JmhValue> iterable) {
+//    // NOTE: remove; makes use of static factory!
+//    final Set.Transient<JmhValue> builder = Set.Transient.of();
+//    iterable.forEach(builder::__insert);
+//    return new ChampSet(builder.freeze());
+//  }
 
   @Override
   public int size() {

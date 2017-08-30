@@ -88,9 +88,9 @@ case class ScalaSet(val xs: ScalaSet.Coll) extends JmhSet {
     override protected[this] def newSpecificBuilder(): Nothing = ???
   }
 
-  override def fromIterable(iterable: java.lang.Iterable[JmhValue]): JmhSet = {
-    ScalaSet(strawman.collection.immutable.Set.fromIterable(iterable))
-  }
+//  override def fromIterable(iterable: java.lang.Iterable[JmhValue]): JmhSet = {
+//    ScalaSet(strawman.collection.immutable.Set.fromIterable(iterable))
+//  }
 
   override def asJavaSet: java.util.Set[JmhValue] = ??? // xs.asJava
 

@@ -37,10 +37,6 @@ public interface JmhSet extends JmhValue, Iterable<JmhValue> {
     throw new UnsupportedOperationException();
   }
 
-  default JmhSet fromIterable(Iterable<JmhValue> iterable) {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   Iterator<JmhValue> iterator();
 
