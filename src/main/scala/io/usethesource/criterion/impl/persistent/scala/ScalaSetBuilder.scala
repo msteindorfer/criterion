@@ -17,6 +17,10 @@ sealed class ScalaSetBuilder extends JmhSet.Builder {
 
 	val xs: SetBuilder[JmhValue, ScalaSet.Coll] = new SetBuilder(ScalaSet.empty)
 
+	override def insert(y: JmhValue) {
+		xs += y
+	}
+
 	override def insert(ys: JmhValue*) {
 		xs ++= ys
 	}

@@ -7,29 +7,28 @@
  */
 package io.usethesource.criterion.impl.persistent.scala
 
-import io.usethesource.criterion.api.JmhValue
-import io.usethesource.criterion.api.JmhValueFactory
+import io.usethesource.criterion.api.{JmhValue, JmhValueFactory}
 
 class ScalaValueFactory extends JmhValueFactory {
-	
-	def set() = setBuilder.done
 
-	def set(xs: JmhValue*) = {
-		val writer = setBuilder
-		writer.insert(xs: _*)
-		writer.done
-	}
+  def set() = setBuilder.done
 
-	def setBuilder = new ScalaSetBuilder
-	
-	def map() = mapBuilder.done
+  def set(xs: JmhValue*) = {
+    val writer = setBuilder
+    writer.insert(xs: _*)
+    writer.done
+  }
 
-	def mapBuilder = new ScalaMapBuilder
-	
-	def setMultimapBuilder = new ScalaSetMultimapBuilder
-	
-	def setMultimap = setMultimapBuilder.done
-	
-	override def toString = "VF_SCALA"
+  override def setBuilder = new ScalaSetBuilder
+
+  //  def map = mapBuilder.done
+
+  override def mapBuilder = new ScalaMapBuilder
+
+  override def setMultimapBuilder = new ScalaSetMultimapBuilder
+
+  //  def setMultimap = setMultimapBuilder.done
+
+  override def toString = "VF_SCALA"
 
 }

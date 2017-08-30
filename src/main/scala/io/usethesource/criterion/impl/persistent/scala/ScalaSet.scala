@@ -9,7 +9,8 @@ package io.usethesource.criterion.impl.persistent.scala
 
 import io.usethesource.criterion.api.{JmhSet, JmhValue}
 
-import scala.collection.JavaConverters.{asJavaIteratorConverter, setAsJavaSetConverter}
+import scala.collection.JavaConverters.{asJavaIteratorConverter, setAsJavaSetConverter, iterableAsScalaIterableConverter}
+import scala.collection.immutable.HashSet
 
 case class ScalaSet(val xs: ScalaSet.Coll) extends JmhSet {
 
@@ -22,6 +23,38 @@ case class ScalaSet(val xs: ScalaSet.Coll) extends JmhSet {
   def insert(x: JmhValue): JmhSet = ScalaSet(xs + x)
 
   def delete(x: JmhValue): JmhSet = ScalaSet(xs - x)
+
+  override def subsetOf(other: JmhSet): Boolean = other match {
+    case that: ScalaSet => this.xs subsetOf that.xs
+    case _ => throw new IllegalArgumentException
+  }
+
+  override def union(other: JmhSet): JmhSet = other match {
+    case that: ScalaSet => ScalaSet(this.xs union that.xs)
+    case _ => throw new IllegalArgumentException
+  }
+
+  override def subtract(other: JmhSet): JmhSet = other match {
+    case that: ScalaSet => ScalaSet(this.xs diff that.xs)
+    case _ => throw new IllegalArgumentException
+  }
+
+  override def intersect(other: JmhSet): JmhSet = other match {
+    case that: ScalaSet => ScalaSet(this.xs intersect that.xs)
+    case _ => throw new IllegalArgumentException
+  }
+
+  override def fromIterable(iterable: java.lang.Iterable[JmhValue]): JmhSet = {
+    ScalaSet(ScalaSet.empty ++ iterable.asScala)
+
+//    val builder = HashSet.newBuilder[JmhValue]
+//    iterable.forEach(item => builder += item)
+//    ScalaSet(builder.result)
+
+//    val builder = HashSet.newBuilder[JmhValue]
+//    builder ++= iterable.asScala
+//    ScalaSet(builder.result)
+  }
 
   def iterator = xs.iterator.asJava
 
