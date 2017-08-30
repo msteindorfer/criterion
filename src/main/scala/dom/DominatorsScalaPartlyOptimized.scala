@@ -149,7 +149,7 @@ class DominatorsScalaPartlyOptimized extends DominatorBenchmark {
 		dom
 	}
 
-	def performBenchmark(bh: Blackhole, sampledGraphsNative: ArrayList[_]): Unit = {
+	def performBenchmark(bh: Blackhole, sampledGraphsNative: java.util.List[_]): Unit = {
 		for (graph <- sampledGraphsNative.asInstanceOf[ArrayList[HashSet[ITuple]]].asScala) {
 		  try {
 				bh.consume(new DominatorsScalaPartlyOptimized().calculateDominators(graph))
@@ -159,7 +159,7 @@ class DominatorsScalaPartlyOptimized extends DominatorBenchmark {
 		}
 	}
 
-	def convertDataToNativeFormat(sampledGraphs: ArrayList[ISet]): ArrayList[_] = {
+	def convertDataToNativeFormat(sampledGraphs: java.util.List[ISet]): java.util.List[_] = {
 		val graphs: ArrayList[HashSet[ITuple]] = new ArrayList(sampledGraphs.size())
 
 		for (graph <- sampledGraphs.asScala) {
