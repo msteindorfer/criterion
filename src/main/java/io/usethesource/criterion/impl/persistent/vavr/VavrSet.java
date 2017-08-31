@@ -5,20 +5,20 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.javaslang;
+package io.usethesource.criterion.impl.persistent.vavr;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
 
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
-import javaslang.collection.HashSet;
+import io.vavr.collection.HashSet;
 
-public final class JavaslangSet implements JmhSet {
+public final class VavrSet implements JmhSet {
 
   private final HashSet<JmhValue> content;
 
-  public JavaslangSet(HashSet<JmhValue> content) {
+  public VavrSet(HashSet<JmhValue> content) {
     this.content = content;
   }
 
@@ -29,12 +29,12 @@ public final class JavaslangSet implements JmhSet {
 
   @Override
   public JmhSet insert(JmhValue value) {
-    return new JavaslangSet(content.add(value));
+    return new VavrSet(content.add(value));
   }
 
   @Override
   public JmhSet delete(JmhValue value) {
-    return new JavaslangSet(content.remove(value));
+    return new VavrSet(content.remove(value));
   }
 
   @Override
@@ -73,8 +73,8 @@ public final class JavaslangSet implements JmhSet {
       return false;
     }
 
-    if (other instanceof JavaslangSet) {
-      JavaslangSet that = (JavaslangSet) other;
+    if (other instanceof VavrSet) {
+      VavrSet that = (VavrSet) other;
 
       if (this.size() != that.size()) {
         return false;

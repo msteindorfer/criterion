@@ -7,6 +7,9 @@
  */
 package io.usethesource.criterion;
 
+import java.util.Arrays;
+import java.util.Random;
+
 import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
 import io.usethesource.capsule.core.PersistentTrieMap;
 import io.usethesource.capsule.core.PersistentTrieSet;
@@ -23,14 +26,16 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Inter
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
+import io.usethesource.capsule.experimental.specialized.TrieMap_5Bits_Spec0To8;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 import io.usethesource.criterion.api.JmhValueFactory;
 import io.usethesource.criterion.impl.immutable.guava.ImmutableGuavaValueFactory;
-import java.util.Arrays;
-import java.util.Random;
+import io.usethesource.criterion.impl.persistent.paguro.PaguroValueFactory;
+import io.usethesource.criterion.impl.persistent.vavr.VavrValueFactory;
 
 public class BenchmarkUtils {
 
-  public static enum ValueFactoryFactory {
+  public enum ValueFactoryFactory {
     VF_CLOJURE {
       @Override
       public JmhValueFactory getInstance() {
@@ -56,16 +61,23 @@ public class BenchmarkUtils {
             PersistentTrieSet.class, PersistentTrieMap.class, PersistentTrieSetMultimap.class);
       }
     },
-    VF_JAVASLANG {
+    VF_CHAMP_SPECIALIZED {
       @Override
       public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.javaslang.JavaslangValueFactory();
+        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
+            TrieSet_5Bits_Spec0To8.class, TrieMap_5Bits_Spec0To8.class, null);
       }
     },
-    VF_UNCLEJIM {
+    VF_VAVR {
       @Override
       public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.unclejim.UnclejimValueFactory();
+        return new VavrValueFactory();
+      }
+    },
+    VF_PAGURO {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new PaguroValueFactory();
       }
     },
     VF_DEXX {

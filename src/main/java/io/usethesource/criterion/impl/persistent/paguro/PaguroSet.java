@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.unclejim;
+package io.usethesource.criterion.impl.persistent.paguro;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -14,11 +14,11 @@ import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
 import org.organicdesign.fp.collections.PersistentHashSet;
 
-public final class UnclejimSet implements JmhSet {
+public final class PaguroSet implements JmhSet {
 
   private final PersistentHashSet<JmhValue> content;
 
-  public UnclejimSet(PersistentHashSet<JmhValue> content) {
+  public PaguroSet(PersistentHashSet<JmhValue> content) {
     this.content = content;
   }
 
@@ -29,12 +29,12 @@ public final class UnclejimSet implements JmhSet {
 
   @Override
   public JmhSet insert(JmhValue value) {
-    return new UnclejimSet(content.put(value));
+    return new PaguroSet(content.put(value));
   }
 
   @Override
   public JmhSet delete(JmhValue value) {
-    return new UnclejimSet(content.without(value));
+    return new PaguroSet(content.without(value));
   }
 
   @Override
@@ -73,8 +73,8 @@ public final class UnclejimSet implements JmhSet {
       return false;
     }
 
-    if (other instanceof UnclejimSet) {
-      UnclejimSet that = (UnclejimSet) other;
+    if (other instanceof PaguroSet) {
+      PaguroSet that = (PaguroSet) other;
 
       if (this.size() != that.size()) {
         return false;

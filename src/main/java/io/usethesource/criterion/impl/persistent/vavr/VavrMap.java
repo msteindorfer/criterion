@@ -5,20 +5,20 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.javaslang;
+package io.usethesource.criterion.impl.persistent.vavr;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
 
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
-import javaslang.collection.HashMap;
+import io.vavr.collection.HashMap;
 
-public final class JavaslangMap implements JmhMap {
+public final class VavrMap implements JmhMap {
 
   private final HashMap<JmhValue, JmhValue> content;
 
-  protected JavaslangMap(HashMap<JmhValue, JmhValue> content) {
+  protected VavrMap(HashMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 
@@ -34,12 +34,12 @@ public final class JavaslangMap implements JmhMap {
 
   @Override
   public JmhMap put(JmhValue key, JmhValue value) {
-    return new JavaslangMap(content.put(key, value));
+    return new VavrMap(content.put(key, value));
   }
 
   @Override
   public JmhMap removeKey(JmhValue key) {
-    return new JavaslangMap(content.remove(key));
+    return new VavrMap(content.remove(key));
   }
 
   @Override
@@ -71,8 +71,8 @@ public final class JavaslangMap implements JmhMap {
       return false;
     }
 
-    if (other instanceof JavaslangMap) {
-      JavaslangMap that = (JavaslangMap) other;
+    if (other instanceof VavrMap) {
+      VavrMap that = (VavrMap) other;
 
       if (this.size() != that.size()) {
         return false;

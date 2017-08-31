@@ -71,10 +71,10 @@ import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CH
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_DEXX;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_JAVASLANG;
+import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_VAVR;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_PCOLLECTIONS;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_SCALA;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_UNCLEJIM;
+import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_PAGURO;
 import static io.usethesource.criterion.BenchmarkUtils.seedFromSizeAndRun;
 import static io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD;
 import static io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset.RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER;
@@ -213,9 +213,9 @@ public final class CalculateFootprintsHeterogeneous {
         (factory) -> createAndMeasurePersistentMap(factory, size, run, preset);
 
     final EnumSet<ValueFactoryFactory> factories = EnumSet
-        .of(VF_UNCLEJIM,
+        .of(VF_PAGURO,
             VF_DEXX,
-            VF_JAVASLANG,
+            VF_VAVR,
             VF_PCOLLECTIONS);
 
     return factories.stream()

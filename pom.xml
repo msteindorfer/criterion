@@ -340,19 +340,19 @@
 
     <!-- 3rd party libraries containing persistent data structures -->
     <dependency>
-      <groupId>io.javaslang</groupId>
-      <artifactId>javaslang</artifactId>
-      <version>2.0.2</version>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+      <version>0.9.0</version>
     </dependency>
     <dependency>
       <groupId>org.organicdesign</groupId>
-      <artifactId>UncleJim</artifactId>
-      <version>1.0.3</version>
+      <artifactId>Paguro</artifactId>
+      <version>2.1.1</version>
     </dependency>
     <dependency>
       <groupId>com.github.andrewoma.dexx</groupId>
       <artifactId>collection</artifactId>
-      <version>0.6</version>
+      <version>0.7</version>
     </dependency>
     <dependency>
       <groupId>org.pcollections</groupId>

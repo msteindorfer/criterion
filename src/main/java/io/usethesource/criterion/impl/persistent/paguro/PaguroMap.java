@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.criterion.impl.persistent.unclejim;
+package io.usethesource.criterion.impl.persistent.paguro;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -15,11 +15,11 @@ import org.organicdesign.fp.collections.PersistentHashMap;
 import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
 
-public final class UnclejimMap implements JmhMap {
+public final class PaguroMap implements JmhMap {
 
   private final PersistentHashMap<JmhValue, JmhValue> content;
 
-  protected UnclejimMap(PersistentHashMap<JmhValue, JmhValue> content) {
+  protected PaguroMap(PersistentHashMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 
@@ -35,12 +35,12 @@ public final class UnclejimMap implements JmhMap {
 
   @Override
   public JmhMap put(JmhValue key, JmhValue value) {
-    return new UnclejimMap(content.assoc(key, value));
+    return new PaguroMap(content.assoc(key, value));
   }
 
   @Override
   public JmhMap removeKey(JmhValue key) {
-    return new UnclejimMap(content.without(key));
+    return new PaguroMap(content.without(key));
   }
 
   @Override
@@ -72,8 +72,8 @@ public final class UnclejimMap implements JmhMap {
       return false;
     }
 
-    if (other instanceof UnclejimMap) {
-      UnclejimMap that = (UnclejimMap) other;
+    if (other instanceof PaguroMap) {
+      PaguroMap that = (PaguroMap) other;
 
       if (this.size() != that.size()) {
         return false;

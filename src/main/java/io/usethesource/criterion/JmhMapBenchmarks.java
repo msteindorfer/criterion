@@ -513,7 +513,7 @@ public class JmhMapBenchmarks {
 //        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
 //        .param("valueFactoryFactory", "VF_JAVASLANG")
-//        .param("valueFactoryFactory", "VF_UNCLEJIM")
+//        .param("valueFactoryFactory", "VF_PAGURO")
 //        .param("valueFactoryFactory", "VF_DEXX")
 //        .param("valueFactoryFactory", "VF_PCOLLECTIONS")
 //        .param("valueFactoryFactory", "VF_GUAVA_IMMUTABLE")
