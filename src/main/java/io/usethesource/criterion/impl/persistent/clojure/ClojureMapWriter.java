@@ -7,43 +7,20 @@
  */
 package io.usethesource.criterion.impl.persistent.clojure;
 
+import java.lang.invoke.MethodHandle;
+
 import clojure.lang.ITransientMap;
 import clojure.lang.PersistentHashMap;
-import io.usethesource.criterion.api.JmhMap;
 import io.usethesource.criterion.api.JmhValue;
+import io.usethesource.criterion.impl.AbstractMapBuilder;
 
-class ClojureMapWriter implements JmhMap.Builder {
 
-  protected ITransientMap xs;
+final class ClojureMapWriter extends
+    AbstractMapBuilder<JmhValue, ITransientMap> {
 
-  protected ClojureMapWriter() {
-    super();
-
-    this.xs = PersistentHashMap.EMPTY.asTransient();
-  }
-
-  @Override
-  public void put(JmhValue key, JmhValue value) {
-    xs = xs.assoc(key, value);
-  }
-
-  @Override
-  public void putAll(JmhMap map) {
-    for (JmhValue k : map) {
-      xs = xs.assoc(k, map.get(k));
-    }
-  }
-
-  @Override
-  public void putAll(java.util.Map<JmhValue, JmhValue> map) {
-    for (JmhValue k : map.keySet()) {
-      xs = xs.assoc(k, map.get(k));
-    }
-  }
-
-  @Override
-  public JmhMap done() {
-    return new ClojureMap(xs.persistent());
+  ClojureMapWriter() {
+    super(PersistentHashMap.EMPTY.asTransient(), set -> set::assoc,
+        set -> new ClojureMap(set.persistent()));
   }
 
 }

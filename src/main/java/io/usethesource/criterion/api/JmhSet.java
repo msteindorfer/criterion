@@ -40,6 +40,7 @@ public interface JmhSet extends JmhValue, Iterable<JmhValue> {
   @Override
   Iterator<JmhValue> iterator();
 
+  @Deprecated
   java.util.Set<JmhValue> asJavaSet();
 
   interface Builder extends JmhBuilder {
