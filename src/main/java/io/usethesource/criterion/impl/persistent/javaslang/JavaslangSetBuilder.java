@@ -8,13 +8,13 @@
 package io.usethesource.criterion.impl.persistent.javaslang;
 
 import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.impl.AbstractMapBuilder;
-import javaslang.collection.HashMap;
+import io.usethesource.criterion.impl.AbstractSetBuilder;
+import javaslang.collection.HashSet;
 
-final class JavaslangMapBuilder extends AbstractMapBuilder<JmhValue, HashMap<JmhValue, JmhValue>> {
+final class JavaslangSetBuilder extends AbstractSetBuilder<JmhValue, HashSet<JmhValue>> {
 
-  JavaslangMapBuilder() {
-    super(HashMap.empty(), map -> map::put, JavaslangMap::new);
+  JavaslangSetBuilder() {
+    super(HashSet.empty(), set -> set::add, JavaslangSet::new);
   }
 
 }

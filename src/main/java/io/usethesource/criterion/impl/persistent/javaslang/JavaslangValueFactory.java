@@ -8,9 +8,15 @@
 package io.usethesource.criterion.impl.persistent.javaslang;
 
 import io.usethesource.criterion.api.JmhMap;
+import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class JavaslangValueFactory implements JmhValueFactory {
+
+  @Override
+  public JmhSet.Builder setBuilder() {
+    return new JavaslangSetBuilder();
+  }
 
   @Override
   public JmhMap.Builder mapBuilder() {

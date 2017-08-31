@@ -8,14 +8,13 @@
 package io.usethesource.criterion.impl.persistent.unclejim;
 
 import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.impl.AbstractMapBuilder;
-import org.organicdesign.fp.collections.PersistentHashMap;
+import io.usethesource.criterion.impl.AbstractSetBuilder;
+import org.organicdesign.fp.collections.PersistentHashSet;
 
-final class UnclejimMapBuilder extends
-    AbstractMapBuilder<JmhValue, PersistentHashMap<JmhValue, JmhValue>> {
+final class UnclejimSetBuilder extends AbstractSetBuilder<JmhValue, PersistentHashSet<JmhValue>> {
 
-  UnclejimMapBuilder() {
-    super(PersistentHashMap.empty(), set -> set::assoc, UnclejimMap::new);
+  UnclejimSetBuilder() {
+    super(PersistentHashSet.empty(), set -> set::put, UnclejimSet::new);
   }
 
 }

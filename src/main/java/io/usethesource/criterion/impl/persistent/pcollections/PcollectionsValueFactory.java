@@ -8,9 +8,15 @@
 package io.usethesource.criterion.impl.persistent.pcollections;
 
 import io.usethesource.criterion.api.JmhMap;
+import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValueFactory;
 
 public class PcollectionsValueFactory implements JmhValueFactory {
+
+  @Override
+  public JmhSet.Builder setBuilder() {
+    return new PcollectionsSetBuilder();
+  }
 
   @Override
   public JmhMap.Builder mapBuilder() {

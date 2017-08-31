@@ -8,15 +8,14 @@
 package io.usethesource.criterion.impl.persistent.pcollections;
 
 import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.impl.AbstractMapBuilder;
-import org.pcollections.HashPMap;
+import io.usethesource.criterion.impl.AbstractSetBuilder;
 import org.pcollections.HashTreePMap;
+import org.pcollections.MapPSet;
 
-final class PcollectionsMapBuilder extends
-    AbstractMapBuilder<JmhValue, HashPMap<JmhValue, JmhValue>> {
+final class PcollectionsSetBuilder extends AbstractSetBuilder<JmhValue, MapPSet<JmhValue>> {
 
-  PcollectionsMapBuilder() {
-    super(HashTreePMap.empty(), map -> map::plus, PcollectionsMap::new);
+  PcollectionsSetBuilder() {
+    super(MapPSet.from(HashTreePMap.empty()), set -> set::plus, PcollectionsSet::new);
   }
 
 }

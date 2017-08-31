@@ -7,14 +7,14 @@
  */
 package io.usethesource.criterion.impl.persistent.dexx;
 
-import com.github.andrewoma.dexx.collection.HashMap;
+import com.github.andrewoma.dexx.collection.HashSet;
 import io.usethesource.criterion.api.JmhValue;
-import io.usethesource.criterion.impl.AbstractMapBuilder;
+import io.usethesource.criterion.impl.AbstractSetBuilder;
 
-final class DexxMapBuilder extends AbstractMapBuilder<JmhValue, HashMap<JmhValue, JmhValue>> {
+final class DexxSetBuilder extends AbstractSetBuilder<JmhValue, HashSet<JmhValue>> {
 
-  DexxMapBuilder() {
-    super(HashMap.empty(), map -> map::put, DexxMap::new);
+  DexxSetBuilder() {
+    super(HashSet.empty(), set -> set::add, DexxSet::new);
   }
 
 }
