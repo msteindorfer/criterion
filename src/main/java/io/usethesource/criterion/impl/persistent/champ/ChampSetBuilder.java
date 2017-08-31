@@ -8,60 +8,29 @@
 package io.usethesource.criterion.impl.persistent.champ;
 
 import io.usethesource.capsule.Set;
+import io.usethesource.capsule.Set.Transient;
 import io.usethesource.capsule.SetFactory;
 import io.usethesource.criterion.api.JmhSet;
 import io.usethesource.criterion.api.JmhValue;
+import io.usethesource.criterion.impl.AbstractSetBuilder;
 
-class ChampSetBuilder implements JmhSet.Builder {
-
-  protected final Set.Transient<JmhValue> setContent;
-  protected JmhSet constructedSet;
+final class ChampSetBuilder extends
+    AbstractSetBuilder<JmhValue, Set.Immutable<JmhValue>> {
 
   ChampSetBuilder(SetFactory setFactory) {
-    setContent = setFactory.transientOf();
-    constructedSet = null;
-  }
-
-  private void put(JmhValue element) {
-    setContent.__insert(element);
-  }
-
-  @Override
-  public void insert(JmhValue... values) {
-    checkMutation();
-
-    for (JmhValue item : values) {
-      put(item);
-    }
-  }
-
-  @Override
-  public void insertAll(Iterable<? extends JmhValue> collection) {
-    checkMutation();
-
-    for (JmhValue item : collection) {
-      put(item);
-    }
-  }
-
-  @Override
-  public JmhSet done() {
-    if (constructedSet == null) {
-      constructedSet = new ChampSet(setContent.freeze());
-    }
-
-    return constructedSet;
-  }
-
-  private void checkMutation() {
-    if (constructedSet != null) {
-      throw new UnsupportedOperationException("Mutation of a finalized set is not supported.");
-    }
-  }
-
-  @Override
-  public String toString() {
-    return setContent.toString();
+    super(setFactory.of(), set -> set::__insert, ChampSet::new);
   }
 
 }
+
+//final class ChampSetBuilder extends
+//    AbstractSetBuilder<JmhValue, Set.Transient<JmhValue>> {
+//
+//  ChampSetBuilder(SetFactory setFactory) {
+//    super(
+//        setFactory.transientOf(),
+//        set -> (item) -> { set.__insert(item); return set; },
+//        set -> new ChampSet(set.freeze()));
+//  }
+//
+//}

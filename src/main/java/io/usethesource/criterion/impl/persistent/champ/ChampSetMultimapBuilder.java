@@ -7,25 +7,25 @@
  */
 package io.usethesource.criterion.impl.persistent.champ;
 
-import io.usethesource.capsule.api.experimental.SetMultimap;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap;
+import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.criterion.api.JmhSetMultimap;
 import io.usethesource.criterion.api.JmhValue;
 
-final class PersistentChampSetMultimapBuilderNew implements JmhSetMultimap.Builder {
+final class ChampSetMultimapBuilder implements JmhSetMultimap.Builder {
 
   protected SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
   protected JmhSetMultimap constructedMap;
 
-  PersistentChampSetMultimapBuilderNew() {
-    mapContent = TrieSetMultimap.of();
+  ChampSetMultimapBuilder(SetMultimapFactory setMultimapFactory) {
+    mapContent = setMultimapFactory.of();
     constructedMap = null;
   }
 
   @Override
   public void insert(JmhValue key, JmhValue value) {
     checkMutation();
-    mapContent = mapContent.insert(key, value);
+    mapContent = mapContent.__insert(key, value);
   }
 
   protected void checkMutation() {
@@ -37,7 +37,7 @@ final class PersistentChampSetMultimapBuilderNew implements JmhSetMultimap.Build
   @Override
   public JmhSetMultimap done() {
     if (constructedMap == null) {
-      constructedMap = new ChampSetMultimapNew(mapContent);
+      constructedMap = new ChampSetMultimap(mapContent);
     }
 
     return constructedMap;

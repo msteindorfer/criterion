@@ -7,13 +7,10 @@
  */
 package io.usethesource.criterion.impl.persistent.clojure;
 
-import java.lang.invoke.MethodHandle;
-
 import clojure.lang.ITransientMap;
 import clojure.lang.PersistentHashMap;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.impl.AbstractMapBuilder;
-
 
 final class ClojureMapWriter extends
     AbstractMapBuilder<JmhValue, ITransientMap> {

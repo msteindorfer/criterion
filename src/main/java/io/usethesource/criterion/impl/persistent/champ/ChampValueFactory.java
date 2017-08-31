@@ -40,21 +40,21 @@ public class ChampValueFactory implements JmhValueFactory {
 
   @Override
   public JmhMap.Builder mapBuilder() {
-    return new PersistentChampMapBuilder(mapFactory);
+    return new ChampMapBuilder(mapFactory);
   }
 
   @Override
   public JmhSetMultimap.Builder setMultimapBuilder() {
     if (setMultimapFactory == null) {
-      return new PersistentChampSetMultimapBuilderNew();
+      return new ChampSetMultimapBuilderNew();
     } else {
-      return new PersistentChampSetMultimapWriter(setMultimapFactory);
+      return new ChampSetMultimapBuilder(setMultimapFactory);
     }
   }
 
   @Override
   public String toString() {
-    return "VF_PDB_PERSISTENT_CURRENT";
+    return "VF_CHAMP";
   }
 
 }
