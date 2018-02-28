@@ -9,10 +9,10 @@ export VALUE_FACTORY_FACTORY="VF_CHAMP_MULTIMAP_HHAMT,VF_SCALA,VF_CLOJURE"
 
 
 ######
-export SIZE=1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608 # short: 16,2048,1048576
-export RUN=0,1,2,3,4 # short: 0
-export WARMUP_ITERATIONS=3 # 10
-export BENCHMARK_ITERATIONS=3 # 20
+export SIZE=$1 					# long: 1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608 # short: 16,2048,1048576
+export RUN=$2  					# long: 0,1,2,3,4 # short: 0
+export WARMUP_ITERATIONS=$3 	# long: 10 # short: 3
+export BENCHMARK_ITERATIONS=$4 	# long: 20 # short: 3
 #####
 export AGGREGATED_SETTINGS=" -jvmArgsPrepend -Xms8g -jvmArgsPrepend -Xmx8g -jvmArgsPrepend -XX:-TieredCompilation -jvmArgsPrepend -XX:+UseCompressedOops -wi $WARMUP_ITERATIONS -i $BENCHMARK_ITERATIONS -f 1 -r 1 -gc true -rf csv -v NORMAL -foe true -bm avgt -p sampleDataSelection=MATCH -p producer=PDB_INTEGER -p size=$SIZE"
 #####
