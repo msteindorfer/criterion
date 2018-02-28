@@ -285,18 +285,18 @@
     <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule</artifactId>
-      <version>0.3.0</version>
+      <version>0.3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule-experimental</artifactId>
-      <version>0.3.0</version>
+      <version>0.3.1-SNAPSHOT</version>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule-veritas</artifactId>
-      <version>0.3.0</version>
-    </dependency>
+      <version>0.3.1-SNAPSHOT</version>
+    </dependency> -->
     <dependency>
       <groupId>com.pholser</groupId>
       <artifactId>junit-quickcheck-core</artifactId>

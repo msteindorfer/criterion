@@ -1,3 +1,0 @@
-java -Xbootclasspath/a:./target/benchmarks.jar -cp ./target/benchmarks.jar -jar /Users/Michael/Development/rascal-devel/jol/jol-cli/target/jol-internals.jar io.usethesource.capsule.TrieMap_5Bits\$BitmapIndexedMapNode
-
-$GRAAL_HOME/bin/java -Xbootclasspath/a:$PDB_JAR -javaagent:jol-cli/target/jol-internals.jar -jar jol-cli/target/jol-estimates.jar "io.usethesource.capsule.TrieMap_BleedingEdge\$BitmapIndexedMapNode"

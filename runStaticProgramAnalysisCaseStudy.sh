@@ -4,15 +4,14 @@ mvn clean install
 mkdir -p target/results
 mkdir -p target/result-logs
 
-# export DOMINATOR_BENCHMARK_ENUM="SCALA,SCALA_LAZY,CLOJURE_LAZY,CHART,CHART_LAZY"
-export DOMINATOR_BENCHMARK_ENUM="CHART,VF_CHAMP_MULTIMAP_HHAMT" # VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED,VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED
+export DOMINATOR_BENCHMARK_ENUM="CHART,VF_CHAMP_MULTIMAP_HHAMT"
 
 export COMMON_JVM_SETTINGS="-Xms12g -Xmx12g"
 
 # Settings for cache measurements:
 export COMMON_SETTINGS="-wi 3 -i 10 -r 10 -f 1 -t 1 -tu s -to 150m -p run=0 -gc true -rf csv -v EXTRA -foe false -bm ss"
 
-LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "dom.JmhCfgDominatorBenchmarks.timeDominatorCalculation$" -p dominatorBenchmarkEnum=$DOMINATOR_BENCHMARK_ENUM -jvmArgs "$COMMON_JVM_SETTINGS -Doverseer.utils.output.file=./target/result-logs/results.perf-stat.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log" $COMMON_SETTINGS -rff ./target/results/results.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log 1>./target/result-logs/results.std-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log 2>./target/result-logs/results.err-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log
+LD_LIBRARY_PATH=~/lib/ java -jar target/benchmarks.jar "dom.JmhCfgDominatorBenchmarks.timeDominatorCalculation$" -p dominatorBenchmarkEnum=$DOMINATOR_BENCHMARK_ENUM -jvmArgs "$COMMON_JVM_SETTINGS -Doverseer.utils.output.file=./target/result-logs/results.perf-stat.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log" $COMMON_SETTINGS -rff ./target/results/results.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log 2>./target/result-logs/results.err-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log | tee ./target/result-logs/results.std-console.JmhCfgDominatorBenchmarks.timeDominatorCalculation.sizeAll.log
 
 TIMESTAMP=`date +"%Y%m%d_%H%M"`
 

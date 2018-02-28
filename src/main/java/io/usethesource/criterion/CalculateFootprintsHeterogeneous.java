@@ -46,12 +46,6 @@ import io.usethesource.capsule.api.Triple;
 import io.usethesource.capsule.core.PersistentTrieMap;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8_IntKey;
-import io.usethesource.capsule.generators.TripleGenerator;
-import io.usethesource.capsule.generators.multimap.AbstractSetMultimapGenerator;
-import io.usethesource.capsule.generators.multimap.SetMultimapGenerator_HCHAMP;
-import io.usethesource.capsule.generators.relation.AbstractTernaryRelationGenerator;
-import io.usethesource.capsule.generators.relation.BidirectionalTrieSetMultimapGenerator;
-import io.usethesource.capsule.generators.relation.TernaryTrieSetMultimapGenerator;
 import io.usethesource.criterion.BenchmarkUtils.Archetype;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
@@ -114,10 +108,10 @@ public final class CalculateFootprintsHeterogeneous {
 
     final boolean appendToFile = false;
 
-    final int numberOfRuns = 1;
+    final int numberOfRuns = 5;
 
-    final List<Integer> sizes = Arrays
-        .asList(16, 2048, 1048576, 8388608); // createExponentialRangeWithIntermediatePoints();
+    final List<Integer> sizes = Arrays.asList(Stream.of(args[0].split(",")).map(Integer::valueOf).toArray(Integer[]::new));
+    //    .asList(16, 2048, 1048576, 8388608); // createExponentialRangeWithIntermediatePoints();
     final List<Integer> runs = rangeExclusive(0, numberOfRuns);
 
 //    final EnumSet<MemoryFootprintPreset> presets = EnumSet
@@ -127,13 +121,13 @@ public final class CalculateFootprintsHeterogeneous {
         (sizeRunTuple) -> extractAndApply(sizeRunTuple,
             (size, run) -> measurePersistentMultimaps(size, run, DATA_STRUCTURE_OVERHEAD).stream());
 
-    writeToFile(
-        directoryPath.resolve("map_sizes_heterogeneous_tiny.csv"),
-        appendToFile,
-        product(rangeInclusive(0, 100, 1), runs).stream()
-            .flatMap(measureAllMultimaps)
-            .collect(Collectors.toList()));
-
+//    writeToFile(
+//        directoryPath.resolve("map_sizes_heterogeneous_tiny.csv"),
+//        appendToFile,
+//        product(rangeInclusive(0, 100, 1), runs).stream()
+//            .flatMap(measureAllMultimaps)
+//            .collect(Collectors.toList()));
+//
 //    writeToFile(
 //        directoryPath.resolve("map_sizes_heterogeneous_small.csv"),
 //        appendToFile,
@@ -189,11 +183,11 @@ public final class CalculateFootprintsHeterogeneous {
             stepSizeOneToOneSelector, run, preset);
 
     final EnumSet<ValueFactoryFactory> factories = EnumSet
-        .of(VF_CHAMP_MULTIMAP_HCHAMP,
+        .of(//VF_CHAMP_MULTIMAP_HCHAMP,
             VF_CHAMP_MULTIMAP_HHAMT,
             VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED,
-            VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,
-            VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED,
+            //VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,
+            //VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED,
             VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED,
             VF_SCALA,
             VF_CLOJURE);
@@ -286,30 +280,6 @@ public final class CalculateFootprintsHeterogeneous {
     return factories.stream()
         .map(executeExperiment)
         .collect(Collectors.toList());
-  }
-
-  private static void measureBinaryAndTernaryMultimaps() {
-    int elementCount = 1048576;
-
-    final Class<? extends AbstractSetMultimapGenerator<? extends SetMultimap.Immutable>>[] generatorClasses =
-        new Class[]{BidirectionalTrieSetMultimapGenerator.class,
-            SetMultimapGenerator_HCHAMP.class};
-
-    System.out.println("\n\n\n\n");
-
-    {
-      final String result = createAndMeasureXXX_2(TernaryTrieSetMultimapGenerator.class,
-          elementCount, 2, 2, 0, RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER);
-
-      System.out.println("\n" + result + "\n\n\n\n");
-    }
-
-    Arrays.asList(generatorClasses).forEach(clazz -> {
-      final String result = createAndMeasureXXX(clazz, elementCount, 2, 2, 0,
-          RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER);
-
-      System.out.println("\n" + result + "\n\n\n\n");
-    });
   }
 
   // public static void testPrintStatsRandomSmallAndBigIntegers() {
@@ -628,93 +598,8 @@ public final class CalculateFootprintsHeterogeneous {
     };
   }
 
-  public static String createAndMeasureXXX(
-      Class<? extends AbstractSetMultimapGenerator<? extends SetMultimap.Immutable>> generatorClass,
-      int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
-      MemoryFootprintPreset preset) {
-
-    try {
-      final AbstractSetMultimapGenerator<? extends SetMultimap.Immutable> gen =
-          generatorClass.newInstance();
-
-      gen.configure(size(elementCount, elementCount));
-
-      gen.addComponentGenerators(Arrays.asList(new IntegerGenerator(), new IntegerGenerator()));
-
-      final SourceOfRandomness random =
-          new SourceOfRandomness(new Random(seedFromSizeAndRun(elementCount, run)));
-
-      final GenerationStatus status =
-          new SimpleGenerationStatus(new GeometricDistribution(), random, 1);
-
-      final Object setMultimapInstance = gen.generate(random, status);
-
-      // System.out.println(setMultimapInstance);
-
-      return measureAndReport(setMultimapInstance, generatorClass.getName(), DataType.SET_MULTIMAP,
-          Archetype.PERSISTENT, false, elementCount, run, preset);
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
-
-    return "ERROR";
-  }
-
   public static final <T> Class<T> classCast(Class clazz) {
     return (Class<T>) clazz;
-  }
-
-  public static String createAndMeasureXXX_2(
-      Class<? extends AbstractTernaryRelationGenerator<? extends TernaryRelation.Immutable>> generatorClass,
-      int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
-      MemoryFootprintPreset preset) {
-
-    final Class<TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> targetClass = classCast(
-        TernaryRelation.Immutable.class);
-
-    final ComponentizedGenerator<TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> generator =
-        new ComponentizedGenerator(targetClass) {
-          @Override
-          public TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>> generate(
-              SourceOfRandomness sourceOfRandomness, GenerationStatus generationStatus) {
-            return null;
-          }
-        };
-
-    try {
-      final AbstractTernaryRelationGenerator<? extends TernaryRelation.Immutable> gen =
-          generatorClass.newInstance();
-
-      gen.configure(size(elementCount, elementCount));
-
-      Generator<Triple> tripleGenerator = new TripleGenerator();
-      tripleGenerator.addComponentGenerators(
-          Arrays.asList(new IntegerGenerator(), new IntegerGenerator(), new IntegerGenerator()));
-
-      gen.addComponentGenerators(Arrays.asList(new IntegerGenerator(), new IntegerGenerator(),
-          new IntegerGenerator(), tripleGenerator));
-
-      final SourceOfRandomness random =
-          new SourceOfRandomness(new Random(seedFromSizeAndRun(elementCount, run)));
-
-      final GenerationStatus status =
-          new SimpleGenerationStatus(new GeometricDistribution(), random, 1);
-
-      final Object setMultimapInstance = gen.generate(random, status);
-
-      // System.out.println(setMultimapInstance);
-
-      return measureAndReport(setMultimapInstance, generatorClass.getName(), DataType.SET_MULTIMAP,
-          Archetype.PERSISTENT, false, elementCount, run, preset);
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
-
-    return "ERROR";
   }
 
   public static String createAndMeasureTrieSetMultimap(ValueFactoryFactory valueFactoryFactory,
