@@ -31,16 +31,8 @@ PERF_STAT_LOG_FILES=target/result-logs/results.perf-stat.*.log
 
 RESULTS_FILE_PERF_STAT=target/results/results.all-real-world-$TIMESTAMP.perf-stat.log
 
-# PERF_HEADER=`echo $PERF_STAT_LOG_FILES | xargs -n 1 head -n 1 | head -n 1 | sed -e 's/^/benchmark,/'`
-# {
-# 	for f in $PERF_STAT_LOG_FILES
-# 	do
-# 		CURRENT_BENCHMARK=`echo "$f" | sed 's/.*\.time\([^.]*\)\(.*\)/\1/'`
-# 		tail -n +2 $f | sed -e "s/^/$CURRENT_BENCHMARK,/"
-# 	done
-# } | cat <(echo $PERF_HEADER) - | xz -9 > $RESULTS_FILE_PERF_STAT.xz
-
-ARCHIVE_PATH=/Users/Michael/Dropbox/Research/hamt-improved-results
+mkdir -p `pwd`/../data/$TIMESTAMP
+ARCHIVE_PATH=`echo $(cd ../data/$TIMESTAMP; pwd)`
 ARCHIVE_NAME=$ARCHIVE_PATH/hamt-benchmark-results-real-world-$TIMESTAMP.tar.xz
 
 RESULTS_FILES=target/results/results.all-real-world-$TIMESTAMP*
