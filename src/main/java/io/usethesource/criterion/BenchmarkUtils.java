@@ -48,12 +48,6 @@ public class BenchmarkUtils {
         return new io.usethesource.criterion.impl.persistent.scala.ScalaValueFactory();
       }
     },
-    VF_SCALA_STRAWMAN {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.scala_strawman.ScalaValueFactory();
-      }
-    },
     VF_CHAMP {
       @Override
       public JmhValueFactory getInstance() {
