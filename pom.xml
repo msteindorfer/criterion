@@ -9,7 +9,7 @@
   <packaging>jar</packaging>
 
   <scm>
-    <developerConnection>scm:git:https://github.com/msteindorfer/criterion.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/msteindorfer/criterion.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
