@@ -5,6 +5,9 @@
 bin/
 target/
 
+**/*.iml
+**/.idea
+
 git.commit.*.txt
 
 *.log
