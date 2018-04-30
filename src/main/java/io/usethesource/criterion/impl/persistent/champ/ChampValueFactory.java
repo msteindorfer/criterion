@@ -25,12 +25,7 @@ public class ChampValueFactory implements JmhValueFactory {
       final Class<?> targetSetMultimapClass) {
     setFactory = targetSetClass == null ? null : new SetFactory(targetSetClass);
     mapFactory = targetMapClass == null ? null : new MapFactory(targetMapClass);
-
-    if (targetSetMultimapClass == null) {
-      setMultimapFactory = null;
-    } else {
-      setMultimapFactory = new SetMultimapFactory(targetSetMultimapClass);
-    }
+    setMultimapFactory = targetSetMultimapClass == null ? null : new SetMultimapFactory(targetSetMultimapClass);
   }
 
   @Override
@@ -45,11 +40,7 @@ public class ChampValueFactory implements JmhValueFactory {
 
   @Override
   public JmhSetMultimap.Builder setMultimapBuilder() {
-    if (setMultimapFactory == null) {
-      return new ChampSetMultimapBuilderNew();
-    } else {
-      return new ChampSetMultimapBuilder(setMultimapFactory);
-    }
+    return new ChampSetMultimapBuilder(setMultimapFactory);
   }
 
   @Override

@@ -62,13 +62,9 @@ import objectexplorer.ObjectGraphMeasurer.Footprint;
 import org.apache.mahout.math.map.OpenIntIntHashMap;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MAP_AS_MULTIMAP;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_DEXX;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_VAVR;
@@ -191,10 +187,7 @@ public final class CalculateFootprintsHeterogeneous {
     final EnumSet<ValueFactoryFactory> factories = EnumSet
         .of(VF_CHAMP_MULTIMAP_HCHAMP,
             VF_CHAMP_MULTIMAP_HHAMT,
-            VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED,
             VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,
-            VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_INTERLINKED,
-            VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED,
             VF_SCALA,
             VF_CLOJURE);
 
@@ -278,9 +271,8 @@ public final class CalculateFootprintsHeterogeneous {
         (factory) -> createAndMeasureTrieMap(factory, size, run, preset);
 
     final EnumSet<ValueFactoryFactory> factories = EnumSet
-        .of(VF_CHAMP_MAP_AS_MULTIMAP,
-            VF_CHAMP_MULTIMAP_HCHAMP,
-            VF_CHAMP_MULTIMAP_HCHAMP,
+        .of(VF_CHAMP_MULTIMAP_HCHAMP,
+            VF_CHAMP_MULTIMAP_HHAMT,
             VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED);
 
     return factories.stream()
